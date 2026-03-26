@@ -1,0 +1,10 @@
+flask
+flask-cors
+python-whois
+dnspython
+rapidfuzz
+tldextract
+requests
+beautifulsoup4
+lxml
+python-dotenv
