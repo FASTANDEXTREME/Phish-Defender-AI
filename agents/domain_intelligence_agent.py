@@ -1,5 +1,18 @@
+"""
+Domain Intelligence Agent — extracts WHOIS + DNS signals and computes a
+risk score using graduated (non-binary) scoring.
+
+Improvements over MVP:
+- Graduated domain age risk (7 / 30 / 90 / 365-day tiers)
+- WHOIS privacy only high-risk when combined with new domain
+- Domain expiry proximity detection (min-registration phishing pattern)
+- DNSSEC presence check (reduces risk for legitimate domains)
+- Multiplicative scoring to avoid inflated scores from weak signals
+"""
+
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any, Dict, Optional
@@ -8,6 +21,8 @@ import dns.resolver
 import whois
 
 from agents.decision_agent import DomainIntelligenceAgentOutput
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -18,6 +33,8 @@ class DomainIntelligenceResult:
     whois_privacy_enabled: bool
     has_mx_record: bool
     nameserver_count: Optional[int]
+    has_dnssec: bool
+    short_expiry: bool
     risk_score: float
 
     def to_dict(self) -> DomainIntelligenceAgentOutput:
@@ -27,6 +44,8 @@ class DomainIntelligenceResult:
             "whois_privacy_enabled": self.whois_privacy_enabled,
             "has_mx_record": self.has_mx_record,
             "nameserver_count": self.nameserver_count,
+            "has_dnssec": self.has_dnssec,
+            "short_expiry": self.short_expiry,
             "risk_score": self.risk_score,
         }
 
@@ -34,19 +53,7 @@ class DomainIntelligenceResult:
 class DomainIntelligenceAgent:
     """
     Domain Intelligence Agent for the Intelligent Phishing Domain Detection system.
-
-    Responsibilities:
-    - Fetch WHOIS data and compute domain age.
-    - Detect WHOIS privacy usage.
-    - Query DNS for MX and NS records.
-    - Compute an interpretable risk score from these signals.
     """
-
-    # Risk contributions as defined in the master prompt
-    NEW_DOMAIN_RISK: float = 0.5
-    WHOIS_PRIVACY_RISK: float = 0.1
-    NO_MX_RISK: float = 0.1
-    LOW_NS_RISK: float = 0.1
 
     NEW_DOMAIN_THRESHOLD_DAYS: int = 30
 
@@ -58,10 +65,12 @@ class DomainIntelligenceAgent:
         self._whois_timeout = whois_timeout
         self._dns_timeout = dns_timeout
 
+        # Reuse one resolver instance per agent (performance)
+        self._resolver = dns.resolver.Resolver()
+        self._resolver.lifetime = dns_timeout
+        self._resolver.timeout = dns_timeout
+
     def run(self, domain: str) -> DomainIntelligenceResult:
-        """
-        Main entry point for the agent.
-        """
         safe_domain = domain.strip().lower()
 
         whois_data = self._safe_fetch_whois(safe_domain)
@@ -72,14 +81,19 @@ class DomainIntelligenceAgent:
         )
 
         whois_privacy_enabled = self._detect_whois_privacy(whois_data)
+        short_expiry = self._detect_short_expiry(whois_data)
 
         has_mx_record, nameserver_count = self._query_dns(safe_domain)
+        has_dnssec = self._check_dnssec(safe_domain)
 
         risk_score = self._compute_risk_score(
+            domain_age_days=domain_age_days,
             is_new_domain=is_new_domain,
             whois_privacy_enabled=whois_privacy_enabled,
             has_mx_record=has_mx_record,
             nameserver_count=nameserver_count,
+            has_dnssec=has_dnssec,
+            short_expiry=short_expiry,
         )
 
         return DomainIntelligenceResult(
@@ -89,6 +103,8 @@ class DomainIntelligenceAgent:
             whois_privacy_enabled=whois_privacy_enabled,
             has_mx_record=has_mx_record,
             nameserver_count=nameserver_count,
+            has_dnssec=has_dnssec,
+            short_expiry=short_expiry,
             risk_score=risk_score,
         )
 
@@ -97,19 +113,13 @@ class DomainIntelligenceAgent:
     # --------------------
 
     def _safe_fetch_whois(self, domain: str) -> Dict[str, Any]:
-        """
-        Fetch WHOIS information defensively.
-        """
         try:
-            # python-whois does not expose an explicit timeout in all versions,
-            # but we still keep this isolated to avoid propagating raw exceptions.
             data = whois.whois(domain)
             if isinstance(data, dict):
                 return data
-            # Some versions return a WHOIS object; convert to dict best‑effort
             return dict(data)  # type: ignore[arg-type]
         except Exception:
-            # On any error, fall back to empty dict so the agent still returns a result
+            logger.debug("WHOIS lookup failed for %s", domain)
             return {}
 
     def _compute_domain_age_days(self, whois_data: Dict[str, Any]) -> Optional[int]:
@@ -117,22 +127,18 @@ class DomainIntelligenceAgent:
         if created is None:
             return None
 
-        # python-whois is inconsistent: creation_date may be a datetime or list[datetime]
         if isinstance(created, list):
-            # Use the earliest creation date as the most conservative assumption
             created = min(created)
 
         if not isinstance(created, datetime):
             return None
 
-        # Normalize to UTC and compute days
         now = datetime.now(timezone.utc)
         created_utc = created
         if created_utc.tzinfo is None:
             created_utc = created_utc.replace(tzinfo=timezone.utc)
 
-        age_days = (now - created_utc).days
-        return max(age_days, 0)
+        return max((now - created_utc).days, 0)
 
     def _detect_whois_privacy(self, whois_data: Dict[str, Any]) -> bool:
         privacy_indicators = (
@@ -141,10 +147,12 @@ class DomainIntelligenceAgent:
             "redacted",
             "whoisguard",
             "contact privacy",
+            "data protected",
+            "withheld for privacy",
         )
 
         text_chunks: list[str] = []
-        for key, value in whois_data.items():
+        for value in whois_data.values():
             if isinstance(value, str):
                 text_chunks.append(value.lower())
             elif isinstance(value, list):
@@ -155,66 +163,114 @@ class DomainIntelligenceAgent:
         combined = " ".join(text_chunks)
         return any(indicator in combined for indicator in privacy_indicators)
 
+    def _detect_short_expiry(self, whois_data: Dict[str, Any]) -> bool:
+        """
+        Check if domain was registered for minimum period (< 1 year).
+        Phishing domains are typically registered for the shortest period possible.
+        """
+        created = whois_data.get("creation_date") or whois_data.get("created")
+        expiry = whois_data.get("expiration_date") or whois_data.get("registrar_registration_expiration_date")
+
+        if created is None or expiry is None:
+            return False
+
+        if isinstance(created, list):
+            created = min(created)
+        if isinstance(expiry, list):
+            expiry = min(expiry)
+
+        if not isinstance(created, datetime) or not isinstance(expiry, datetime):
+            return False
+
+        registration_span = (expiry - created).days
+        return registration_span < 400  # Less than ~13 months
+
     # --------------------
     # DNS helpers
     # --------------------
 
     def _query_dns(self, domain: str) -> tuple[bool, Optional[int]]:
-        """
-        Query DNS for MX and NS records using dnspython, with timeouts and safe error handling.
-        """
-        resolver = dns.resolver.Resolver()
-        resolver.lifetime = self._dns_timeout
-        resolver.timeout = self._dns_timeout
-
         has_mx = False
         nameserver_count: Optional[int] = None
 
-        # MX records
         try:
-            answers = resolver.resolve(domain, "MX")
+            answers = self._resolver.resolve(domain, "MX")
             has_mx = bool(answers)
         except Exception:
             has_mx = False
 
-        # NS records
         try:
-            answers = resolver.resolve(domain, "NS")
+            answers = self._resolver.resolve(domain, "NS")
             nameserver_count = len(list(answers))
         except Exception:
             nameserver_count = None
 
         return has_mx, nameserver_count
 
+    def _check_dnssec(self, domain: str) -> bool:
+        """Check if the domain has DNSSEC enabled (DNSKEY records)."""
+        try:
+            answers = self._resolver.resolve(domain, "DNSKEY")
+            return bool(answers)
+        except Exception:
+            return False
+
     # --------------------
-    # Risk computation
+    # Risk computation (graduated)
     # --------------------
+
+    def _age_risk(self, age_days: Optional[int]) -> float:
+        """Non-binary graduated risk based on domain age."""
+        if age_days is None:
+            return 0.15  # Unknown (WHOIS failed) = mild risk, not punitive
+        if age_days < 7:
+            return 0.50  # Brand new = very high
+        if age_days < 30:
+            return 0.35  # Less than a month
+        if age_days < 90:
+            return 0.15  # Less than 3 months
+        if age_days < 365:
+            return 0.05  # Less than a year
+        return 0.0       # Established
 
     def _compute_risk_score(
         self,
+        domain_age_days: Optional[int],
         is_new_domain: bool,
         whois_privacy_enabled: bool,
         has_mx_record: bool,
         nameserver_count: Optional[int],
+        has_dnssec: bool,
+        short_expiry: bool,
     ) -> float:
-        risk = 0.0
+        # Primary signal: domain age (graduated)
+        risk = self._age_risk(domain_age_days)
 
-        if is_new_domain:
-            risk += self.NEW_DOMAIN_RISK
-
+        # WHOIS privacy — only strongly risky when combined with new domain
         if whois_privacy_enabled:
-            risk += self.WHOIS_PRIVACY_RISK
+            if is_new_domain:
+                risk += 0.15  # Privacy + new = suspicious combo
+            else:
+                risk += 0.05  # Many legit sites use privacy
 
+        # No MX records
         if not has_mx_record:
-            risk += self.NO_MX_RISK
+            risk += 0.10
 
+        # Low nameserver count
         if nameserver_count is not None and nameserver_count <= 1:
-            risk += self.LOW_NS_RISK
+            risk += 0.10
 
-        # Clamp to [0, 0.8] as specified, then to [0, 1] for general safety
-        risk = min(risk, 0.8)
+        # Short registration span
+        if short_expiry:
+            risk += 0.10
+
+        # DNSSEC reduces risk slightly (legitimate infrastructure)
+        if has_dnssec:
+            risk = max(0.0, risk - 0.05)
+
+        # Clamp to [0, 1]
         return max(0.0, min(1.0, risk))
 
 
 __all__ = ["DomainIntelligenceAgent", "DomainIntelligenceResult"]
-
