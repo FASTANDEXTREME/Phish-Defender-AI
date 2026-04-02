@@ -33,8 +33,8 @@ warnings.filterwarnings("ignore", category=InsecureRequestWarning)
 
 logger = logging.getLogger(__name__)
 
-# Maximum HTML to download (bytes) — phishing pages are typically small
-MAX_RESPONSE_SIZE = 500_000
+# Maximum HTML to download (bytes). Increased to 2MB to accommodate heavy JS/React phishing pages.
+MAX_RESPONSE_SIZE = 2_000_000
 
 
 @dataclass(frozen=True)
@@ -51,6 +51,7 @@ class WebsiteContentResult:
     suspicious_iframes: int
     has_meta_refresh: bool
     has_js_redirect: bool
+    page_title: Optional[str]
     risk_score: float
 
     def to_dict(self) -> WebsiteContentAgentOutput:
@@ -67,6 +68,7 @@ class WebsiteContentResult:
             "suspicious_iframes": self.suspicious_iframes,
             "has_meta_refresh": self.has_meta_refresh,
             "has_js_redirect": self.has_js_redirect,
+            "page_title": self.page_title,
             "risk_score": self.risk_score,
         }
 
@@ -107,6 +109,7 @@ class WebsiteContentAgent:
                 suspicious_iframes=0,
                 has_meta_refresh=False,
                 has_js_redirect=False,
+                page_title=None,
                 risk_score=0.0,
             )
 
@@ -114,16 +117,49 @@ class WebsiteContentAgent:
 
         soup = BeautifulSoup(html, "lxml")
 
-        # --- Forms ---
+        # --- Forms & Inputs ---
         forms = soup.find_all("form")
         forms_count = len(forms)
 
         password_inputs = soup.find_all("input", {"type": "password"})
         password_field_detected = len(password_inputs) > 0
 
-        login_form_detected = any(
-            form.find("input", {"type": "password"}) is not None for form in forms
-        )
+        # Enhance detection for Modern phishing: they often use generic 'text' or 'email' inputs for credentials/OTP/Cards
+        text_inputs = soup.find_all("input", {"type": ["text", "email", "tel", "number", ""]})
+        suspicious_input_detected = False
+        for inp in text_inputs:
+            name = str(inp.get("name", "")).lower()
+            id_ = str(inp.get("id", "")).lower()
+            placeholder = str(inp.get("placeholder", "")).lower()
+            combined_attrs = f"{name} {id_} {placeholder}"
+            
+            # Look for username, email, card, or OTP fields
+            target_keywords = ["email", "user", "login", "password", "otp", "card", "cvv", "phone", "account"]
+            if any(kw in combined_attrs for kw in target_keywords):
+                suspicious_input_detected = True
+                break
+
+        login_form_detected = False
+        for form in forms:
+            has_pw = form.find("input", {"type": "password"}) is not None
+            has_suspicious_txt = False
+            for inp in form.find_all("input", {"type": ["text", "email", "tel", ""]}) + form.find_all("input", class_=True):
+                combined = f"{inp.get('name','')} {inp.get('id','')} {inp.get('placeholder','')} {inp.get('class','')} ".lower()
+                if any(kw in combined for kw in ["email", "user", "otp", "code", "card"]):
+                    has_suspicious_txt = True
+                    break
+            
+            if has_pw or has_suspicious_txt:
+                login_form_detected = True
+                break
+
+        # Fallback if no <form> wrapper exists (React/Vue often just use raw divs and inputs with onClick handlers)
+        if not login_form_detected and (password_field_detected or suspicious_input_detected):
+            login_form_detected = True
+
+        # Extract Title
+        title_tag = soup.find("title")
+        page_title = title_tag.text.strip() if title_tag else ""
 
         # --- Cross-domain form actions ---
         cross_domain_forms = self._count_cross_domain_forms(forms, page_domain)
@@ -174,6 +210,7 @@ class WebsiteContentAgent:
             suspicious_iframes=suspicious_iframes,
             has_meta_refresh=has_meta_refresh,
             has_js_redirect=has_js_redirect,
+            page_title=page_title,
         )
 
         return WebsiteContentResult(
@@ -189,6 +226,7 @@ class WebsiteContentAgent:
             suspicious_iframes=suspicious_iframes,
             has_meta_refresh=has_meta_refresh,
             has_js_redirect=has_js_redirect,
+            page_title=page_title,
             risk_score=risk_score,
         )
 
@@ -207,6 +245,42 @@ class WebsiteContentAgent:
             urls = [f"https://{target}", f"http://{target}"]
 
         for url in urls:
+            # 1. Try Playwright first to catch JS-rendered DOM (React/Vue/etc.)
+            try:
+                from playwright.sync_api import sync_playwright
+                with sync_playwright() as p:
+                    # Launch lightweight headless chromium with anti-bot headers
+                    browser = p.chromium.launch(
+                        headless=True,
+                        args=[
+                            "--disable-blink-features=AutomationControlled",
+                        ]
+                    )
+                    context = browser.new_context(
+                        ignore_https_errors=True,
+                        user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                        viewport={"width": 1920, "height": 1080},
+                        locale="en-US"
+                    )
+                    page = context.new_page()
+                    # Wait for network idle to ensure React/Vue elements fully loaded
+                    try:
+                        page.goto(url, timeout=int(self._timeout * 1000), wait_until="networkidle")
+                    except Exception:
+                        # Fallback to load if networkidle times out
+                        pass
+                    content = page.content()
+                    final_url = page.url
+                    browser.close()
+                    # Enforce size limit
+                    if len(content) > MAX_RESPONSE_SIZE:
+                        content = content[:MAX_RESPONSE_SIZE]
+                    return content, final_url
+            except Exception as pe:
+                logger.debug(f"Playwright failed for {url}: {pe}. Falling back to requests.")
+                pass
+                
+            # 2. Fallback to raw requests
             try:
                 resp = self._session.get(
                     url,
@@ -269,15 +343,23 @@ class WebsiteContentAgent:
         suspicious_iframes: int,
         has_meta_refresh: bool,
         has_js_redirect: bool,
+        page_title: str,
     ) -> float:
         risk = 0.0
 
         # Login form and password field — merged to avoid double-counting.
         # login_form_detected implies password_field_detected, so treat as one signal.
         if login_form_detected:
-            risk += 0.25  # Unified login form signal
+            risk += 0.40  # Unified login form signal (bumped up severity for form pages)
         elif password_field_detected:
-            risk += 0.15  # Bare password field without form context
+            risk += 0.20  # Bare password field without form context
+
+        # Title Impersonation (e.g. title is 'H-E-B Rewards Program' but domain is vercel)
+        # We can safely flag certain keywords in titles
+        if page_title:
+            lower_title = page_title.lower()
+            if any(kw in lower_title for kw in ["secure", "login", "auth", "verify", "account", "webmail", "reward"]):
+                risk += 0.20
 
         # Cross-domain form submissions — strongest credential-harvesting indicator
         if cross_domain_forms > 0:

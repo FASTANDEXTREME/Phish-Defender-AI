@@ -210,11 +210,47 @@ class DecisionAgent:
                 + content_risk * w["content"]
             )
 
+        # -----------------------------------------------------------------
+        # Direct Combo Multipliers (Deadly Phishing Signatures)
+        # -----------------------------------------------------------------
+        # A brand new throwaway domain asking for login/password is a guaranteed flag
+        has_login = content.get("login_form_detected") or content.get("password_field_detected")
+        is_new = intelligence.get("is_new_domain")
+        is_hosted = intelligence.get("is_hosted_platform")
+        strong_sim = float(similarity.get("similarity_score", 0.0) or 0.0) > 0.60
+        
+        # Combo 1: New Domain + Login Form
+        if is_new and has_login:
+            logger.info("Combo detected: New domain + Login Form -> %s", input_domain)
+            score = max(score, 0.65)  # Directly jump to PHISHING confidence
+        
+        # Combo 2: Suspicious Hosting Platform + Login Form + Brand Similarity
+        if is_hosted and has_login and strong_sim:
+            logger.info("Combo detected: Hosting + Login Form + Similarity -> %s", input_domain)
+            score = max(score, 0.85)
+
+        # Combo 3: Obvious Impersonation (Strong Sim) on a Hosted Platform
+        if strong_sim and is_hosted:
+            logger.info("Combo detected: Impersonation on Hosted Platform -> %s", input_domain)
+            score = max(score, 0.75)
+
+        # Combo 4: Pure impersonation (Sim risk very high)
+        if sim_risk >= 0.75:
+            logger.info("Combo detected: Very high similarity risk -> %s", input_domain)
+            score = max(score, 0.65)
+
+        # Combo 5: Explicit Login form detected on ANY suspicious intelligence
+        if has_login and (intel_risk >= 0.40):
+            logger.info("Combo detected: Login Form with Suspicious Intelligence -> %s", input_domain)
+            score = max(score, 0.55)
+
         # Signal amplification — when multiple agents agree on high risk
+        # Lowered threshold from 0.5 to 0.4 so combinations of mid-risk signals still trigger the boost
         high_risk_agents = sum(
-            1 for r in [sim_risk, intel_risk, content_risk] if r >= 0.5
+            1 for r in [sim_risk, intel_risk, content_risk] if r >= 0.40
         )
         if high_risk_agents >= CORROBORATION_THRESHOLD:
+            logger.info("Corroboration: %d agents >= 0.40 -> Applying boost for %s", high_risk_agents, input_domain)
             score = min(1.0, score * CORROBORATION_BOOST)
 
         score = max(0.0, min(1.0, score))
@@ -267,16 +303,17 @@ class DecisionAgent:
         if label == "SAFE":
             return "HIGH" if score < 0.1 else "MEDIUM"
         if label == "PHISHING":
-            return "HIGH" if score >= 0.85 else "MEDIUM"
+            return "HIGH" if score >= min(1.0, PHISHING_THRESHOLD + 0.15) else "MEDIUM"
         # SUSPICIOUS
-        return "MEDIUM" if score >= 0.55 else "LOW"
+        midpoint = SUSPICIOUS_THRESHOLD + ((PHISHING_THRESHOLD - SUSPICIOUS_THRESHOLD) / 2.0)
+        return "MEDIUM" if score >= midpoint else "LOW"
 
     def _compute_severity(
         self, score: float, label: ClassificationLabel, sb: SafeBrowsingAgentOutput
     ) -> SeverityLabel:
         if not sb.get("is_safe", True):
             return "CRITICAL"
-        if label == "PHISHING" and score >= 0.85:
+        if label == "PHISHING" and score >= min(1.0, PHISHING_THRESHOLD + 0.15):
             return "HIGH"
         if label == "PHISHING":
             return "MEDIUM"

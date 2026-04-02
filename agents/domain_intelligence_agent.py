@@ -16,11 +16,14 @@ import logging
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any, Dict, Optional
+from urllib.parse import urlparse
 
 import dns.resolver
 import whois
+import tldextract
 
 from agents.decision_agent import DomainIntelligenceAgentOutput
+from core.config import KNOWN_HOSTING_PLATFORMS
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +33,7 @@ class DomainIntelligenceResult:
     input_domain: str
     domain_age_days: Optional[int]
     is_new_domain: bool
+    is_hosted_platform: bool
     whois_privacy_enabled: bool
     has_mx_record: bool
     nameserver_count: Optional[int]
@@ -41,6 +45,7 @@ class DomainIntelligenceResult:
         return {
             "domain_age_days": self.domain_age_days,
             "is_new_domain": self.is_new_domain,
+            "is_hosted_platform": self.is_hosted_platform,
             "whois_privacy_enabled": self.whois_privacy_enabled,
             "has_mx_record": self.has_mx_record,
             "nameserver_count": self.nameserver_count,
@@ -72,8 +77,23 @@ class DomainIntelligenceAgent:
 
     def run(self, domain: str) -> DomainIntelligenceResult:
         safe_domain = domain.strip().lower()
+        
+        # Clean the input to get just the hostname, as WHOIS fails on full URLs.
+        if "://" not in safe_domain and "/" in safe_domain:
+            parsed = urlparse("http://" + safe_domain)
+        else:
+            parsed = urlparse(safe_domain)
+            
+        safe_domain = parsed.hostname or safe_domain
 
-        whois_data = self._safe_fetch_whois(safe_domain)
+        # For WHOIS, we must query the root domain, not the deep subdomain.
+        ext = tldextract.extract(safe_domain)
+        root_domain = f"{ext.domain}.{ext.suffix}" if ext.domain and ext.suffix else safe_domain
+        
+        # Check if the root domain is a known hosting platform
+        is_hosted_platform = root_domain in KNOWN_HOSTING_PLATFORMS
+
+        whois_data = self._safe_fetch_whois(root_domain)
         domain_age_days = self._compute_domain_age_days(whois_data)
         is_new_domain = (
             domain_age_days is not None
@@ -89,6 +109,7 @@ class DomainIntelligenceAgent:
         risk_score = self._compute_risk_score(
             domain_age_days=domain_age_days,
             is_new_domain=is_new_domain,
+            is_hosted_platform=is_hosted_platform,
             whois_privacy_enabled=whois_privacy_enabled,
             has_mx_record=has_mx_record,
             nameserver_count=nameserver_count,
@@ -100,6 +121,7 @@ class DomainIntelligenceAgent:
             input_domain=safe_domain,
             domain_age_days=domain_age_days,
             is_new_domain=is_new_domain,
+            is_hosted_platform=is_hosted_platform,
             whois_privacy_enabled=whois_privacy_enabled,
             has_mx_record=has_mx_record,
             nameserver_count=nameserver_count,
@@ -237,6 +259,7 @@ class DomainIntelligenceAgent:
         self,
         domain_age_days: Optional[int],
         is_new_domain: bool,
+        is_hosted_platform: bool,
         whois_privacy_enabled: bool,
         has_mx_record: bool,
         nameserver_count: Optional[int],
@@ -245,6 +268,11 @@ class DomainIntelligenceAgent:
     ) -> float:
         # Primary signal: domain age (graduated)
         risk = self._age_risk(domain_age_days)
+        
+        # If WHOIS failed/unknown BUT we know it's a hosting platform, it's a huge risk
+        # Threat actors massively abuse Vercel, Webflow, Pages.dev for free hosting
+        if domain_age_days is None and is_hosted_platform:
+            risk += 0.35  # Bumps the base 0.15 to a punitive 0.50 risk constraint
 
         # WHOIS privacy — only strongly risky when combined with new domain
         if whois_privacy_enabled:

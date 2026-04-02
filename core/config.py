@@ -62,23 +62,46 @@ KNOWN_BRANDS: Dict[str, str] = {
     "binance": "binance.com",
     "kraken": "kraken.com",
     "metamask": "metamask.io",
+    "kucoin": "kucoin.com",
+    "trezor": "trezor.io",
+    "ledger": "ledger.com",
+    "solflare": "solflare.com",
+    "rabby": "rabby.io",
+    "phantom": "phantom.app",
     # E-commerce
     "ebay": "ebay.com",
     "walmart": "walmart.com",
     "shopify": "shopify.com",
     "flipkart": "flipkart.com",
     "alibaba": "alibaba.com",
+    "allegro": "allegro.pl",
+    "heb": "heb.com",
     # Government / Services
     "irs": "irs.gov",
     "usps": "usps.com",
     "fedex": "fedex.com",
     "dhl": "dhl.com",
     "ups": "ups.com",
+    "docomo": "docomo.ne.jp",
+    "optus": "optus.com.au",
+    "mondial": "mondialrelay.fr",
+    "mondialrelay": "mondialrelay.fr",
     # Gaming
     "steam": "steampowered.com",
     "epicgames": "epicgames.com",
     "roblox": "roblox.com",
 }
+
+# ---------------------------------------------------------------------------
+# Free Hosting Platforms (commonly abused for throwaway subdomains)
+# ---------------------------------------------------------------------------
+KNOWN_HOSTING_PLATFORMS: List[str] = [
+    "vercel.app", "webflow.io", "wixstudio.com", "github.io", "pages.dev",
+    "zapier.app", "lovable.app", "godaddysites.com", "web.app", "replit.dev",
+    "edgeone.app", "weebly.com", "mystagingwebsite.com", "kesug.com",
+    "amazonaws.com", "cloudflare.net", "herokuapp.com", "firebaseapp.com",
+    "netlify.app", "glitch.me", "onrender.com", "site123.me", "pantheonsite.io"
+]
 
 # ---------------------------------------------------------------------------
 # Unicode homoglyphs (Cyrillic / IPA → Latin equivalents)
@@ -173,9 +196,9 @@ SCORING_WEIGHTS_WITH_SB = {
     "safe_browsing": 0.35,
 }
 SCORING_WEIGHTS_WITHOUT_SB = {
-    "similarity": 0.40,
-    "intelligence": 0.30,
-    "content": 0.30,
+    "similarity": 0.15,
+    "intelligence": 0.45,
+    "content": 0.40,
 }
 
 # ---------------------------------------------------------------------------
@@ -183,17 +206,18 @@ SCORING_WEIGHTS_WITHOUT_SB = {
 # Max possible score without SB is 1.0 now (with new sim scoring).
 # Lowered from 0.7/0.4 so agents can trigger classification independently.
 # ---------------------------------------------------------------------------
-PHISHING_THRESHOLD: float = 0.60
+PHISHING_THRESHOLD: float = 0.45
 SUSPICIOUS_THRESHOLD: float = 0.30
 
 # ---------------------------------------------------------------------------
 # Signal amplification: if N agents report high risk, boost the score
 # ---------------------------------------------------------------------------
 CORROBORATION_THRESHOLD: int = 2   # number of high-risk agents needed
-CORROBORATION_BOOST: float = 1.30  # was 1.15 — 30% boost for agreement
+CORROBORATION_BOOST: float = 1.50  # 50% boost for agreement
 
 __all__ = [
     "KNOWN_BRANDS",
+    "KNOWN_HOSTING_PLATFORMS",
     "UNICODE_HOMOGLYPHS",
     "HOMOGLYPH_TRANSLATE",
     "PHISHING_DOMAIN_KEYWORDS",

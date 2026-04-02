@@ -74,23 +74,29 @@ class DomainSimilarityAgent:
 
         # Extract once and reuse across all analysis methods
         ext = tldextract.extract(input_value)
-        domain_part = ext.domain or input_value.split(".")[0]
+        
+        # KEY FIX: Include subdomain. Phishing often hides brands here (e.g. kucoin.webflow.io)
+        if ext.subdomain:
+            domain_part = f"{ext.subdomain}.{ext.domain}"
+        else:
+            domain_part = ext.domain or input_value.split(".")[0]
 
         root_domain = f"{ext.domain}.{ext.suffix}" if ext.domain and ext.suffix else (ext.domain or input_value)
         normalized_domain = self._normalize_domain(root_domain)
-        norm_ext = tldextract.extract(normalized_domain)
-        norm_domain_part = norm_ext.domain or normalized_domain.split(".")[0]
+        
+        # We also want the normalized full domain part (subdomain + domain) for matching
+        full_normalized = self._normalize_domain(input_value.replace(f".{ext.suffix}", "") if ext.suffix else input_value)
 
-        brand_name, brand_detected = self._detect_brand_containment(norm_domain_part)
+        brand_name, brand_detected = self._detect_brand_containment(full_normalized)
 
         # Check if the domain itself is exactly the brand name (e.g. "amazon" in "amazon.in")
-        is_exact_brand = domain_part in self._brands
+        is_exact_brand = ext.domain in self._brands
 
         if is_exact_brand:
-            closest_brand = domain_part
+            closest_brand = ext.domain
             similarity_score = 0.0
         else:
-            closest_brand, similarity_score = self._find_closest_brand(normalized_domain, norm_domain_part)
+            closest_brand, similarity_score = self._find_closest_brand(full_normalized, full_normalized)
 
         # Detect phishing keywords in the domain
         phishing_keywords = self._detect_phishing_keywords(domain_part)

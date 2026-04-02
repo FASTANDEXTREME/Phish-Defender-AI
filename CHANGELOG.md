@@ -2,6 +2,26 @@
 
 This changelog documents all structural, architectural, algorithmic, and UI improvements made to transform the Intelligent Phishing Domain Detection System MVP into a robust, production-ready security tool.
 
+## [2.1.1] - 2nd April 2026
+
+### 🚀 Major Upgrades
+- **Playwright JS Rendering Engine (`agents/website_content_agent.py`)**: 
+  - Upgraded the static DOM scraper to a full headless browser (Playwright Chromium) to evaluate obfuscated, dynamically loaded, or JavaScript-heavy React/Vue phishing sites. Includes anti-bot evasion headers.
+
+### 🛡️ Algorithmic Improvements & Bug Fixes
+- **Deep Subdomain Brand Detection (`agents/domain_similarity_agent.py`)**: 
+  - Fixed a critical evasion tactic where phishers hid brands in long subdomains (e.g., `kucoin-login-auth.webflow.io`). The similarity agent now evaluates the entire subdomain string, instead of solely querying the root framework provider.
+- **Deadly Combo Multipliers (`agents/decision_agent.py`)**: 
+  - Restructured decision scoring to instantly bump known phishing vectors into the RED threshold based on categorical combinations (e.g., *Brand Impersonation + Hosted Platform*, or *New Domain + Login Form*).
+- **Free Hosting Platform Awareness (`agents/domain_intelligence_agent.py`, `core/config.py`)**: 
+  - Integrated `tldextract` to correctly retrieve WHOIS data for root domains spanning public suffix platforms (Vercel, Wix, Replit). If WHOIS intentionally fails for a known hosting platform, it receives a severe penalty.
+- **Modern Input Harvester Detection (`agents/website_content_agent.py`)**: 
+  - Expanded parsing logic beyond raw `<input type="password">` to flag suspicious `text`, `email`, `tel`, and `number` inputs frequently abused for OTPs and credit card harvesting. Includes mapping to `<title>` tags for brand impersonation context.
+- **Expanded Brand Catalog (`core/config.py`)**: 
+  - Added new high-value targeted brands spanning global ecommerce, international telecom arrays, and Web3 crypto exchanges (e.g., Kucoin, Trezor, Ledger).
+
+---
+
 ## [2.1.0] - 2nd April 2026
 
 ### 🔧 Production-Level Codebase Optimization
