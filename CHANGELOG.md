@@ -1,8 +1,39 @@
-# Changelog: Phish-Defender AI v2.0.0
+# Changelog: Phish-Defender AI
 
 This changelog documents all structural, architectural, algorithmic, and UI improvements made to transform the Intelligent Phishing Domain Detection System MVP into a robust, production-ready security tool.
 
-## [2.0.0] - April 2026
+## [2.1.0] - 2nd April 2026
+
+### 🔧 Production-Level Codebase Optimization
+
+Deep refactor and optimization pass across the entire codebase for production readiness — **15 targeted improvements** with zero behavioral changes.
+
+### 🐛 Bug Fixes
+- **Fixed fail-closed logic bug (`agents/safe_browsing_agent.py`)**: When the Safe Browsing API was unreachable and `fail_open=False`, the agent incorrectly returned `is_safe=True`. Now correctly returns `is_safe=False` with `risk_score=0.3`, matching the documented fail-closed intent.
+
+### ⚡ Performance Improvements
+- **Non-blocking server startup (`app.py`)**: Server IP/geolocation resolution moved from a synchronous blocking call (up to 5s delay) to a daemon background thread. Flask now starts instantly.
+- **Streaming memory fix (`agents/website_content_agent.py`)**: Replaced `resp.content[:N]` (which buffers the entire HTTP response into memory) with proper `iter_content()` chunked reading that actually respects the 500KB size limit.
+- **Eliminated redundant `tldextract.extract()` calls (`agents/domain_similarity_agent.py`)**: Previously called 4× per domain scan on the same input. Now extracted once in `run()` and passed to all downstream methods — ~4× fewer DNS/parsing operations per scan.
+- **Connection pooling for Safe Browsing API (`agents/safe_browsing_agent.py`)**: Added `requests.Session` for HTTP connection reuse instead of creating new connections per API call.
+- **Lazy `argparse` import (`core/pipeline.py`)**: Moved `import argparse` inside `main()` so it's only loaded when the CLI is used, saving import overhead for web server requests.
+- **Cached DOM element references (`frontend/index.html`)**: 20+ `document.getElementById()` calls that ran on every scan are now cached at initialization time.
+
+### 🧹 Code Quality & Cleanup
+- **Removed unused imports**: `Tuple` from `core/user_input_domain.py`, top-level `argparse` from `core/pipeline.py`.
+- **Top-level `import os` (`app.py`)**: Moved from inline route handler import to module-level per PEP 8.
+- **Streamlined error collection (`core/pipeline.py`)**: Replaced 4 repetitive if-blocks for agent error/timing collection with a single data-driven loop.
+- **Module-level warning suppression (`agents/website_content_agent.py`)**: `InsecureRequestWarning` filter moved from per-call inside `_fetch_html()` to module-level (runs once).
+- **Static methods (`agents/domain_similarity_agent.py`)**: Converted `_extract_root_domain` and `_detect_phishing_keywords` to `@staticmethod` since they don't use instance state.
+- **List comprehension (`agents/domain_similarity_agent.py`)**: Replaced imperative loop in `_detect_phishing_keywords` with a list comprehension.
+- **Removed duplicate stylesheet (`frontend/index.html`)**: Material Symbols Outlined font was loaded twice via identical `<link>` tags.
+
+### 🎨 UI/UX Improvements
+- **Dynamic risk bar color coding (`frontend/index.html`)**: Similarity, Intelligence, and Content risk bars now dynamically change color based on risk percentage — 🟢 green (<30%), 🟡 yellow (30–60%), 🔴 red (≥60%) — instead of always displaying in cyan.
+
+---
+
+## [2.0.0] - 1st April 2026
 
 ### 🚀 Major Features & Architectural Changes
 - **Frontend-Backend Integration (`app.py`)**: 

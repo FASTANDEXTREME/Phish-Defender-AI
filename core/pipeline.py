@@ -14,7 +14,6 @@ import concurrent.futures
 import json
 import logging
 import time
-import argparse
 from typing import Any, Dict, Optional
 
 from agents.decision_agent import DecisionAgent
@@ -90,28 +89,26 @@ def run_pipeline(domain: str) -> Dict[str, Any]:
         content_result, content_time, content_err = future_content.result()
         sb_result, sb_time, sb_err = future_sb.result()
 
-    # Collect timings
-    agent_timings = {
-        "similarity_ms": round(sim_time, 1),
-        "intelligence_ms": round(intel_time, 1),
-        "content_ms": round(content_time, 1),
-        "safe_browsing_ms": round(sb_time, 1),
-    }
+    # Collect timings and errors in one pass
+    _agent_results = [
+        ("similarity",    sim_result,     sim_time,     sim_err,     _DEFAULT_SIMILARITY),
+        ("intelligence",  intel_result,   intel_time,   intel_err,   _DEFAULT_INTELLIGENCE),
+        ("content",       content_result, content_time, content_err, _DEFAULT_CONTENT),
+        ("safe_browsing", sb_result,      sb_time,      sb_err,      _DEFAULT_SAFE_BROWSING),
+    ]
 
-    # Use defaults for failed agents
-    if sim_err:
-        agent_errors["similarity"] = sim_err
-    if intel_err:
-        agent_errors["intelligence"] = intel_err
-    if content_err:
-        agent_errors["content"] = content_err
-    if sb_err:
-        agent_errors["safe_browsing"] = sb_err
+    agent_timings: Dict[str, float] = {}
+    outputs: Dict[str, Dict[str, Any]] = {}
+    for name, result, elapsed, err, default in _agent_results:
+        agent_timings[f"{name}_ms"] = round(elapsed, 1)
+        if err:
+            agent_errors[name] = err
+        outputs[name] = result or default
 
-    similarity_output = sim_result or _DEFAULT_SIMILARITY
-    intelligence_output = intel_result or _DEFAULT_INTELLIGENCE
-    content_output = content_result or _DEFAULT_CONTENT
-    sb_output = sb_result or _DEFAULT_SAFE_BROWSING
+    similarity_output = outputs["similarity"]
+    intelligence_output = outputs["intelligence"]
+    content_output = outputs["content"]
+    sb_output = outputs["safe_browsing"]
 
     # 3) Decision Agent
     result = _decision_agent.run(
@@ -136,6 +133,8 @@ def run_pipeline(domain: str) -> Dict[str, Any]:
 
 
 def main() -> None:
+    import argparse  # Lazy import — only needed for CLI usage
+
     parser = argparse.ArgumentParser(
         description="Run Intelligent Phishing Domain Detection pipeline for a single domain."
     )

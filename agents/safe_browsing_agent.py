@@ -17,7 +17,7 @@ from typing import Any, Dict, List
 import requests
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv()  # Load .env once at import time
 
 logger = logging.getLogger(__name__)
 
@@ -59,6 +59,9 @@ class SafeBrowsingAgent:
         self._timeout = timeout
         self._fail_open = fail_open
 
+        # Connection pooling via Session
+        self._session = requests.Session()
+
         if not self._api_key:
             logger.warning("No Safe Browsing API key configured — agent will return safe by default")
 
@@ -93,7 +96,7 @@ class SafeBrowsingAgent:
 
         try:
             endpoint = self.ENDPOINT_URL.format(self._api_key)
-            response = requests.post(endpoint, json=payload, timeout=self._timeout)
+            response = self._session.post(endpoint, json=payload, timeout=self._timeout)
             response.raise_for_status()
 
             result = response.json()
@@ -126,7 +129,7 @@ class SafeBrowsingAgent:
                 # Fail closed — treat as suspicious
                 return SafeBrowsingResult(
                     input_domain=url,
-                    is_safe=True,
+                    is_safe=False,
                     threat_matches=[],
                     risk_score=0.3,  # Moderate risk when can't verify
                 )

@@ -72,23 +72,28 @@ class DomainSimilarityAgent:
     def run(self, domain_or_url: str) -> DomainSimilarityResult:
         input_value = domain_or_url.strip().lower()
 
-        root_domain = self._extract_root_domain(input_value)
-        normalized_domain = self._normalize_domain(root_domain)
+        # Extract once and reuse across all analysis methods
+        ext = tldextract.extract(input_value)
+        domain_part = ext.domain or input_value.split(".")[0]
 
-        brand_name, brand_detected = self._detect_brand_containment(normalized_domain)
+        root_domain = f"{ext.domain}.{ext.suffix}" if ext.domain and ext.suffix else (ext.domain or input_value)
+        normalized_domain = self._normalize_domain(root_domain)
+        norm_ext = tldextract.extract(normalized_domain)
+        norm_domain_part = norm_ext.domain or normalized_domain.split(".")[0]
+
+        brand_name, brand_detected = self._detect_brand_containment(norm_domain_part)
 
         # Check if the domain itself is exactly the brand name (e.g. "amazon" in "amazon.in")
-        ext = tldextract.extract(input_value)
-        is_exact_brand = ext.domain in self._brands
+        is_exact_brand = domain_part in self._brands
 
         if is_exact_brand:
-            closest_brand = ext.domain
+            closest_brand = domain_part
             similarity_score = 0.0
         else:
-            closest_brand, similarity_score = self._find_closest_brand(normalized_domain)
+            closest_brand, similarity_score = self._find_closest_brand(normalized_domain, norm_domain_part)
 
         # Detect phishing keywords in the domain
-        phishing_keywords = self._detect_phishing_keywords(root_domain)
+        phishing_keywords = self._detect_phishing_keywords(domain_part)
 
         risk_score = self._compute_risk_score(
             brand_detected=brand_detected,
@@ -109,7 +114,8 @@ class DomainSimilarityAgent:
             risk_score=risk_score,
         )
 
-    def _extract_root_domain(self, domain_or_url: str) -> str:
+    @staticmethod
+    def _extract_root_domain(domain_or_url: str) -> str:
         ext = tldextract.extract(domain_or_url)
         if ext.domain and ext.suffix:
             return f"{ext.domain}.{ext.suffix}"
@@ -119,11 +125,8 @@ class DomainSimilarityAgent:
         """Replace homograph characters (Unicode + ASCII look-alikes) to catch impersonation."""
         return domain.translate(HOMOGLYPH_TRANSLATE)
 
-    def _detect_brand_containment(self, normalized_domain: str) -> Tuple[Optional[str], bool]:
-        # Extract just the domain part (no TLD) for checking
-        ext = tldextract.extract(normalized_domain)
-        domain_part = ext.domain or normalized_domain.split(".")[0]
-
+    def _detect_brand_containment(self, domain_part: str) -> Tuple[Optional[str], bool]:
+        """Check if a known brand name is embedded in the domain part."""
         for brand in self._brands:
             if brand in domain_part and brand != domain_part:
                 # Short brands (≤3 chars) must appear as a standalone segment
@@ -134,13 +137,10 @@ class DomainSimilarityAgent:
                 return brand, True
         return None, False
 
-    def _find_closest_brand(self, normalized_domain: str) -> Tuple[Optional[str], float]:
+    def _find_closest_brand(self, normalized_domain: str, domain_part: str) -> Tuple[Optional[str], float]:
         """Multi-algorithm fuzzy matching for better typosquatting detection."""
         best_brand: Optional[str] = None
         best_score: float = 0.0
-
-        ext = tldextract.extract(normalized_domain)
-        domain_part = ext.domain or normalized_domain.split(".")[0]
 
         for brand, legit_domain in self._brands.items():
             # Full domain ratio
@@ -163,19 +163,12 @@ class DomainSimilarityAgent:
 
         return best_brand, best_score
 
-    def _detect_phishing_keywords(self, root_domain: str) -> List[str]:
+    @staticmethod
+    def _detect_phishing_keywords(domain_part: str) -> List[str]:
         """Detect phishing-related keywords in the domain name itself."""
-        ext = tldextract.extract(root_domain)
-        domain_part = ext.domain or root_domain.split(".")[0]
-
         # Split on common delimiters
         parts = domain_part.replace("-", " ").replace("_", " ").replace(".", " ").lower()
-
-        found = []
-        for keyword in PHISHING_DOMAIN_KEYWORDS:
-            if keyword in parts:
-                found.append(keyword)
-        return found
+        return [kw for kw in PHISHING_DOMAIN_KEYWORDS if kw in parts]
 
     def _compute_risk_score(
         self,

@@ -1,11 +1,13 @@
+import logging
+import os
 import re
 import threading
 import webbrowser
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+
 from core.pipeline import run_pipeline
-import logging
 
 # ---------------------------------------------------------------------------
 # App setup — serve frontend/ as static root so index.html is at "/"
@@ -24,16 +26,23 @@ logger = logging.getLogger(__name__)
 # Resolve server identity on startup (non-blocking fallback)
 # ---------------------------------------------------------------------------
 server_info = {"ip": "Unknown", "location": "Unknown"}
-try:
-    import requests as _req
-    _resp = _req.get("https://ipapi.co/json/", timeout=5).json()
-    server_info["ip"] = _resp.get("ip", "Unknown")
-    _city = _resp.get("city", "")
-    _country = _resp.get("country_code", "")
-    server_info["location"] = f"{_city}, {_country}".strip(", ")
-    logger.info("Resolved server identity: %s | %s", server_info["ip"], server_info["location"])
-except Exception as exc:
-    logger.warning("Failed to fetch server IP: %s", exc)
+
+
+def _resolve_server_identity() -> None:
+    """Fetch public IP/location in a background thread so startup isn't blocked."""
+    try:
+        import requests as _req
+        resp = _req.get("https://ipapi.co/json/", timeout=5).json()
+        server_info["ip"] = resp.get("ip", "Unknown")
+        city = resp.get("city", "")
+        country = resp.get("country_code", "")
+        server_info["location"] = f"{city}, {country}".strip(", ")
+        logger.info("Resolved server identity: %s | %s", server_info["ip"], server_info["location"])
+    except Exception as exc:
+        logger.warning("Failed to fetch server IP: %s", exc)
+
+
+threading.Thread(target=_resolve_server_identity, daemon=True).start()
 
 # ---------------------------------------------------------------------------
 # Input validation helpers
@@ -68,7 +77,6 @@ def serve_frontend():
 
 @app.route('/server_info', methods=['GET'])
 def get_server_info():
-    import os
     api_key = os.environ.get("GOOGLE_SAFE_BROWSING_API_KEY", os.environ.get("API_KEY", ""))
     return jsonify({**server_info, "api_key_active": bool(api_key)})
 

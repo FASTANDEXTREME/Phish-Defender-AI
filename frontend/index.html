@@ -12,9 +12,6 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
         rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet" />
     <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -384,6 +381,36 @@
             document.getElementById('stage5')
         ];
 
+        // --- Cache DOM references (avoid re-querying on each scan) ---
+        const riskPanel = document.getElementById('riskPanel');
+        const riskIcon = document.getElementById('riskIcon');
+        const riskLabel = document.getElementById('riskLabel');
+        const riskExplanation = document.getElementById('riskExplanation');
+        const riskScoreEl = document.getElementById('riskScore');
+        const severityBadge = document.getElementById('severityBadge');
+        const confidenceLabelEl = document.getElementById('confidenceLabel');
+        const similarityRiskText = document.getElementById('similarityRiskText');
+        const similarityRiskBar = document.getElementById('similarityRiskBar');
+        const intelRiskText = document.getElementById('intelRiskText');
+        const intelRiskBar = document.getElementById('intelRiskBar');
+        const contentRiskText = document.getElementById('contentRiskText');
+        const contentRiskBar = document.getElementById('contentRiskBar');
+        const sbText = document.getElementById('safeBrowsingText');
+        const sbBar = document.getElementById('safeBrowsingBar');
+        const latencyIndicator = document.getElementById('latencyIndicator');
+        const whoisRegistrar = document.getElementById('whoisRegistrar');
+        const whoisDate = document.getElementById('whoisDate');
+        const whoisExpiry = document.getElementById('whoisExpiry');
+        const scanCountLabel = document.getElementById('scanCountLabel');
+        const scanStatusLabel = document.getElementById('scanStatusLabel');
+        const integrityBar = document.getElementById('integrityBar');
+
+        function riskBarColor(pct) {
+            if (pct >= 60) return 'bg-red-500';
+            if (pct >= 30) return 'bg-yellow-500';
+            return 'bg-emerald-500';
+        }
+
         function updateStage(index, status, detail) {
             const stage = stages[index];
             stage.classList.remove('opacity-40', 'grayscale', 'animate-pulse');
@@ -474,50 +501,41 @@
         let scanCount = 0;
         function incrementScanCount() {
             scanCount++;
-            document.getElementById('scanCountLabel').textContent = `${scanCount} Scan${scanCount !== 1 ? 's' : ''}`;
-            document.getElementById('scanStatusLabel').textContent = 'Active';
+            scanCountLabel.textContent = `${scanCount} Scan${scanCount !== 1 ? 's' : ''}`;
+            scanStatusLabel.textContent = 'Active';
             // Progress bar: cap at 100% after 20 scans
             const pct = Math.min(scanCount * 5, 100);
-            document.getElementById('integrityBar').style.width = `${pct}%`;
+            integrityBar.style.width = `${pct}%`;
         }
 
         function displayResults(data) {
             // Update real latency from pipeline metadata
             if (data.pipeline_metadata && data.pipeline_metadata.total_ms) {
-                document.getElementById('latencyIndicator').textContent =
+                latencyIndicator.textContent =
                     `LATENCY: ${Math.round(data.pipeline_metadata.total_ms)}MS`;
             }
             incrementScanCount();
-            // Risk Panel
-            const riskPanel = document.getElementById('riskPanel');
-            const riskIcon = document.getElementById('riskIcon');
-            const riskLabel = document.getElementById('riskLabel');
-            const riskExplanation = document.getElementById('riskExplanation');
-            const riskScore = document.getElementById('riskScore');
 
             const scorePercent = (data.final_risk_score * 100).toFixed(1);
-            riskScore.textContent = `${scorePercent}%`;
-
-            const severityBadge = document.getElementById('severityBadge');
-            const confidenceLabel = document.getElementById('confidenceLabel');
+            riskScoreEl.textContent = `${scorePercent}%`;
 
             if (data.classification === 'PHISHING') {
                 riskPanel.className = 'flex items-center justify-between p-4 bg-red-500/10 border border-red-500/30 rounded-xl';
                 riskIcon.className = 'size-16 rounded-lg bg-red-500/20 flex items-center justify-center text-red-500';
                 riskLabel.className = 'text-xl font-bold text-red-500 tracking-tight';
-                riskScore.className = 'text-4xl font-black text-red-500 glow-text';
+                riskScoreEl.className = 'text-4xl font-black text-red-500 glow-text';
                 riskLabel.textContent = 'HIGH RISK DETECTED';
             } else if (data.classification === 'SUSPICIOUS') {
                 riskPanel.className = 'flex items-center justify-between p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-xl';
                 riskIcon.className = 'size-16 rounded-lg bg-yellow-500/20 flex items-center justify-center text-yellow-500';
                 riskLabel.className = 'text-xl font-bold text-yellow-500 tracking-tight';
-                riskScore.className = 'text-4xl font-black text-yellow-500 glow-text';
+                riskScoreEl.className = 'text-4xl font-black text-yellow-500 glow-text';
                 riskLabel.textContent = 'SUSPICIOUS DOMAIN';
             } else {
                 riskPanel.className = 'flex items-center justify-between p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl';
                 riskIcon.className = 'size-16 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-500';
                 riskLabel.className = 'text-xl font-bold text-emerald-500 tracking-tight';
-                riskScore.className = 'text-4xl font-black text-emerald-500 glow-text';
+                riskScoreEl.className = 'text-4xl font-black text-emerald-500 glow-text';
                 riskLabel.textContent = 'DOMAIN SEEMS SAFE';
             }
 
@@ -536,7 +554,7 @@
 
             // Confidence label
             if (data.confidence) {
-                confidenceLabel.textContent = `Risk Score · ${data.confidence} Confidence`;
+                confidenceLabelEl.textContent = `Risk Score · ${data.confidence} Confidence`;
             }
 
             riskExplanation.textContent = data.explanation.join(' ');
@@ -544,27 +562,29 @@
             // Metadata & Raw Outputs
             if (data.raw_intelligence) {
                 const date = data.raw_intelligence.domain_age_days ? `${data.raw_intelligence.domain_age_days} days old` : 'Unknown';
-                document.getElementById('whoisDate').textContent = date;
-
-                // For showcase, since we don't have registrar in agent output natively, mark privacy
+                whoisDate.textContent = date;
                 const privacy = data.raw_intelligence.whois_privacy_enabled ? 'Privacy Protected' : 'Public';
-                document.getElementById('whoisRegistrar').textContent = privacy;
-                document.getElementById('whoisExpiry').textContent = data.raw_intelligence.is_new_domain ? 'Recent' : 'Established';
+                whoisRegistrar.textContent = privacy;
+                whoisExpiry.textContent = data.raw_intelligence.is_new_domain ? 'Recent' : 'Established';
             }
 
-            // Risk Bars
-            document.getElementById('similarityRiskText').textContent = `${(data.similarity_risk * 100).toFixed(0)}%`;
-            document.getElementById('similarityRiskBar').style.width = `${data.similarity_risk * 100}%`;
+            // Risk Bars — dynamic color coding
+            const simPct = (data.similarity_risk * 100);
+            similarityRiskText.textContent = `${simPct.toFixed(0)}%`;
+            similarityRiskBar.style.width = `${simPct}%`;
+            similarityRiskBar.className = `h-full ${riskBarColor(simPct)} rounded-full transition-all duration-300`;
 
-            document.getElementById('intelRiskText').textContent = `${(data.intelligence_risk * 100).toFixed(0)}%`;
-            document.getElementById('intelRiskBar').style.width = `${data.intelligence_risk * 100}%`;
+            const intPct = (data.intelligence_risk * 100);
+            intelRiskText.textContent = `${intPct.toFixed(0)}%`;
+            intelRiskBar.style.width = `${intPct}%`;
+            intelRiskBar.className = `h-full ${riskBarColor(intPct)} rounded-full transition-all duration-300`;
 
-            document.getElementById('contentRiskText').textContent = `${(data.content_risk * 100).toFixed(0)}%`;
-            document.getElementById('contentRiskBar').style.width = `${data.content_risk * 100}%`;
+            const contPct = (data.content_risk * 100);
+            contentRiskText.textContent = `${contPct.toFixed(0)}%`;
+            contentRiskBar.style.width = `${contPct}%`;
+            contentRiskBar.className = `h-full ${riskBarColor(contPct)} rounded-full transition-all duration-300`;
 
             // Safe Browsing
-            const sbText = document.getElementById('safeBrowsingText');
-            const sbBar = document.getElementById('safeBrowsingBar');
             if (data.raw_safe_browsing && !data.raw_safe_browsing.is_safe) {
                 sbText.textContent = "Malicious";
                 sbText.className = "text-red-500";

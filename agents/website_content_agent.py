@@ -26,6 +26,11 @@ from bs4 import BeautifulSoup
 from agents.decision_agent import WebsiteContentAgentOutput
 from core.config import SUSPICIOUS_CONTENT_KEYWORDS
 
+# Suppress InsecureRequestWarning once at module level
+import warnings
+from urllib3.exceptions import InsecureRequestWarning
+warnings.filterwarnings("ignore", category=InsecureRequestWarning)
+
 logger = logging.getLogger(__name__)
 
 # Maximum HTML to download (bytes) — phishing pages are typically small
@@ -201,10 +206,6 @@ class WebsiteContentAgent:
         else:
             urls = [f"https://{target}", f"http://{target}"]
 
-        import warnings
-        from urllib3.exceptions import InsecureRequestWarning
-        warnings.simplefilter('ignore', InsecureRequestWarning)
-
         for url in urls:
             try:
                 resp = self._session.get(
@@ -214,8 +215,15 @@ class WebsiteContentAgent:
                     stream=True,
                 )
                 if 200 <= resp.status_code < 400:
-                    # Read only up to MAX_RESPONSE_SIZE
-                    content = resp.content[:MAX_RESPONSE_SIZE]
+                    # Read incrementally up to MAX_RESPONSE_SIZE
+                    chunks: list[bytes] = []
+                    downloaded = 0
+                    for chunk in resp.iter_content(chunk_size=65_536):
+                        chunks.append(chunk)
+                        downloaded += len(chunk)
+                        if downloaded >= MAX_RESPONSE_SIZE:
+                            break
+                    content = b"".join(chunks)[:MAX_RESPONSE_SIZE]
                     return content.decode("utf-8", errors="replace"), resp.url
             except Exception:
                 continue

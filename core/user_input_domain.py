@@ -9,7 +9,6 @@ and returns a clean root domain string for downstream agents.
 
 from dataclasses import dataclass
 import re
-from typing import Tuple
 from urllib.parse import urlparse
 
 
