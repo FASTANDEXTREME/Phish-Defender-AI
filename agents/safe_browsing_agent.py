@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import logging
 import os
+import threading
 from dataclasses import dataclass
 from typing import Any, Dict, List
 
@@ -59,8 +60,8 @@ class SafeBrowsingAgent:
         self._timeout = timeout
         self._fail_open = fail_open
 
-        # Connection pooling via Session
-        self._session = requests.Session()
+        # Thread-safe session pool via threading.local
+        self._thread_local = threading.local()
 
         if not self._api_key:
             logger.warning("No Safe Browsing API key configured — agent will return safe by default")
@@ -96,7 +97,8 @@ class SafeBrowsingAgent:
 
         try:
             endpoint = self.ENDPOINT_URL.format(self._api_key)
-            response = self._session.post(endpoint, json=payload, timeout=self._timeout)
+            session = self._get_session()
+            response = session.post(endpoint, json=payload, timeout=self._timeout)
             response.raise_for_status()
 
             result = response.json()
@@ -133,6 +135,13 @@ class SafeBrowsingAgent:
                     threat_matches=[],
                     risk_score=0.3,  # Moderate risk when can't verify
                 )
+
+
+    def _get_session(self) -> requests.Session:
+        """Return a per-thread requests.Session — thread-safe by isolation."""
+        if not hasattr(self._thread_local, "session"):
+            self._thread_local.session = requests.Session()
+        return self._thread_local.session
 
 
 __all__ = ["SafeBrowsingAgent", "SafeBrowsingResult"]

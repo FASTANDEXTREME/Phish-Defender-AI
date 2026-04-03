@@ -8,14 +8,17 @@ Improvements over MVP:
 - Suspicious iframe detection
 - Meta-refresh and JavaScript redirect detection
 - Expanded keyword set from centralized config
-- Response size limiting (500KB) for performance
-- Connection pooling via requests.Session
+- Response size limiting (2MB) for performance
+- Persistent browser pool for Playwright (reuse instead of launch-per-request)
+- Thread-safe HTTP via per-thread requests.Session
 """
 
 from __future__ import annotations
 
+import atexit
 import logging
 import re
+import threading
 from dataclasses import dataclass
 from typing import List, Optional
 from urllib.parse import urlparse
@@ -35,6 +38,154 @@ logger = logging.getLogger(__name__)
 
 # Maximum HTML to download (bytes). Increased to 2MB to accommodate heavy JS/React phishing pages.
 MAX_RESPONSE_SIZE = 2_000_000
+
+# ---------------------------------------------------------------------------
+# Thread-safe requests.Session pool via threading.local
+# Each thread gets its own Session — no shared state, no race conditions.
+# ---------------------------------------------------------------------------
+_thread_local = threading.local()
+
+_USER_AGENT = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) "
+    "Chrome/120.0.0.0 Safari/537.36"
+)
+
+
+def _get_thread_session() -> requests.Session:
+    """Return a per-thread requests.Session — thread-safe by isolation."""
+    if not hasattr(_thread_local, "session"):
+        session = requests.Session()
+        session.headers.update({"User-Agent": _USER_AGENT})
+        _thread_local.session = session
+    return _thread_local.session
+
+
+# ---------------------------------------------------------------------------
+# Persistent Playwright browser pool
+# Keeps ONE browser alive across requests — creates new contexts per request.
+# Contexts are isolated (separate cookies/storage) but share the same process.
+# ---------------------------------------------------------------------------
+class _BrowserPool:
+    """
+    Manages a persistent Chromium browser instance for Playwright.
+    
+    - One browser process shared across all requests (saves ~200MB RAM per request)
+    - Each request gets a fresh BrowserContext (isolated cookies/storage)
+    - Thread-safe via a lock
+    - Auto-cleanup on process exit via atexit
+    """
+
+    def __init__(self):
+        self._browser = None
+        self._playwright = None
+        self._lock = threading.Lock()
+        self._available = False
+        self._checked = False
+
+    def _ensure_browser(self) -> bool:
+        """Lazily start the persistent browser. Returns True if available."""
+        if self._checked and not self._available:
+            return False
+
+        with self._lock:
+            if self._browser is not None:
+                return True
+            if self._checked:
+                return self._available
+
+            self._checked = True
+            try:
+                from playwright.sync_api import sync_playwright
+                self._playwright = sync_playwright().start()
+                self._browser = self._playwright.chromium.launch(
+                    headless=True,
+                    args=[
+                        "--disable-blink-features=AutomationControlled",
+                        "--no-sandbox",
+                        "--disable-dev-shm-usage",
+                        "--disable-gpu",
+                    ],
+                )
+                self._available = True
+                logger.info("Browser pool: Chromium launched — JS-rendered page analysis enabled")
+                atexit.register(self.shutdown)
+                return True
+            except Exception as exc:
+                self._available = False
+                logger.warning(
+                    "Browser pool: Playwright unavailable (%s). "
+                    "Content agent will use raw HTTP fallback. "
+                    "To enable: pip install playwright && playwright install chromium && playwright install-deps",
+                    exc,
+                )
+                return False
+
+    @property
+    def is_available(self) -> bool:
+        return self._ensure_browser()
+
+    def fetch_page(self, url: str, timeout_ms: int) -> tuple[Optional[str], Optional[str]]:
+        """
+        Fetch a page using the pooled browser. Returns (html, final_url).
+        Creates a fresh context per request for isolation.
+        """
+        if not self._ensure_browser():
+            return None, None
+
+        context = None
+        try:
+            context = self._browser.new_context(
+                ignore_https_errors=True,
+                user_agent=_USER_AGENT,
+                viewport={"width": 1920, "height": 1080},
+                locale="en-US",
+            )
+            page = context.new_page()
+            # Set a hard ceiling on ALL page operations to prevent hung renderers
+            page.set_default_timeout(timeout_ms + 5000)
+            try:
+                page.goto(url, timeout=timeout_ms, wait_until="networkidle")
+            except Exception:
+                pass  # Fallback — page may have partially loaded
+            content = page.content()
+            final_url = page.url
+            return content, final_url
+        except Exception as exc:
+            logger.debug("Browser pool fetch failed for %s: %s", url, exc)
+            # If the browser process crashed, mark as unavailable
+            if "Browser has been closed" in str(exc) or "Target closed" in str(exc):
+                with self._lock:
+                    self._browser = None
+                    self._checked = False
+            return None, None
+        finally:
+            if context:
+                try:
+                    context.close()
+                except Exception:
+                    pass
+
+    def shutdown(self):
+        """Gracefully close the browser and Playwright server."""
+        with self._lock:
+            if self._browser:
+                try:
+                    self._browser.close()
+                except Exception:
+                    pass
+                self._browser = None
+            if self._playwright:
+                try:
+                    self._playwright.stop()
+                except Exception:
+                    pass
+                self._playwright = None
+            self._available = False
+
+
+# Module-level singleton — shared across all WebsiteContentAgent instances
+_browser_pool = _BrowserPool()
 
 
 @dataclass(frozen=True)
@@ -79,19 +230,11 @@ class WebsiteContentAgent:
     """
     Website Content Analysis Agent.
     Downloads HTML content, parses it, and extracts phishing-related signals.
+    Uses a persistent browser pool for Playwright and per-thread HTTP sessions.
     """
 
     def __init__(self, timeout: float = 10.0) -> None:
         self._timeout = timeout
-        # Connection pooling via Session
-        self._session = requests.Session()
-        self._session.headers.update({
-            "User-Agent": (
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/120.0.0.0 Safari/537.36"
-            )
-        })
 
     def run(self, domain: str) -> WebsiteContentResult:
         input_domain = domain.strip().lower()
@@ -254,6 +397,7 @@ class WebsiteContentAgent:
     def _fetch_html(self, target: str) -> tuple[Optional[str], Optional[str]]:
         """
         Try HTTPS first, then HTTP. Return (html, final_url) or (None, None).
+        Uses browser pool for Playwright, per-thread session for HTTP fallback.
         Limits response to MAX_RESPONSE_SIZE bytes.
         """
         if target.startswith("http://") or target.startswith("https://"):
@@ -262,44 +406,20 @@ class WebsiteContentAgent:
             urls = [f"https://{target}", f"http://{target}"]
 
         for url in urls:
-            # 1. Try Playwright first to catch JS-rendered DOM (React/Vue/etc.)
-            try:
-                from playwright.sync_api import sync_playwright
-                with sync_playwright() as p:
-                    # Launch lightweight headless chromium with anti-bot headers
-                    browser = p.chromium.launch(
-                        headless=True,
-                        args=[
-                            "--disable-blink-features=AutomationControlled",
-                        ]
-                    )
-                    context = browser.new_context(
-                        ignore_https_errors=True,
-                        user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                        viewport={"width": 1920, "height": 1080},
-                        locale="en-US"
-                    )
-                    page = context.new_page()
-                    # Wait for network idle to ensure React/Vue elements fully loaded
-                    try:
-                        page.goto(url, timeout=int(self._timeout * 1000), wait_until="networkidle")
-                    except Exception:
-                        # Fallback to load if networkidle times out
-                        pass
-                    content = page.content()
-                    final_url = page.url
-                    browser.close()
-                    # Enforce size limit
+            # 1. Try Playwright browser pool first (JS-rendered DOM)
+            if _browser_pool.is_available:
+                content, final_url = _browser_pool.fetch_page(
+                    url, timeout_ms=int(self._timeout * 1000)
+                )
+                if content is not None:
                     if len(content) > MAX_RESPONSE_SIZE:
                         content = content[:MAX_RESPONSE_SIZE]
                     return content, final_url
-            except Exception as pe:
-                logger.debug(f"Playwright failed for {url}: {pe}. Falling back to requests.")
-                pass
-                
-            # 2. Fallback to raw requests
+
+            # 2. Fallback to raw HTTP (thread-safe per-thread session)
             try:
-                resp = self._session.get(
+                session = _get_thread_session()
+                resp = session.get(
                     url,
                     timeout=self._timeout,
                     verify=False,

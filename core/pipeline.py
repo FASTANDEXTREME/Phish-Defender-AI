@@ -37,6 +37,15 @@ _phishtank_agent = PhishTankAgent()
 _decision_agent = DecisionAgent()
 _uid_module = UserInputDomainModule()
 
+# Pre-warm tldextract's public suffix list cache at startup so the first
+# request doesn't trigger a network download (fails in air-gapped envs).
+try:
+    import tldextract
+    tldextract.extract("warmup.example.com")
+    logger.debug("tldextract public suffix list cache warmed up")
+except Exception:
+    pass
+
 
 def _safe_run_agent(agent, method_name: str, arg: str) -> tuple[Optional[Dict], float, Optional[str]]:
     """

@@ -14,6 +14,9 @@ This changelog documents all structural, architectural, algorithmic, and UI impr
 - **Dynamic Intelligence Toggles**:
   - Implemented query parameter support (`?safebrowsing=true/false` and `?phishtank=true/false`) for granular control over intelligence layers.
   - Updated the backend pipeline and decision agent to dynamically redistribute scoring weights when specific layers are disabled.
+- **Headless Linux Terminal Support**:
+  - Fully hardened for production-grade headless Linux server deployment.
+  - Supports terminal-only environments (no DISPLAY needed) with resource-efficient Playwright pooling and Gunicorn WSGI readiness.
 
 ### 🛡️ Algorithmic Improvements
 - **5-Way Parallel Pipeline (`core/pipeline.py`)**: 

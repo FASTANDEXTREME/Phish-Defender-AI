@@ -24,7 +24,11 @@ logger = logging.getLogger(__name__)
 
 PHISHTANK_URL = "http://data.phishtank.com/data/online-valid.json.gz"
 UPDATE_INTERVAL = 3600  # 1 hour
-CACHE_FILE = os.path.join("data", "phishtank.json.gz")
+
+# Absolute path anchored to project root — works regardless of CWD
+_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_DATA_DIR = os.path.join(_PROJECT_ROOT, "data")
+CACHE_FILE = os.path.join(_DATA_DIR, "phishtank.json.gz")
 
 
 @dataclass(frozen=True)
@@ -55,11 +59,16 @@ class PhishTankAgent:
         self._refreshing = False
 
         # Ensure data directory exists
-        os.makedirs("data", exist_ok=True)
+        os.makedirs(_DATA_DIR, exist_ok=True)
 
         # Attempt to load immediately from disk if available
         if os.path.exists(CACHE_FILE):
             self._load_from_disk()
+        else:
+            # Pre-seed in background at startup so the first user request isn't blocked
+            logger.info("PhishTank cache not found — starting background download at startup")
+            self._refreshing = True
+            threading.Thread(target=self._download_and_cache, daemon=True).start()
 
     def _normalize_url(self, url: str) -> str:
         # Hack to ensure urlparse works if there is no scheme
@@ -130,12 +139,8 @@ class PhishTankAgent:
 
         if needs_refresh:
             self._refreshing = True
-            if not os.path.exists(CACHE_FILE):
-                # If no file exists at all, we must block slightly otherwise we have NO data
-                self._download_and_cache()
-            else:
-                # Lazy background load to prevent latency spike
-                threading.Thread(target=self._download_and_cache, daemon=True).start()
+            # Always refresh in background — never block user requests
+            threading.Thread(target=self._download_and_cache, daemon=True).start()
 
     def run(self, url: str) -> PhishTankResult:
         full_url = url if url.startswith("http") else f"http://{url}"

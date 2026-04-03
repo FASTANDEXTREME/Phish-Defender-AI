@@ -41,8 +41,8 @@ function App() {
 
   return (
     <div className="min-h-screen bg-dark-900 text-gray-200 font-sans selection:bg-primary-500/30 selection:text-white relative overflow-hidden">
-      {/* Global Background elements */}
-      <div className="fixed inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 pointer-events-none mix-blend-overlay"></div>
+      {/* Global Background elements — inline SVG noise, no external CDN dependency */}
+      <div className="fixed inset-0 bg-[url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22 opacity=%220.08%22/%3E%3C/svg%3E')] opacity-20 pointer-events-none mix-blend-overlay"></div>
       
       <Navbar />
 

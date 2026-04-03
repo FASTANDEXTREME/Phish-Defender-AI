@@ -73,9 +73,13 @@ class DomainIntelligenceAgent:
         self._dns_timeout = dns_timeout
 
         # Reuse one resolver instance per agent (performance)
+        # Use explicit fallback nameservers for consistent behavior across environments
         self._resolver = dns.resolver.Resolver()
         self._resolver.lifetime = dns_timeout
         self._resolver.timeout = dns_timeout
+        # Fallback: if system DNS is unreliable, use well-known public resolvers
+        if not self._resolver.nameservers:
+            self._resolver.nameservers = ["1.1.1.1", "8.8.8.8"]
 
     def run(self, domain: str) -> DomainIntelligenceResult:
         safe_domain = domain.strip().lower()
