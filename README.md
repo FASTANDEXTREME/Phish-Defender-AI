@@ -1,24 +1,41 @@
 # Phish-Defender AI 🛡️
 
-Phish-Defender AI is a multi-agent cybersecurity intelligence system designed to detect phishing and malicious websites. Instead of relying on a single detection method, it orchestrates four specialized AI agents to analyze domains, perform DNS/WHOIS lookups, scrape live website content via headless Chromium, and evaluate brand similarity in real-time.
+Phish-Defender AI is a multi-agent cybersecurity intelligence system designed to detect phishing and malicious websites. It orchestrates five specialized AI agents to analyze domains, perform DNS/WHOIS lookups, scrape live website content via a modern headless browser, and cross-reference multiple global threat intelligence databases in real-time.
+
+---
 
 ## 🌟 Project Overview
 
 The system accepts a domain or URL, validates it against Server-Side Request Forgery (SSRF) attempts, and analyzes it concurrently. It calculates a weighted risk score and outputs a final classification, confidence level, and detailed explanation. 
 
-The entire backend and the visual "Command Center" frontend are seamlessly integrated, with the Python Flask server directly hosting the UI natively and updating live telemetry data.
+The latest version features a **completely reworked modern UI** and integrated **PhishTank Threat Intelligence**, providing a robust defense against zero-day phishing attacks.
+
+---
+
+## 🔥 Key Features (v2.2.0)
+
+- ✅ **New UI / Command Center**: Rebuilt from the ground up using **Vite, React, and Tailwind CSS** for a premium, high-performance experience.
+- ✅ **PhishTank Integration**: Real-time cross-referencing against the PhishTank global phishing database.
+- ✅ **Dynamic API Toggles**: Ability to enable/disable **Google Safe Browsing** and **PhishTank** intelligence layers on-the-fly.
+- ✅ **5-Way Parallel Pipeline**: Concurrent execution of all intelligence agents with per-agent error isolation.
+- ✅ **Headless JS Rendering**: Full JavaScript execution via Playwright Chromium to catch obfuscated phishing kits.
 
 ---
 
 ## 🏗️ System Architecture & Workflow
 
 ### 1. The Pipeline (`core/pipeline.py`)
-When a scan initializes, the pipeline starts a `ThreadPoolExecutor` to run all four intelligence agents fully in parallel. It isolates errors per agent—meaning if one agent fails (e.g., a WHOIS timeout), it falls back to a safe default rather than crashing the scan. It also calculates granular latency metadata for the frontend.
+When a scan initializes, the pipeline starts a `ThreadPoolExecutor` to run all specialized intelligence agents fully in parallel. It isolates errors per agent—meaning if one agent fails (e.g., a network timeout), it falls back to a safe default rather than crashing the scan. It also calculates granular latency metadata for the frontend.
 
 ### 2. The Specialized Agents
+- **PhishTank Intelligence Agent (`phishtank_agent.py`)** [NEW]
+  - Queries the PhishTank global database of confirmed phishing URLs.
+  - **Zero-Latency Lookups**: Operates on a local O(1) set-based cache for millisecond response times.
+  - **Automated Sync**: Performs non-blocking background refreshes of the threat dataset every hour.
+  - **No API Key Required**: Works out-of-the-box with public data downloads.
 - **Google Safe Browsing Agent (`safe_browsing_agent.py`)** 
   - Queries Google's Safe Browsing API v4.
-  - **Authoritative Override:** If Google flags the URL as a threat, it triggers an immediate pipeline override, forcing a `1.0` (CRITICAL) risk score and a `PHISHING` classification, bypassing other agent opinions.
+  - **Authoritative Override**: If Google flags the URL as a threat, it triggers an immediate pipeline override, forcing a `1.0` (CRITICAL) risk score and a `PHISHING` classification.
 - **Domain Similarity Agent (`domain_similarity_agent.py`)** 
   - Detects typosquatting, brand impersonation, and homograph attacks.
   - Evaluates the **entire subdomain string**, catching impersonated brands deeply nested on free hosting platforms (e.g., `kucoin.webflow.io`).
@@ -32,12 +49,11 @@ When a scan initializes, the pipeline starts a `ThreadPoolExecutor` to run all f
   - Identifies contextual WHOIS privacy protections and short-expiry domains (registered for only 1 year and expiring within 30 days).
 - **Website Content Agent (`website_content_agent.py`)** 
   - Utilizes **Playwright Headless Chromium** to render obfuscated, dynamically loaded, or JavaScript-heavy pages fully before analysis.
-  - Limits payload to 2MB to prevent memory bomb-attacks.
-  - Searches for high-risk credential harvesting indicators, parsing not just `<input type="password">` but recognizing generic `email`, `tel`, and `code` inputs frequently abused for OTPs.
-  - Analyzes the page `<title>` for brand impersonation context and tracks cross-domain `<form>` submissions, excessive hidden `<input>` fields, iframe injections, and automated Meta/JS redirects.
+  - Recognizes generic `email`, `tel`, and `code` inputs frequently abused for OTPs and credential harvesting.
+  - Tracks cross-domain `<form>` submissions, iframe injections, and automated Meta/JS redirects.
 
 ### 3. The Decision Engine (`decision_agent.py`)
-- Aggregates the numerical risk scores (0.0 to 1.0) from all four agents.
+- Aggregates the numerical risk scores (0.0 to 1.0) from all **five** specialized agents.
 - **Deadly Combo Multipliers:** Applies immediate, massive risk multipliers for known zero-day heuristics (e.g., New Domain + Login Form, or Brand Similarity + Free Hosting Platform), instantly bypassing simple algorithm masking to score as `PHISHING/SUSPICIOUS`.
 - **Dynamic Weight Redistribution:** If Google Safe Browsing returns "safe", the algorithm dynamically redistributes its mathematical weight entirely to the custom Intelligence (45%), Content (40%), and Similarity (15%) agents, allowing them to independently catch zero-day attacks.
 - Applies a **50% Corroboration Boost** to the final score if two or more agents independently detect high risk (score `>= 0.40`).
@@ -69,13 +85,12 @@ For this rigorous stress test, **Google Safe Browsing was completely disabled**,
 
 ## 💻 Tech Stack
 - **Backend**: Python 3.8+, Flask, Flask-CORS
+- **Frontend**: **Vite, React, Tailwind CSS** (Modern High-Performance Stack)
 - **Concurrency**: Python `concurrent.futures`
 - **Dynamic Rendering**: `playwright`
 - **Scraping & Parsing**: `requests`, `beautifulsoup4`, `lxml`
 - **String Matching**: `rapidfuzz` (Levenshtein based fuzzy matching)
 - **Domain/DNS tools**: `python-whois`, `dnspython`, `tldextract`
-- **Environment**: `python-dotenv`
-- **Frontend**: HTML5, Vanilla CSS (Tailwind via CDN for utility), Vanilla JavaScript (Fetch API)
 
 ---
 
@@ -83,7 +98,8 @@ For this rigorous stress test, **Google Safe Browsing was completely disabled**,
 
 ### Prerequisites
 - Python 3.8 or higher.
-- A free [Google Safe Browsing API Key](https://developers.google.com/safe-browsing) (Optional, but highly recommended for the override layer).
+- Node.js (for frontend development, optional for production if using bundled `dist`).
+- A [Google Safe Browsing API Key](https://developers.google.com/safe-browsing) (Optional).
 
 ### Instructions
 1. **Clone the repository:**
@@ -103,7 +119,7 @@ For this rigorous stress test, **Google Safe Browsing was completely disabled**,
    playwright install chromium
    ```
 4. **Configure API Keys:**
-   Create a `.env` file in the root directory and add your key. Without it, the Safe Browsing Agent gracefully fails-open and relies entirely on the custom AI agents.
+   Create a `.env` file in the root directory. Safe Browsing is optional; PhishTank requires no key.
    ```env
    GOOGLE_SAFE_BROWSING_API_KEY=your_api_key_here
    ```
@@ -111,7 +127,13 @@ For this rigorous stress test, **Google Safe Browsing was completely disabled**,
    ```bash
    python app.py
    ```
-   The application will automatically boot the server and open your default system browser to the Command Center UI (`http://127.0.0.1:5000`).
+
+### Dynamic Toggles
+The system supports dynamic enabling/disabling of intelligence layers via query parameters:
+- `?safebrowsing=false`: Disable Google Safe Browsing layer.
+- `?phishtank=false`: Disable PhishTank layer.
+
+Example: `http://127.0.0.1:5000/analyze?domain=example.com&safebrowsing=true&phishtank=false`
 
 ---
 

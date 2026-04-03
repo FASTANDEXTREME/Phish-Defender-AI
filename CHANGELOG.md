@@ -2,6 +2,27 @@
 
 This changelog documents all structural, architectural, algorithmic, and UI improvements made to transform the Intelligent Phishing Domain Detection System MVP into a robust, production-ready security tool.
 
+## [2.2.0] - 3rd April 2026
+
+### 🚀 Major Features & Architectural Changes
+- **Major Frontend Rework**: 
+  - Fully migrated the legacy Vanilla HTML/JS frontend to a modern **Vite + React + Tailwind CSS** stack.
+  - Implemented a premium, high-performance UI with enhanced glassmorphism and real-time state management.
+- **PhishTank Threat Intelligence Integration (`agents/phishtank_agent.py`)**: 
+  - Added a fifth intelligence agent that cross-references URLs against the official PhishTank global phishing database.
+  - Features O(1) set-based lookups and automated, non-blocking background dataset refreshes (1-hour interval).
+- **Dynamic Intelligence Toggles**:
+  - Implemented query parameter support (`?safebrowsing=true/false` and `?phishtank=true/false`) for granular control over intelligence layers.
+  - Updated the backend pipeline and decision agent to dynamically redistribute scoring weights when specific layers are disabled.
+
+### 🛡️ Algorithmic Improvements
+- **5-Way Parallel Pipeline (`core/pipeline.py`)**: 
+  - Expanded the concurrent execution engine to support 5 agents (Similarity, Intelligence, Content, Google Safe Browsing, PhishTank) with per-agent error isolation.
+- **Decision Score Integration (`agents/decision_agent.py`)**: 
+  - Integrated PhishTank signals into the decision engine, providing high-risk overrides that work in tandem with Google Safe Browsing.
+
+---
+
 ## [2.1.1] - 2nd April 2026
 
 ### 🚀 Major Upgrades
