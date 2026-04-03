@@ -39,6 +39,7 @@ class DomainIntelligenceResult:
     nameserver_count: Optional[int]
     has_dnssec: bool
     short_expiry: bool
+    ssl_valid: bool
     risk_score: float
 
     def to_dict(self) -> DomainIntelligenceAgentOutput:
@@ -51,6 +52,7 @@ class DomainIntelligenceResult:
             "nameserver_count": self.nameserver_count,
             "has_dnssec": self.has_dnssec,
             "short_expiry": self.short_expiry,
+            "ssl_valid": self.ssl_valid,
             "risk_score": self.risk_score,
         }
 
@@ -105,6 +107,7 @@ class DomainIntelligenceAgent:
 
         has_mx_record, nameserver_count = self._query_dns(safe_domain)
         has_dnssec = self._check_dnssec(safe_domain)
+        ssl_valid = self._check_ssl_certificate(safe_domain)
 
         risk_score = self._compute_risk_score(
             domain_age_days=domain_age_days,
@@ -115,6 +118,7 @@ class DomainIntelligenceAgent:
             nameserver_count=nameserver_count,
             has_dnssec=has_dnssec,
             short_expiry=short_expiry,
+            ssl_valid=ssl_valid,
         )
 
         return DomainIntelligenceResult(
@@ -127,6 +131,7 @@ class DomainIntelligenceAgent:
             nameserver_count=nameserver_count,
             has_dnssec=has_dnssec,
             short_expiry=short_expiry,
+            ssl_valid=ssl_valid,
             risk_score=risk_score,
         )
 
@@ -237,6 +242,20 @@ class DomainIntelligenceAgent:
         except Exception:
             return False
 
+    def _check_ssl_certificate(self, domain: str) -> bool:
+        """Check if the domain has a valid SSL certificate."""
+        import ssl
+        import socket
+        try:
+            context = ssl.create_default_context()
+            with socket.create_connection((domain, 443), timeout=self._dns_timeout) as sock:
+                with context.wrap_socket(sock, server_hostname=domain) as ssock:
+                    cert = ssock.getpeercert()
+                    return bool(cert)
+        except Exception as e:
+            logger.debug("SSL check failed for %s: %s", domain, e)
+            return False
+
     # --------------------
     # Risk computation (graduated)
     # --------------------
@@ -265,14 +284,21 @@ class DomainIntelligenceAgent:
         nameserver_count: Optional[int],
         has_dnssec: bool,
         short_expiry: bool,
+        ssl_valid: bool,
     ) -> float:
         # Primary signal: domain age (graduated)
         risk = self._age_risk(domain_age_days)
         
-        # If WHOIS failed/unknown BUT we know it's a hosting platform, it's a huge risk
-        # Threat actors massively abuse Vercel, Webflow, Pages.dev for free hosting
-        if domain_age_days is None and is_hosted_platform:
-            risk += 0.35  # Bumps the base 0.15 to a punitive 0.50 risk constraint
+        # Valid SSL acts as a strong health signal, reducing risk.
+        if ssl_valid:
+            if domain_age_days is None:
+                # If WHOIS failed but SSL is valid, heavily discount the unknown age penalty
+                risk = max(0.0, risk - 0.10)
+            else:
+                risk = max(0.0, risk - 0.05)
+        else:
+            # Missing SSL on a modern web app is suspicious
+            risk += 0.15
 
         # WHOIS privacy — only strongly risky when combined with new domain
         if whois_privacy_enabled:

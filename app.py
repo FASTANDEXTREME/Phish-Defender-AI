@@ -10,9 +10,9 @@ from flask_cors import CORS
 from core.pipeline import run_pipeline
 
 # ---------------------------------------------------------------------------
-# App setup — serve frontend/ as static root so index.html is at "/"
+# App setup — serve frontend/dist as static root so index.html is at "/"
 # ---------------------------------------------------------------------------
-app = Flask(__name__, static_folder='frontend', static_url_path='')
+app = Flask(__name__, static_folder='frontend/dist', static_url_path='')
 CORS(app)
 
 # Configure logging
@@ -84,15 +84,17 @@ def get_server_info():
 @app.route('/analyze', methods=['GET'])
 def analyze():
     raw_domain = request.args.get('domain', '')
+    safebrowsing_enabled = request.args.get('safebrowsing', 'true').lower() == 'true'
+    phishtank_enabled = request.args.get('phishtank', 'true').lower() == 'true'
     try:
         domain = _validate_domain(raw_domain)
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
 
-    logger.info("Analyzing domain: %s", domain)
+    logger.info("Analyzing domain: %s | safebrowsing=%s | phishtank=%s", domain, safebrowsing_enabled, phishtank_enabled)
 
     try:
-        result = run_pipeline(domain)
+        result = run_pipeline(domain, safebrowsing_enabled=safebrowsing_enabled, phishtank_enabled=phishtank_enabled)
         return jsonify(result)
     except ValueError as e:
         logger.error("Validation error for %s: %s", domain, e)

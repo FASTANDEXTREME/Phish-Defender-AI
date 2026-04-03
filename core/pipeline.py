@@ -21,6 +21,7 @@ from agents.domain_intelligence_agent import DomainIntelligenceAgent
 from agents.domain_similarity_agent import DomainSimilarityAgent
 from agents.website_content_agent import WebsiteContentAgent
 from agents.safe_browsing_agent import SafeBrowsingAgent
+from agents.phishtank_agent import PhishTankAgent
 from core.user_input_domain import UserInputDomainModule
 
 logger = logging.getLogger(__name__)
@@ -32,6 +33,7 @@ _similarity_agent = DomainSimilarityAgent()
 _intelligence_agent = DomainIntelligenceAgent()
 _content_agent = WebsiteContentAgent()
 _safe_browsing_agent = SafeBrowsingAgent()
+_phishtank_agent = PhishTankAgent()
 _decision_agent = DecisionAgent()
 _uid_module = UserInputDomainModule()
 
@@ -54,12 +56,13 @@ def _safe_run_agent(agent, method_name: str, arg: str) -> tuple[Optional[Dict], 
 
 # Default safe outputs for when an agent fails
 _DEFAULT_SIMILARITY: Dict[str, Any] = {"risk_score": 0.0, "similarity_score": 0.0, "brand_detected": None}
-_DEFAULT_INTELLIGENCE: Dict[str, Any] = {"risk_score": 0.0, "is_new_domain": False, "has_mx_record": True}
-_DEFAULT_CONTENT: Dict[str, Any] = {"risk_score": 0.0, "page_reachable": False}
-_DEFAULT_SAFE_BROWSING: Dict[str, Any] = {"risk_score": 0.0, "is_safe": True, "threat_matches": []}
+_DEFAULT_INTELLIGENCE: Dict[str, Any] = {"risk_score": 0.0, "is_new_domain": False, "has_mx_record": True, "ssl_valid": False}
+_DEFAULT_CONTENT: Dict[str, Any] = {"risk_score": 0.0, "page_reachable": False, "legitimate_app_behavior": False}
+_DEFAULT_SAFE_BROWSING: Dict[str, Any] = {"risk_score": 0.0, "is_safe": True, "threat_matches": [], "is_disabled": False}
+_DEFAULT_PHISHTANK: Dict[str, Any] = {"risk_score": 0.0, "is_phishing": False, "is_disabled": False}
 
 
-def run_pipeline(domain: str) -> Dict[str, Any]:
+def run_pipeline(domain: str, safebrowsing_enabled: bool = True, phishtank_enabled: bool = True) -> Dict[str, Any]:
     """
     End-to-end pipeline:
     1. Clean and validate domain
@@ -78,16 +81,29 @@ def run_pipeline(domain: str) -> Dict[str, Any]:
     agent_errors: Dict[str, str] = {}
     agent_timings: Dict[str, float] = {}
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
         future_sim = executor.submit(_safe_run_agent, _similarity_agent, "run", clean_domain)
         future_intel = executor.submit(_safe_run_agent, _intelligence_agent, "run", clean_domain)
         future_content = executor.submit(_safe_run_agent, _content_agent, "run", full_url)
-        future_sb = executor.submit(_safe_run_agent, _safe_browsing_agent, "run", full_url)
+        
+        if safebrowsing_enabled:
+            future_sb = executor.submit(_safe_run_agent, _safe_browsing_agent, "run", full_url)
+        if phishtank_enabled:
+            future_pt = executor.submit(_safe_run_agent, _phishtank_agent, "run", full_url)
 
         sim_result, sim_time, sim_err = future_sim.result()
         intel_result, intel_time, intel_err = future_intel.result()
         content_result, content_time, content_err = future_content.result()
-        sb_result, sb_time, sb_err = future_sb.result()
+        
+        if safebrowsing_enabled:
+            sb_result, sb_time, sb_err = future_sb.result()
+        else:
+            sb_result, sb_time, sb_err = {"risk_score": 0.0, "is_safe": True, "threat_matches": [], "is_disabled": True}, 0.0, None
+
+        if phishtank_enabled:
+            pt_result, pt_time, pt_err = future_pt.result()
+        else:
+            pt_result, pt_time, pt_err = {"risk_score": 0.0, "is_phishing": False, "is_disabled": True}, 0.0, None
 
     # Collect timings and errors in one pass
     _agent_results = [
@@ -95,6 +111,7 @@ def run_pipeline(domain: str) -> Dict[str, Any]:
         ("intelligence",  intel_result,   intel_time,   intel_err,   _DEFAULT_INTELLIGENCE),
         ("content",       content_result, content_time, content_err, _DEFAULT_CONTENT),
         ("safe_browsing", sb_result,      sb_time,      sb_err,      _DEFAULT_SAFE_BROWSING),
+        ("phishtank",     pt_result,      pt_time,      pt_err,      _DEFAULT_PHISHTANK),
     ]
 
     agent_timings: Dict[str, float] = {}
@@ -105,17 +122,13 @@ def run_pipeline(domain: str) -> Dict[str, Any]:
             agent_errors[name] = err
         outputs[name] = result or default
 
-    similarity_output = outputs["similarity"]
-    intelligence_output = outputs["intelligence"]
-    content_output = outputs["content"]
-    sb_output = outputs["safe_browsing"]
-
     # 3) Decision Agent
     result = _decision_agent.run(
-        similarity=similarity_output,
-        intelligence=intelligence_output,
-        content=content_output,
-        safe_browsing=sb_output,
+        similarity=outputs["similarity"],
+        intelligence=outputs["intelligence"],
+        content=outputs["content"],
+        safe_browsing=outputs["safe_browsing"],
+        phishtank=outputs["phishtank"],
     )
 
     output = result.to_dict()

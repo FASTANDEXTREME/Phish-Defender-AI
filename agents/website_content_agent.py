@@ -52,6 +52,7 @@ class WebsiteContentResult:
     has_meta_refresh: bool
     has_js_redirect: bool
     page_title: Optional[str]
+    legitimate_app_behavior: bool
     risk_score: float
 
     def to_dict(self) -> WebsiteContentAgentOutput:
@@ -69,6 +70,7 @@ class WebsiteContentResult:
             "has_meta_refresh": self.has_meta_refresh,
             "has_js_redirect": self.has_js_redirect,
             "page_title": self.page_title,
+            "legitimate_app_behavior": self.legitimate_app_behavior,
             "risk_score": self.risk_score,
         }
 
@@ -110,6 +112,7 @@ class WebsiteContentAgent:
                 has_meta_refresh=False,
                 has_js_redirect=False,
                 page_title=None,
+                legitimate_app_behavior=False,
                 risk_score=0.0,
             )
 
@@ -199,6 +202,18 @@ class WebsiteContentAgent:
             raw_html,
         ))
 
+        is_legitimate_app = (
+            not login_form_detected and
+            not password_field_detected and
+            not suspicious_found and
+            cross_domain_forms == 0 and
+            hidden_inputs_count < 3 and
+            suspicious_iframes == 0 and
+            not has_meta_refresh and
+            not has_js_redirect and
+            bool(page_title)
+        )
+
         risk_score = self._compute_risk_score(
             login_form_detected=login_form_detected,
             password_field_detected=password_field_detected,
@@ -211,6 +226,7 @@ class WebsiteContentAgent:
             has_meta_refresh=has_meta_refresh,
             has_js_redirect=has_js_redirect,
             page_title=page_title,
+            is_legitimate_app=is_legitimate_app,
         )
 
         return WebsiteContentResult(
@@ -227,6 +243,7 @@ class WebsiteContentAgent:
             has_meta_refresh=has_meta_refresh,
             has_js_redirect=has_js_redirect,
             page_title=page_title,
+            legitimate_app_behavior=is_legitimate_app,
             risk_score=risk_score,
         )
 
@@ -344,8 +361,13 @@ class WebsiteContentAgent:
         has_meta_refresh: bool,
         has_js_redirect: bool,
         page_title: str,
+        is_legitimate_app: bool,
     ) -> float:
         risk = 0.0
+
+        if is_legitimate_app:
+            # Baseline risk reduction for normal pages
+            risk -= 0.20
 
         # Login form and password field — merged to avoid double-counting.
         # login_form_detected implies password_field_detected, so treat as one signal.
@@ -384,7 +406,7 @@ class WebsiteContentAgent:
         if has_meta_refresh or has_js_redirect:
             risk += 0.05
 
-        return max(0.0, min(1.0, risk))
+        return max(-0.20, min(1.0, risk))
 
 
 __all__ = ["WebsiteContentAgent", "WebsiteContentResult"]

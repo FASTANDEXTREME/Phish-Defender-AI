@@ -54,6 +54,7 @@ class DomainIntelligenceAgentOutput(TypedDict, total=False):
     nameserver_count: int | None
     has_dnssec: bool
     short_expiry: bool
+    ssl_valid: bool
     risk_score: float
 
 
@@ -70,6 +71,7 @@ class WebsiteContentAgentOutput(TypedDict, total=False):
     suspicious_iframes: int
     has_meta_refresh: bool
     has_js_redirect: bool
+    legitimate_app_behavior: bool
     risk_score: float
 
 
@@ -78,6 +80,14 @@ class SafeBrowsingAgentOutput(TypedDict, total=False):
     is_safe: bool
     threat_matches: List[Dict[str, Any]]
     risk_score: float
+    is_disabled: bool
+
+
+class PhishTankAgentOutput(TypedDict, total=False):
+    input_domain: str
+    is_phishing: bool
+    risk_score: float
+    is_disabled: bool
 
 
 # ---------------------------------------------------------------------------
@@ -100,6 +110,7 @@ class DecisionAgentResult:
     intelligence_risk: float
     content_risk: float
     safe_browsing_risk: float
+    phishtank_risk: float
     final_risk_score: float
     classification: ClassificationLabel
     confidence: ConfidenceLabel
@@ -110,6 +121,7 @@ class DecisionAgentResult:
     raw_intelligence: DomainIntelligenceAgentOutput
     raw_content: WebsiteContentAgentOutput
     raw_safe_browsing: SafeBrowsingAgentOutput
+    raw_phishtank: PhishTankAgentOutput
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -118,6 +130,7 @@ class DecisionAgentResult:
             "intelligence_risk": self.intelligence_risk,
             "content_risk": self.content_risk,
             "safe_browsing_risk": self.safe_browsing_risk,
+            "phishtank_risk": self.phishtank_risk,
             "final_risk_score": self.final_risk_score,
             "classification": self.classification,
             "confidence": self.confidence,
@@ -128,6 +141,7 @@ class DecisionAgentResult:
             "raw_intelligence": self.raw_intelligence,
             "raw_content": self.raw_content,
             "raw_safe_browsing": self.raw_safe_browsing,
+            "raw_phishtank": self.raw_phishtank,
         }
 
 
@@ -146,14 +160,16 @@ class DecisionAgent:
         intelligence: DomainIntelligenceAgentOutput,
         content: WebsiteContentAgentOutput,
         safe_browsing: SafeBrowsingAgentOutput,
+        phishtank: PhishTankAgentOutput,
     ) -> DecisionAgentResult:
 
-        input_domain = self._resolve_input_domain(similarity, intelligence, content, safe_browsing)
+        input_domain = self._resolve_input_domain(similarity, intelligence, content, safe_browsing, phishtank)
 
         sim_risk = float(similarity.get("risk_score", 0.0) or 0.0)
         intel_risk = float(intelligence.get("risk_score", 0.0) or 0.0)
         content_risk = float(content.get("risk_score", 0.0) or 0.0)
         sb_risk = float(safe_browsing.get("risk_score", 0.0) or 0.0)
+        pt_risk = float(phishtank.get("risk_score", 0.0) or 0.0)
 
         # -----------------------------------------------------------------
         # OVERRIDE: Google Safe Browsing is an authoritative trust layer
@@ -161,7 +177,7 @@ class DecisionAgent:
         if not safe_browsing.get("is_safe", True):
             logger.warning("Safe Browsing override: %s flagged as malicious", input_domain)
             explanation_items = self._build_explanation_items(
-                similarity, intelligence, content, safe_browsing, 1.0, "PHISHING"
+                similarity, intelligence, content, safe_browsing, phishtank, 1.0, "PHISHING"
             )
             # Prepend the critical override message
             override_item = ExplanationItem(
@@ -178,6 +194,7 @@ class DecisionAgent:
                 intel_risk=intel_risk,
                 content_risk=content_risk,
                 sb_risk=sb_risk,
+                pt_risk=pt_risk,
                 final_risk_score=1.0,
                 classification="PHISHING",
                 confidence="HIGH",
@@ -187,6 +204,7 @@ class DecisionAgent:
                 intelligence=intelligence,
                 content=content,
                 safe_browsing=safe_browsing,
+                phishtank=phishtank,
             )
 
         # -----------------------------------------------------------------
@@ -218,31 +236,53 @@ class DecisionAgent:
         is_new = intelligence.get("is_new_domain")
         is_hosted = intelligence.get("is_hosted_platform")
         strong_sim = float(similarity.get("similarity_score", 0.0) or 0.0) > 0.60
+        ssl_valid = intelligence.get("ssl_valid", False)
+        legitimate_app = content.get("legitimate_app_behavior", False)
         
         # Combo 1: New Domain + Login Form
         if is_new and has_login:
             logger.info("Combo detected: New domain + Login Form -> %s", input_domain)
-            score = max(score, 0.65)  # Directly jump to PHISHING confidence
+            score += 0.20
         
         # Combo 2: Suspicious Hosting Platform + Login Form + Brand Similarity
         if is_hosted and has_login and strong_sim:
             logger.info("Combo detected: Hosting + Login Form + Similarity -> %s", input_domain)
-            score = max(score, 0.85)
+            score += 0.25
 
         # Combo 3: Obvious Impersonation (Strong Sim) on a Hosted Platform
         if strong_sim and is_hosted:
             logger.info("Combo detected: Impersonation on Hosted Platform -> %s", input_domain)
-            score = max(score, 0.75)
+            score += 0.20
 
         # Combo 4: Pure impersonation (Sim risk very high)
         if sim_risk >= 0.75:
             logger.info("Combo detected: Very high similarity risk -> %s", input_domain)
-            score = max(score, 0.65)
+            score += 0.20
 
         # Combo 5: Explicit Login form detected on ANY suspicious intelligence
         if has_login and (intel_risk >= 0.40):
             logger.info("Combo detected: Login Form with Suspicious Intelligence -> %s", input_domain)
-            score = max(score, 0.55)
+            score += 0.15
+
+        # -----------------------------------------------------------------
+        # PhishTank Override (High Suspicion / High Risk)
+        # -----------------------------------------------------------------
+        if phishtank.get("is_phishing", False):
+            logger.warning("PhishTank override: %s flagged", input_domain)
+            score = max(0.44, score)  # High risk but not exclusively >0.45 solely from PhishTank
+            
+            # Note: We append the item manually to the explanation items array later, 
+            # or rely on `_build_explanation_items` below so we don't duplicate.
+
+        # -----------------------------------------------------------------
+        # Graceful Degradation (Positive Signals)
+        # -----------------------------------------------------------------
+        if legitimate_app and ssl_valid:
+            logger.info("Graceful degradation: legitimate behavior and valid SSL -> %s", input_domain)
+            # significantly reduce the score since it behaves completely like a valid app
+            score = max(0.0, score - 0.30)
+        elif legitimate_app:
+            score = max(0.0, score - 0.15)
 
         # Signal amplification — when multiple agents agree on high risk
         # Lowered threshold from 0.5 to 0.4 so combinations of mid-risk signals still trigger the boost
@@ -260,7 +300,7 @@ class DecisionAgent:
         severity = self._compute_severity(score, classification, safe_browsing)
 
         explanation_items = self._build_explanation_items(
-            similarity, intelligence, content, safe_browsing, score, classification
+            similarity, intelligence, content, safe_browsing, phishtank, score, classification
         )
 
         return self._build_result(
@@ -269,6 +309,7 @@ class DecisionAgent:
             intel_risk=intel_risk,
             content_risk=content_risk,
             sb_risk=sb_risk,
+            pt_risk=pt_risk,
             final_risk_score=round(score, 4),
             classification=classification,
             confidence=confidence,
@@ -278,6 +319,7 @@ class DecisionAgent:
             intelligence=intelligence,
             content=content,
             safe_browsing=safe_browsing,
+            phishtank=phishtank,
         )
 
     # ------------------------------------------------------------------
@@ -329,6 +371,7 @@ class DecisionAgent:
         intel_risk: float,
         content_risk: float,
         sb_risk: float,
+        pt_risk: float,
         final_risk_score: float,
         classification: ClassificationLabel,
         confidence: ConfidenceLabel,
@@ -338,6 +381,7 @@ class DecisionAgent:
         intelligence: DomainIntelligenceAgentOutput,
         content: WebsiteContentAgentOutput,
         safe_browsing: SafeBrowsingAgentOutput,
+        phishtank: PhishTankAgentOutput,
     ) -> DecisionAgentResult:
         # Build both a flat human-readable list and a structured detail list
         explanation_strings = [item.signal for item in explanation_items]
@@ -352,6 +396,7 @@ class DecisionAgent:
             intelligence_risk=intel_risk,
             content_risk=content_risk,
             safe_browsing_risk=sb_risk,
+            phishtank_risk=pt_risk,
             final_risk_score=final_risk_score,
             classification=classification,
             confidence=confidence,
@@ -362,6 +407,7 @@ class DecisionAgent:
             raw_intelligence=intelligence,
             raw_content=content,
             raw_safe_browsing=safe_browsing,
+            raw_phishtank=phishtank,
         )
 
     # ------------------------------------------------------------------
@@ -374,6 +420,7 @@ class DecisionAgent:
         intelligence: DomainIntelligenceAgentOutput,
         content: WebsiteContentAgentOutput,
         safe_browsing: SafeBrowsingAgentOutput,
+        phishtank: PhishTankAgentOutput,
         final_score: float,
         classification: ClassificationLabel,
     ) -> List[ExplanationItem]:
@@ -392,6 +439,14 @@ class DecisionAgent:
                 category="safe_browsing",
                 signal="Google Safe Browsing flagged this URL as malicious.",
                 impact="critical",
+            ))
+
+        # --- PhishTank ---
+        if phishtank.get("is_phishing", False):
+            items.append(ExplanationItem(
+                category="phishtank",
+                signal="CRITICAL: PhishTank database flagged this URL as a high risk link.",
+                impact="high",
             ))
 
         # --- Similarity ---
@@ -462,6 +517,19 @@ class DecisionAgent:
                 impact="medium",
             ))
 
+        if intelligence.get("ssl_valid"):
+            items.append(ExplanationItem(
+                category="intelligence",
+                signal="Domain has a valid SSL certificate.",
+                impact="low",  # positive impact, but kept visually as info
+            ))
+        else:
+            items.append(ExplanationItem(
+                category="intelligence",
+                signal="Domain lacks a valid SSL certificate.",
+                impact="medium",
+            ))
+
         # --- Content ---
         if not content.get("page_reachable", True):
             items.append(ExplanationItem(
@@ -516,6 +584,13 @@ class DecisionAgent:
                 impact="medium",
             ))
 
+        if content.get("legitimate_app_behavior"):
+            items.append(ExplanationItem(
+                category="content",
+                signal="Page structure and behavior appear legitimate (safe content).",
+                impact="low",  # positive
+            ))
+
         # Fallback
         if len(items) == 1:
             items.append(ExplanationItem(
@@ -532,6 +607,7 @@ __all__ = [
     "DomainIntelligenceAgentOutput",
     "WebsiteContentAgentOutput",
     "SafeBrowsingAgentOutput",
+    "PhishTankAgentOutput",
     "DecisionAgentResult",
     "DecisionAgent",
     "ExplanationItem",
