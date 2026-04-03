@@ -13,7 +13,9 @@ from core.pipeline import run_pipeline
 # ---------------------------------------------------------------------------
 # App setup — serve frontend/dist as static root so index.html is at "/"
 # ---------------------------------------------------------------------------
-app = Flask(__name__, static_folder='frontend/dist', static_url_path='')
+_base_dir = os.path.dirname(os.path.abspath(__file__))
+_dist_folder = os.path.join(_base_dir, 'frontend', 'dist')
+app = Flask(__name__, static_folder=_dist_folder, static_url_path='')
 CORS(app)
 
 # Configure logging
