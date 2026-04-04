@@ -21,6 +21,7 @@ from agents.domain_intelligence_agent import DomainIntelligenceAgent
 from agents.domain_similarity_agent import DomainSimilarityAgent
 from agents.website_content_agent import WebsiteContentAgent
 from agents.safe_browsing_agent import SafeBrowsingAgent
+from core.cross_reference_engine import CrossReferenceEngine
 from agents.phishtank_agent import PhishTankAgent
 from core.user_input_domain import UserInputDomainModule
 
@@ -34,6 +35,7 @@ _intelligence_agent = DomainIntelligenceAgent()
 _content_agent = WebsiteContentAgent()
 _safe_browsing_agent = SafeBrowsingAgent()
 _phishtank_agent = PhishTankAgent()
+_cross_reference_engine = CrossReferenceEngine()
 _decision_agent = DecisionAgent()
 _uid_module = UserInputDomainModule()
 
@@ -131,13 +133,28 @@ def run_pipeline(domain: str, safebrowsing_enabled: bool = True, phishtank_enabl
             agent_errors[name] = err
         outputs[name] = result or default
 
-    # 3) Decision Agent
+    # 3) Cross-Reference Engine (correlates signals across agents)
+    cre_start = time.monotonic()
+    try:
+        cross_ref_result = _cross_reference_engine.run(
+            similarity=outputs["similarity"],
+            intelligence=outputs["intelligence"],
+            content=outputs["content"],
+        )
+    except Exception as exc:
+        logger.exception("Cross-Reference Engine failed")
+        cross_ref_result = {"cross_ref_risk_score": 0.0, "brand_content_mismatch": False}
+        agent_errors["cross_reference"] = str(exc)
+    agent_timings["cross_reference_ms"] = round((time.monotonic() - cre_start) * 1000, 1)
+
+    # 4) Decision Agent
     result = _decision_agent.run(
         similarity=outputs["similarity"],
         intelligence=outputs["intelligence"],
         content=outputs["content"],
         safe_browsing=outputs["safe_browsing"],
         phishtank=outputs["phishtank"],
+        cross_reference=cross_ref_result,
     )
 
     output = result.to_dict()

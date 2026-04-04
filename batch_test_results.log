@@ -1,46 +1,517 @@
 Loading links from file...
-Loaded 55917 total links.
+Loaded 55870 total links.
 Bypassing SafeBrowsing & PhishTank & sweeping file for 100 LIVE links...
 ================================================================================
 
-[Scanning #1] https://yvibptl.cn/w/2/da/ds=docomos/
-  -> Pre-checking connection... DEAD. Skipping.
-
-[Scanning #2] https://gdobcwk.cn/w/2/da/ds=docomos/
-  -> Pre-checking connection... DEAD. Skipping.
-
-[Scanning #3] http://suite-trezor.netlify.app
+[Scanning #1] https://tydytdytyddyi484ytfty.blogspot.com/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
   ====== [SUCCESS # 1/100 LIVE DOMAIN] ======
-  Classification : PHISHING
-  Risk Level     : HIGH (Score: 0.815)
+  Classification : SUSPICIOUS
+  Risk Level     : LOW (Score: 0.34)
   Reasons/Explanations:
-    - Final risk score 0.81 -> classified as PHISHING.
-    - Domain resembles known brand 'trezor' with similarity 90%.
+    - Final risk score 0.34 -> classified as SUSPICIOUS.
     - Domain has no MX (mail) records — unusual for legitimate domains.
     - Domain has a valid SSL certificate.
-    - Page structure and behavior appear legitimate (safe content).
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
 
-[Scanning #4] https://suite-trezor.netlify.app/
+[Scanning #2] https://robloxmodsapk.com/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
+Brand impersonation detected on robloxmodsapk.com: page references brands ['meta']
+CRE: Brand-content mismatch detected (brands: ['meta'])
   ====== [SUCCESS # 2/100 LIVE DOMAIN] ======
   Classification : PHISHING
-  Risk Level     : HIGH (Score: 0.815)
+  Risk Level     : HIGH (Score: 1.0)
   Reasons/Explanations:
-    - Final risk score 0.81 -> classified as PHISHING.
+    - Final risk score 1.00 -> classified as PHISHING.
+    - Domain resembles known brand 'roblox' with similarity 90%.
+    - Domain is relatively young (309 days old).
+    - WHOIS privacy is enabled, hiding registrant information.
+    - Domain registered for minimum period (< 1 year) — common in throwaway phishing domains.
+    - Domain has a valid SSL certificate.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+    - BRAND IMPERSONATION: Page content references brand(s) [meta] but domain does not match.
+    - Cross-Reference Engine risk score: 0.75
+
+[Scanning #3] https://unlock-apple.com/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #4] https://ccfhab.cn/w/2/da/ds=docomos/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #5] https://esjkut.cn/w/2/da/ds=docomos/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #6] https://mtqogl.cn/ds2/e/2qe=docomotiaos/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #7] https://krk-telegram.com.cn/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+Brand impersonation detected on krk-telegram.com.cn: page references brands ['apple']
+CRE: Brand-content mismatch detected (brands: ['apple'])
+  ====== [SUCCESS # 3/100 LIVE DOMAIN] ======
+  Classification : PHISHING
+  Risk Level     : HIGH (Score: 1.0)
+  Reasons/Explanations:
+    - Final risk score 1.00 -> classified as PHISHING.
+    - Domain resembles known brand 'telegram' with similarity 90%.
+    - Domain is relatively young (67 days old).
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain registered for minimum period (< 1 year) — common in throwaway phishing domains.
+    - Domain has a valid SSL certificate.
+    - BRAND IMPERSONATION: Page content references brand(s) [apple] but domain does not match.
+    - Cross-Reference Engine risk score: 0.75
+
+[Scanning #8] https://ton-telegram.network/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+Brand impersonation detected on ton-telegram.network: page references brands ['google', 'instagram', 'twitter', 'github', 'chase', 'regions', 'binance']
+CRE: Brand-content mismatch detected (brands: ['google', 'instagram', 'twitter', 'github', 'chase', 'regions', 'binance'])
+  ====== [SUCCESS # 4/100 LIVE DOMAIN] ======
+  Classification : PHISHING
+  Risk Level     : HIGH (Score: 1.0)
+  Reasons/Explanations:
+    - Final risk score 1.00 -> classified as PHISHING.
+    - Domain resembles known brand 'telegram' with similarity 90%.
+    - Domain has a valid SSL certificate.
+    - Suspicious iframe(s) embedding external content.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+    - BRAND IMPERSONATION: Page content references brand(s) [google, instagram, twitter, github, chase] but domain does not match.
+    - Cross-Reference Engine risk score: 0.75
+
+[Scanning #9] https://org-telegram.hl.cn/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #10] https://www.trx-okx-app.com/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #11] https://managesuite-trezor.com/?input_24=u9gF7CLkbfiDdHpefDWOG8AxaGKzbat2X%5B...%5DlttwpJ0Pl760qn14RBLLN6qx9K0JbpU5CE03qBQQn2SksdRadvYlqTSBA%3D%3D
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+  ====== [SUCCESS # 5/100 LIVE DOMAIN] ======
+  Classification : PHISHING
+  Risk Level     : HIGH (Score: 1.0)
+  Reasons/Explanations:
+    - Final risk score 1.00 -> classified as PHISHING.
     - Domain resembles known brand 'trezor' with similarity 90%.
+    - Domain registered very recently (0 days old).
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain registered for minimum period (< 1 year) — common in throwaway phishing domains.
+    - Domain has a valid SSL certificate.
+    - Page structure and behavior appear legitimate (safe content).
+
+[Scanning #12] https://www.robloxhack.cheatmodonline.com/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+  ====== [SUCCESS # 6/100 LIVE DOMAIN] ======
+  Classification : PHISHING
+  Risk Level     : MEDIUM (Score: 0.545)
+  Reasons/Explanations:
+    - Final risk score 0.54 -> classified as PHISHING.
+    - Domain resembles known brand 'roblox' with similarity 90%.
+    - WHOIS privacy is enabled, hiding registrant information.
     - Domain has no MX (mail) records — unusual for legitimate domains.
     - Domain has a valid SSL certificate.
     - Page structure and behavior appear legitimate (safe content).
 
-[Scanning #5] https://canaldecomunicacionanonimocopeinca.com/docomo/
+[Scanning #13] https://okx-web3-tron-usdt-trc20-000000313.pages.dev/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
+  ====== [SUCCESS # 7/100 LIVE DOMAIN] ======
+  Classification : SAFE
+  Risk Level     : INFO (Score: 0.295)
+  Reasons/Explanations:
+    - Final risk score 0.30 -> classified as SAFE.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain has a valid SSL certificate.
+
+[Scanning #14] https://zoom.murigu.com/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+  ====== [SUCCESS # 8/100 LIVE DOMAIN] ======
+  Classification : PHISHING
+  Risk Level     : MEDIUM (Score: 0.575)
+  Reasons/Explanations:
+    - Final risk score 0.57 -> classified as PHISHING.
+    - Domain resembles known brand 'zoom' with similarity 90%.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain lacks a valid SSL certificate.
+    - Page structure and behavior appear legitimate (safe content).
+
+[Scanning #15] https://okx-web3-tron-usdt-trc20-000000475.pages.dev/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
+  ====== [SUCCESS # 9/100 LIVE DOMAIN] ======
+  Classification : SAFE
+  Risk Level     : INFO (Score: 0.095)
+  Reasons/Explanations:
+    - Final risk score 0.10 -> classified as SAFE.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain has a valid SSL certificate.
+
+[Scanning #16] https://www.binancebooster.com/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+  ====== [SUCCESS # 10/100 LIVE DOMAIN] ======
+  Classification : PHISHING
+  Risk Level     : MEDIUM (Score: 0.58)
+  Reasons/Explanations:
+    - Final risk score 0.58 -> classified as PHISHING.
+    - Domain resembles known brand 'binance' with similarity 90%.
+    - Domain is relatively young (257 days old).
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain registered for minimum period (< 1 year) — common in throwaway phishing domains.
+    - Domain has a valid SSL certificate.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+
+[Scanning #17] https://binancebooster.com/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+  ====== [SUCCESS # 11/100 LIVE DOMAIN] ======
+  Classification : PHISHING
+  Risk Level     : MEDIUM (Score: 0.58)
+  Reasons/Explanations:
+    - Final risk score 0.58 -> classified as PHISHING.
+    - Domain resembles known brand 'binance' with similarity 90%.
+    - Domain is relatively young (257 days old).
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain registered for minimum period (< 1 year) — common in throwaway phishing domains.
+    - Domain has a valid SSL certificate.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+
+[Scanning #18] https://blogread-trezor.com/index_blog.html?input_24=u9gF7CLkbfiDdHpefDWOG8AxaGKzbat2X[...]lttwpJ0Pl760qn14RBLLN6qx9K0JbpU5CE03qBQQn2SksdRadvYlqTSBA==
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+Brand impersonation detected on blogread-trezor.com: page references brands ['meta']
+CRE: Brand-content mismatch detected (brands: ['meta'])
+  ====== [SUCCESS # 12/100 LIVE DOMAIN] ======
+  Classification : PHISHING
+  Risk Level     : HIGH (Score: 1.0)
+  Reasons/Explanations:
+    - Final risk score 1.00 -> classified as PHISHING.
+    - Domain resembles known brand 'trezor' with similarity 90%.
+    - Domain registered very recently (0 days old).
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain registered for minimum period (< 1 year) — common in throwaway phishing domains.
+    - Domain has a valid SSL certificate.
+    - Phishing-related keywords detected: within 24 hours, unauthorized access, action required.
+    - BRAND IMPERSONATION: Page content references brand(s) [meta] but domain does not match.
+    - Cross-Reference Engine risk score: 0.75
+
+[Scanning #19] https://allegrolokalnie.69879198217.cfd/oferta/2011-boro-przyczepka-lekka/29376
   -> Pre-checking connection... DEAD. Skipping.
 
-[Scanning #6] https://panel.standard.us-east-1.oortstorages.com/fitsal.sg
+[Scanning #20] http://sadmatanza.com/css/Msk/MetaMask/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #21] https://pelicanaviation.in/web3/adobe.php
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #22] https://www.ope-961084.pro/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #23] https://www.ope-961084.pro/captcha.php
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #24] https://fatima.ope-961084.pro/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #25] https://fatima.ope-961084.pro/captcha.php
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #26] https://abbib.ope-961084.pro/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #27] https://abbib.ope-961084.pro/captcha.php
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #28] https://youssef.ope-961084.pro/captcha.php
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #29] https://youssef.ope-961084.pro/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #30] https://amel.ope-961084.pro/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #31] https://amel.ope-961084.pro/captcha.php
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #32] https://alain.ope-961084.pro/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #33] https://alain.ope-961084.pro/captcha.php
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #34] https://gazing.pp.ua/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 3/100 LIVE DOMAIN] ======
+Brand impersonation detected on gazing.pp.ua: page references brands ['github', 'gemini']
+CRE: Brand-content mismatch detected (brands: ['github', 'gemini'])
+CRE: Brand impersonation + credential/payment collection detected
+  ====== [SUCCESS # 13/100 LIVE DOMAIN] ======
+  Classification : PHISHING
+  Risk Level     : HIGH (Score: 0.72)
+  Reasons/Explanations:
+    - Final risk score 0.72 -> classified as PHISHING.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain has a valid SSL certificate.
+    - Login or password input form detected on the page.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+    - BRAND IMPERSONATION: Page content references brand(s) [github, gemini] but domain does not match.
+    - Cross-Reference Engine risk score: 0.80
+
+[Scanning #35] https://creditagricole-mescompte.com/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+Brand impersonation detected on creditagricole-mescompte.com: page references brands ['apple']
+CRE: Brand-content mismatch detected (brands: ['apple'])
+CRE: Brand impersonation + credential/payment collection detected
+  ====== [SUCCESS # 14/100 LIVE DOMAIN] ======
+  Classification : PHISHING
+  Risk Level     : HIGH (Score: 0.8625)
+  Reasons/Explanations:
+    - Final risk score 0.86 -> classified as PHISHING.
+    - Domain is highly similar to a known domain (similarity 75%).
+    - Domain is relatively young (33 days old).
+    - WHOIS privacy is enabled, hiding registrant information.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain registered for minimum period (< 1 year) — common in throwaway phishing domains.
+    - Domain has a valid SSL certificate.
+    - Login or password input form detected on the page.
+    - High number of external scripts (15).
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+    - BRAND IMPERSONATION: Page content references brand(s) [apple] but domain does not match.
+    - Cross-Reference Engine risk score: 0.80
+
+[Scanning #36] https://creditagricole-mescompte.com/pages/asset.php
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+Brand impersonation detected on creditagricole-mescompte.com: page references brands ['apple']
+CRE: Brand-content mismatch detected (brands: ['apple'])
+CRE: Brand impersonation + credential/payment collection detected
+  ====== [SUCCESS # 15/100 LIVE DOMAIN] ======
+  Classification : PHISHING
+  Risk Level     : HIGH (Score: 0.8625)
+  Reasons/Explanations:
+    - Final risk score 0.86 -> classified as PHISHING.
+    - Domain is highly similar to a known domain (similarity 75%).
+    - Domain is relatively young (33 days old).
+    - WHOIS privacy is enabled, hiding registrant information.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain registered for minimum period (< 1 year) — common in throwaway phishing domains.
+    - Domain has a valid SSL certificate.
+    - Login or password input form detected on the page.
+    - High number of external scripts (15).
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+    - BRAND IMPERSONATION: Page content references brand(s) [apple] but domain does not match.
+    - Cross-Reference Engine risk score: 0.80
+
+[Scanning #37] https://aigemini.zeabur.app/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
+Brand impersonation detected on aigemini.zeabur.app: page references brands ['github']
+CRE: Brand-content mismatch detected (brands: ['github'])
+CRE: Brand impersonation + credential/payment collection detected
+  ====== [SUCCESS # 16/100 LIVE DOMAIN] ======
+  Classification : PHISHING
+  Risk Level     : HIGH (Score: 1.0)
+  Reasons/Explanations:
+    - Final risk score 1.00 -> classified as PHISHING.
+    - Domain resembles known brand 'gemini' with similarity 90%.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain has a valid SSL certificate.
+    - Login or password input form detected on the page.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+    - BRAND IMPERSONATION: Page content references brand(s) [github] but domain does not match.
+    - Cross-Reference Engine risk score: 0.80
+
+[Scanning #38] https://get-started-desktop.wixstudio.com/en-us
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+Brand impersonation detected on get-started-desktop.wixstudio.com: page references brands ['ledger']
+CRE: Brand-content mismatch detected (brands: ['ledger'])
+  ====== [SUCCESS # 17/100 LIVE DOMAIN] ======
+  Classification : PHISHING
+  Risk Level     : MEDIUM (Score: 0.5875)
+  Reasons/Explanations:
+    - Final risk score 0.59 -> classified as PHISHING.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain has a valid SSL certificate.
+    - High number of external scripts (11).
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+    - BRAND IMPERSONATION: Page content references brand(s) [ledger] but domain does not match.
+    - Cross-Reference Engine risk score: 0.75
+
+[Scanning #39] https://52479-santander.com/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+Brand impersonation detected on 52479-santander.com: page references brands ['irs']
+CRE: Brand-content mismatch detected (brands: ['irs'])
+  ====== [SUCCESS # 18/100 LIVE DOMAIN] ======
+  Classification : PHISHING
+  Risk Level     : HIGH (Score: 0.8175)
+  Reasons/Explanations:
+    - Final risk score 0.82 -> classified as PHISHING.
+    - Domain registered very recently (2 days old).
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain registered for minimum period (< 1 year) — common in throwaway phishing domains.
+    - Domain has a valid SSL certificate.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+    - BRAND IMPERSONATION: Page content references brand(s) [irs] but domain does not match.
+    - Cross-Reference Engine risk score: 0.75
+
+[Scanning #40] https://52479-santander.com/payment/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+Brand impersonation detected on 52479-santander.com: page references brands ['irs']
+CRE: Brand-content mismatch detected (brands: ['irs'])
+  ====== [SUCCESS # 19/100 LIVE DOMAIN] ======
+  Classification : PHISHING
+  Risk Level     : HIGH (Score: 0.8175)
+  Reasons/Explanations:
+    - Final risk score 0.82 -> classified as PHISHING.
+    - Domain registered very recently (2 days old).
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain registered for minimum period (< 1 year) — common in throwaway phishing domains.
+    - Domain has a valid SSL certificate.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+    - BRAND IMPERSONATION: Page content references brand(s) [irs] but domain does not match.
+    - Cross-Reference Engine risk score: 0.75
+
+[Scanning #41] https://email-member-and-password-update.webflow.io/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+  ====== [SUCCESS # 20/100 LIVE DOMAIN] ======
+  Classification : SUSPICIOUS
+  Risk Level     : LOW (Score: 0.355)
+  Reasons/Explanations:
+    - Final risk score 0.35 -> classified as SUSPICIOUS.
+    - WHOIS privacy is enabled, hiding registrant information.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain has a valid SSL certificate.
+    - Login or password input form detected on the page.
+
+[Scanning #42] https://gmxauthe.vercel.app/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
+Brand impersonation detected on gmxauthe.vercel.app: page references brands ['apple', 'amazon', 'instagram', 'tiktok']
+CRE: Brand-content mismatch detected (brands: ['apple', 'amazon', 'instagram', 'tiktok'])
+CRE: Brand impersonation + credential/payment collection detected
+  ====== [SUCCESS # 21/100 LIVE DOMAIN] ======
+  Classification : PHISHING
+  Risk Level     : HIGH (Score: 0.99)
+  Reasons/Explanations:
+    - Final risk score 0.99 -> classified as PHISHING.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain has a valid SSL certificate.
+    - Login or password input form detected on the page.
+    - Form submits data to a different domain (1 cross-domain form(s)).
+    - Suspicious iframe(s) embedding external content.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+    - BRAND IMPERSONATION: Page content references brand(s) [apple, amazon, instagram, tiktok] but domain does not match.
+    - Cross-Reference Engine risk score: 0.80
+
+[Scanning #43] https://sso-io-ndaxx-auth.webflow.io/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+  ====== [SUCCESS # 22/100 LIVE DOMAIN] ======
+  Classification : SUSPICIOUS
+  Risk Level     : LOW (Score: 0.395)
+  Reasons/Explanations:
+    - Final risk score 0.40 -> classified as SUSPICIOUS.
+    - WHOIS privacy is enabled, hiding registrant information.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain has a valid SSL certificate.
+    - Page structure and behavior appear legitimate (safe content).
+
+[Scanning #44] https://wuwizcr.cn/w/2/da/ds=docomos/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #45] https://hdytuko.cn/w/2/da/ds=docomos/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #46] https://ijteea.cn/ds2/e/2qe=docomotiaos/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #47] http://allegro-lokalnie.9g89w23823g.cfd/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+Error trying to connect to socket: closing socket - timed out
+  ====== [SUCCESS # 23/100 LIVE DOMAIN] ======
+  Classification : PHISHING
+  Risk Level     : HIGH (Score: 1.0)
+  Reasons/Explanations:
+    - Final risk score 1.00 -> classified as PHISHING.
+    - Domain resembles known brand 'allegro' with similarity 90%.
+    - Domain registered very recently (5 days old).
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain registered for minimum period (< 1 year) — common in throwaway phishing domains.
+    - Domain has a valid SSL certificate.
+
+[Scanning #48] http://allegro.343984y398h.bond/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+Error trying to connect to socket: closing socket - timed out
+  ====== [SUCCESS # 24/100 LIVE DOMAIN] ======
+  Classification : PHISHING
+  Risk Level     : HIGH (Score: 1.0)
+  Reasons/Explanations:
+    - Final risk score 1.00 -> classified as PHISHING.
+    - Domain resembles known brand 'allegro' with similarity 90%.
+    - Domain registered very recently (4 days old).
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain registered for minimum period (< 1 year) — common in throwaway phishing domains.
+    - Domain has a valid SSL certificate.
+
+[Scanning #49] https://allegro.343984y398h.bond/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+Error trying to connect to socket: closing socket - timed out
+  ====== [SUCCESS # 25/100 LIVE DOMAIN] ======
+  Classification : PHISHING
+  Risk Level     : HIGH (Score: 1.0)
+  Reasons/Explanations:
+    - Final risk score 1.00 -> classified as PHISHING.
+    - Domain resembles known brand 'allegro' with similarity 90%.
+    - Domain registered very recently (4 days old).
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain registered for minimum period (< 1 year) — common in throwaway phishing domains.
+    - Domain has a valid SSL certificate.
+
+[Scanning #50] https://wgpqczj.cn/2etDur8G7t.yamaguchi.jp
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #51] https://permohonanrumahprojek.litres-gov.my.id/c/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #52] https://peredodabemposta.com/uu/YKdBAeTaaLLlqaf9
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+  -> Actually DEAD (Content Agent could not load it properly). Skipping.
+
+[Scanning #53] https://yvibptl.cn/w/2/da/ds=docomos/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #54] https://gdobcwk.cn/w/2/da/ds=docomos/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #55] http://suite-trezor.netlify.app
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
+  ====== [SUCCESS # 26/100 LIVE DOMAIN] ======
+  Classification : PHISHING
+  Risk Level     : HIGH (Score: 1.0)
+  Reasons/Explanations:
+    - Final risk score 1.00 -> classified as PHISHING.
+    - Domain resembles known brand 'trezor' with similarity 90%.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain has a valid SSL certificate.
+    - Page structure and behavior appear legitimate (safe content).
+    - Cross-reference analysis: domain name contains brand 'trezor' on a hosted platform.
+    - Cross-Reference Engine risk score: 0.55
+
+[Scanning #56] https://suite-trezor.netlify.app/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
+  ====== [SUCCESS # 27/100 LIVE DOMAIN] ======
+  Classification : PHISHING
+  Risk Level     : HIGH (Score: 1.0)
+  Reasons/Explanations:
+    - Final risk score 1.00 -> classified as PHISHING.
+    - Domain resembles known brand 'trezor' with similarity 90%.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain has a valid SSL certificate.
+    - Page structure and behavior appear legitimate (safe content).
+    - Cross-reference analysis: domain name contains brand 'trezor' on a hosted platform.
+    - Cross-Reference Engine risk score: 0.55
+
+[Scanning #57] https://canaldecomunicacionanonimocopeinca.com/docomo/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #58] https://panel.standard.us-east-1.oortstorages.com/fitsal.sg
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+  ====== [SUCCESS # 28/100 LIVE DOMAIN] ======
   Classification : SUSPICIOUS
   Risk Level     : LOW (Score: 0.35)
   Reasons/Explanations:
@@ -50,17 +521,17 @@ Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo fa
     - Login or password input form detected on the page.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
 
-[Scanning #7] http://lkjgfdwertyuiop-5137fsshgs.edgeone.dev/2025NewAldomainindex.html
+[Scanning #59] http://lkjgfdwertyuiop-5137fsshgs.edgeone.dev/2025NewAldomainindex.html
   -> Pre-checking connection... LIVE! Running AI Pipeline...
 Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
   -> Actually DEAD (Content Agent could not load it properly). Skipping.
 
-[Scanning #8] https://www.walletconnect-olive.vercel.app/
+[Scanning #60] https://www.walletconnect-olive.vercel.app/
   -> Pre-checking connection... DEAD. Skipping.
 
-[Scanning #9] https://eurogenerale.rscad.com.br/sgx/fs/
+[Scanning #61] https://eurogenerale.rscad.com.br/sgx/fs/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 4/100 LIVE DOMAIN] ======
+  ====== [SUCCESS # 29/100 LIVE DOMAIN] ======
   Classification : SAFE
   Risk Level     : INFO (Score: 0.15)
   Reasons/Explanations:
@@ -69,59 +540,28 @@ Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo fa
     - Domain has a valid SSL certificate.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
 
-[Scanning #10] http://seedphrasefinder.xyz
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 5/100 LIVE DOMAIN] ======
-  Classification : SAFE
-  Risk Level     : INFO (Score: 0.165)
-  Reasons/Explanations:
-    - Final risk score 0.17 -> classified as SAFE.
-    - Domain is highly similar to a known domain (similarity 72%).
-    - Domain is relatively young (124 days old).
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain registered for minimum period (< 1 year) — common in throwaway phishing domains.
-    - Domain has a valid SSL certificate.
-    - Page structure and behavior appear legitimate (safe content).
+[Scanning #62] http://seedphrasefinder.xyz
+  -> Pre-checking connection... DEAD. Skipping.
 
-[Scanning #11] https://seedphrasefinder.xyz/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 6/100 LIVE DOMAIN] ======
-  Classification : SAFE
-  Risk Level     : INFO (Score: 0.165)
-  Reasons/Explanations:
-    - Final risk score 0.17 -> classified as SAFE.
-    - Domain is highly similar to a known domain (similarity 72%).
-    - Domain is relatively young (124 days old).
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain registered for minimum period (< 1 year) — common in throwaway phishing domains.
-    - Domain has a valid SSL certificate.
-    - Page structure and behavior appear legitimate (safe content).
+[Scanning #63] https://seedphrasefinder.xyz/
+  -> Pre-checking connection... DEAD. Skipping.
 
-[Scanning #12] http://emergencydatarequest.shop/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 7/100 LIVE DOMAIN] ======
-  Classification : SAFE
-  Risk Level     : INFO (Score: 0.095)
-  Reasons/Explanations:
-    - Final risk score 0.10 -> classified as SAFE.
-    - Domain has a valid SSL certificate.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+[Scanning #64] http://emergencydatarequest.shop/
+  -> Pre-checking connection... DEAD. Skipping.
 
-[Scanning #13] https://docs.google.com/presentation/d/e/2PACX-1vSsUPC--3WQHWf_WwSfOid2KJLNJIohEE3kN-RUtqnp8Gj9Q8ZKljq1a6MUWOmEV2DSCZjoYEpuqNI6/pub?start=false&amp;loop=false&amp;delayms=3000
+[Scanning #65] https://docs.google.com/presentation/d/e/2PACX-1vSsUPC--3WQHWf_WwSfOid2KJLNJIohEE3kN-RUtqnp8Gj9Q8ZKljq1a6MUWOmEV2DSCZjoYEpuqNI6/pub?start=false&amp;loop=false&amp;delayms=3000
   -> Pre-checking connection... LIVE! Running AI Pipeline...
   -> Actually DEAD (Content Agent could not load it properly). Skipping.
 
-[Scanning #14] https://jfja-vy75-607y.elaine-titotiberti-com-s-account.workers.dev/508252af4ac5239d?email=a
+[Scanning #66] https://jfja-vy75-607y.elaine-titotiberti-com-s-account.workers.dev/508252af4ac5239d?email=a
   -> Pre-checking connection... DEAD. Skipping.
 
-[Scanning #15] https://upcmailhispeed.flazio.com/home?r=289013
+[Scanning #67] https://upcmailhispeed.flazio.com/home?r=289013
   -> Pre-checking connection... DEAD. Skipping.
 
-[Scanning #16] https://buonobuono.jp/zribpuf/amlcnqt/1itzfnu/FFBB/fb.php
+[Scanning #68] https://buonobuono.jp/zribpuf/amlcnqt/1itzfnu/FFBB/fb.php
   -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 8/100 LIVE DOMAIN] ======
+  ====== [SUCCESS # 30/100 LIVE DOMAIN] ======
   Classification : SAFE
   Risk Level     : INFO (Score: 0.075)
   Reasons/Explanations:
@@ -129,99 +569,63 @@ Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo fa
     - WHOIS privacy is enabled, hiding registrant information.
     - Domain has a valid SSL certificate.
 
-[Scanning #17] http://dhl-info.ru/track/track.php
+[Scanning #69] http://dhl-info.ru/track/track.php
   -> Pre-checking connection... DEAD. Skipping.
 
-[Scanning #18] http://dhl-info.ru/
+[Scanning #70] http://dhl-info.ru/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #71] http://trezr-suite-explor.pages.dev
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #72] https://trezr-suite-explor.pages.dev/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #73] https://yjnlgmq.wanxiongzhilu.cn/pkkjp/aenop/potyunde/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #74] https://tepcojp.co/ja/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #75] https://emergencydatarequest.shop/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #76] https://elsbhefb.lmfnil.cn/RSV_P/smart_index.htm/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #77] http://www.demotrans.com.bd/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #78] https://docusign-k7l.roxanne-jspelectrical-com-s-account.workers.dev/64bb24862156f43a
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #79] https://ln.run/nLGtF
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #80] https://omniva.vip/ee
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #81] http://web3-appconnect.pages.dev/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #82] https://web3-appconnect.pages.dev/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #83] http://megamodify.pages.dev/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #84] https://megamodify.pages.dev/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #85] http://connecfix.pages.dev/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #86] https://connecfix.pages.dev/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #87] https://qrco.de/bgiDqY
   -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 9/100 LIVE DOMAIN] ======
-  Classification : PHISHING
-  Risk Level     : HIGH (Score: 0.6375)
-  Reasons/Explanations:
-    - Final risk score 0.64 -> classified as PHISHING.
-    - Domain contains brand name 'dhl' in a suspicious context.
-    - Domain registered very recently (4 days old).
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain registered for minimum period (< 1 year) — common in throwaway phishing domains.
-    - Domain has a valid SSL certificate.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-
-[Scanning #19] http://trezr-suite-explor.pages.dev
-  -> Pre-checking connection... DEAD. Skipping.
-
-[Scanning #20] https://trezr-suite-explor.pages.dev/
-  -> Pre-checking connection... DEAD. Skipping.
-
-[Scanning #21] https://yjnlgmq.wanxiongzhilu.cn/pkkjp/aenop/potyunde/
-  -> Pre-checking connection... DEAD. Skipping.
-
-[Scanning #22] https://tepcojp.co/ja/
-  -> Pre-checking connection... DEAD. Skipping.
-
-[Scanning #23] https://emergencydatarequest.shop/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 10/100 LIVE DOMAIN] ======
-  Classification : SAFE
-  Risk Level     : INFO (Score: 0.095)
-  Reasons/Explanations:
-    - Final risk score 0.10 -> classified as SAFE.
-    - Domain has a valid SSL certificate.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-
-[Scanning #24] https://elsbhefb.lmfnil.cn/RSV_P/smart_index.htm/
-  -> Pre-checking connection... DEAD. Skipping.
-
-[Scanning #25] http://www.demotrans.com.bd/
-  -> Pre-checking connection... DEAD. Skipping.
-
-[Scanning #26] https://docusign-k7l.roxanne-jspelectrical-com-s-account.workers.dev/64bb24862156f43a
-  -> Pre-checking connection... DEAD. Skipping.
-
-[Scanning #27] https://ln.run/nLGtF
-  -> Pre-checking connection... DEAD. Skipping.
-
-[Scanning #28] https://omniva.vip/ee
-  -> Pre-checking connection... DEAD. Skipping.
-
-[Scanning #29] http://web3-appconnect.pages.dev/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 11/100 LIVE DOMAIN] ======
-  Classification : SAFE
-  Risk Level     : INFO (Score: 0.195)
-  Reasons/Explanations:
-    - Final risk score 0.20 -> classified as SAFE.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Page structure and behavior appear legitimate (safe content).
-
-[Scanning #30] https://web3-appconnect.pages.dev/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 12/100 LIVE DOMAIN] ======
-  Classification : SAFE
-  Risk Level     : INFO (Score: 0.195)
-  Reasons/Explanations:
-    - Final risk score 0.20 -> classified as SAFE.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Page structure and behavior appear legitimate (safe content).
-
-[Scanning #31] http://megamodify.pages.dev/
-  -> Pre-checking connection... DEAD. Skipping.
-
-[Scanning #32] https://megamodify.pages.dev/
-  -> Pre-checking connection... DEAD. Skipping.
-
-[Scanning #33] http://connecfix.pages.dev/
-  -> Pre-checking connection... DEAD. Skipping.
-
-[Scanning #34] https://connecfix.pages.dev/
-  -> Pre-checking connection... DEAD. Skipping.
-
-[Scanning #35] https://qrco.de/bgiDqY
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 13/100 LIVE DOMAIN] ======
+  ====== [SUCCESS # 31/100 LIVE DOMAIN] ======
   Classification : SAFE
   Risk Level     : INFO (Score: 0.265)
   Reasons/Explanations:
@@ -231,9 +635,9 @@ Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo fa
     - High number of external scripts (24).
     - Tech support scam indicators detected: toll free.
 
-[Scanning #36] https://q-r.to/bgiDqY
+[Scanning #88] https://q-r.to/bgiDqY
   -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 14/100 LIVE DOMAIN] ======
+  ====== [SUCCESS # 32/100 LIVE DOMAIN] ======
   Classification : SAFE
   Risk Level     : INFO (Score: 0.217)
   Reasons/Explanations:
@@ -243,9 +647,9 @@ Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo fa
     - High number of external scripts (24).
     - Tech support scam indicators detected: toll free.
 
-[Scanning #37] https://l.ead.me/bgiDqY
+[Scanning #89] https://l.ead.me/bgiDqY
   -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 15/100 LIVE DOMAIN] ======
+  ====== [SUCCESS # 33/100 LIVE DOMAIN] ======
   Classification : SAFE
   Risk Level     : INFO (Score: 0.265)
   Reasons/Explanations:
@@ -256,10 +660,10 @@ Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo fa
     - High number of external scripts (24).
     - Tech support scam indicators detected: toll free.
 
-[Scanning #38] https://ipfs.io/ipfs/bafkreierdp22iqo7a2nw3jo6hg5ieohxvvxwz36md2frplebv72mpasewy#{email}
+[Scanning #90] https://ipfs.io/ipfs/bafkreierdp22iqo7a2nw3jo6hg5ieohxvvxwz36md2frplebv72mpasewy#{email}
   -> Pre-checking connection... LIVE! Running AI Pipeline...
 Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 16/100 LIVE DOMAIN] ======
+  ====== [SUCCESS # 34/100 LIVE DOMAIN] ======
   Classification : PHISHING
   Risk Level     : MEDIUM (Score: 0.46)
   Reasons/Explanations:
@@ -270,54 +674,48 @@ Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo fa
     - Form submits data to a different domain (1 cross-domain form(s)).
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
 
-[Scanning #39] https://did.li/u3sDN
+[Scanning #91] https://did.li/u3sDN
   -> Pre-checking connection... DEAD. Skipping.
 
-[Scanning #40] https://autopases.cyou/cl
+[Scanning #92] https://autopases.cyou/cl
   -> Pre-checking connection... DEAD. Skipping.
 
-[Scanning #41] https://did.li/s3sDN
+[Scanning #93] https://did.li/s3sDN
   -> Pre-checking connection... DEAD. Skipping.
 
-[Scanning #42] https://toepcom.eu.cc/pmihFACA4C
+[Scanning #94] https://toepcom.eu.cc/pmihFACA4C
   -> Pre-checking connection... DEAD. Skipping.
 
-[Scanning #43] https://tinyurl.com/dfgyydftyrewr
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 17/100 LIVE DOMAIN] ======
-  Classification : SAFE
-  Risk Level     : INFO (Score: 0.24)
-  Reasons/Explanations:
-    - Final risk score 0.24 -> classified as SAFE.
-    - Domain has a valid SSL certificate.
-    - Login or password input form detected on the page.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-
-[Scanning #44] https://rb.gy/s1mmxm
+[Scanning #95] https://tinyurl.com/dfgyydftyrewr
   -> Pre-checking connection... DEAD. Skipping.
 
-[Scanning #45] https://www.robiox.com.py/games/77747658251236/Moon-Update-Sailor-Piece?privateServerLinkCode=383895814952709870082686616080
+[Scanning #96] https://rb.gy/s1mmxm
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #97] https://www.robiox.com.py/games/77747658251236/Moon-Update-Sailor-Piece?privateServerLinkCode=383895814952709870082686616080
   -> Pre-checking connection... LIVE! Running AI Pipeline...
   -> Actually DEAD (Content Agent could not load it properly). Skipping.
 
-[Scanning #46] https://linkurl.pk/LmJyUxqA
+[Scanning #98] https://linkurl.pk/LmJyUxqA
   -> Pre-checking connection... LIVE! Running AI Pipeline...
 Brand impersonation detected on roblox.com.ge: page references brands ['chase']
-  ====== [SUCCESS # 18/100 LIVE DOMAIN] ======
+CRE: Brand-content mismatch detected (brands: ['chase'])
+  ====== [SUCCESS # 35/100 LIVE DOMAIN] ======
   Classification : PHISHING
-  Risk Level     : HIGH (Score: 0.78)
+  Risk Level     : HIGH (Score: 0.6975)
   Reasons/Explanations:
-    - Final risk score 0.78 -> classified as PHISHING.
+    - Final risk score 0.70 -> classified as PHISHING.
     - Domain registered very recently (19 days old).
     - Domain has no MX (mail) records — unusual for legitimate domains.
     - Domain has a valid SSL certificate.
     - High number of external scripts (115).
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
     - BRAND IMPERSONATION: Page content references brand(s) [chase] but domain does not match.
+    - Cross-Reference Engine risk score: 0.75
 
-[Scanning #47] https://roblox.com.ge/games/79798983053805/Untitled-Game?privateServerLinkCode=38045816557110881882093339372296
+[Scanning #99] https://roblox.com.ge/games/79798983053805/Untitled-Game?privateServerLinkCode=38045816557110881882093339372296
   -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 19/100 LIVE DOMAIN] ======
+  ====== [SUCCESS # 36/100 LIVE DOMAIN] ======
   Classification : SAFE
   Risk Level     : INFO (Score: 0.14)
   Reasons/Explanations:
@@ -327,10 +725,10 @@ Brand impersonation detected on roblox.com.ge: page references brands ['chase']
     - Domain registered for minimum period (< 1 year) — common in throwaway phishing domains.
     - Domain has a valid SSL certificate.
 
-[Scanning #48] https://bafkreieuwxsau5sl7xlrjqlplgz3dfcuyrb3myf7oimnxivbjlntdp22dy.ipfs.dweb.link/
+[Scanning #100] https://bafkreieuwxsau5sl7xlrjqlplgz3dfcuyrb3myf7oimnxivbjlntdp22dy.ipfs.dweb.link/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
 Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 20/100 LIVE DOMAIN] ======
+  ====== [SUCCESS # 37/100 LIVE DOMAIN] ======
   Classification : PHISHING
   Risk Level     : MEDIUM (Score: 0.49)
   Reasons/Explanations:
@@ -341,83 +739,83 @@ Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo fa
     - Form submits data to a different domain (2 cross-domain form(s)).
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
 
-[Scanning #49] https://pub-a532c3ce55564db894248fd1ca2c0e48.r2.dev/ANNCNSYMEXX002243.html
+[Scanning #101] https://pub-a532c3ce55564db894248fd1ca2c0e48.r2.dev/ANNCNSYMEXX002243.html
   -> Pre-checking connection... LIVE! Running AI Pipeline...
 Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
   -> Actually DEAD (Content Agent could not load it properly). Skipping.
 
-[Scanning #50] https://pub-29f0c7965f654c84b7975438c4026422.r2.dev/AoemmwMmexxxo2933.html
+[Scanning #102] https://pub-29f0c7965f654c84b7975438c4026422.r2.dev/AoemmwMmexxxo2933.html
   -> Pre-checking connection... LIVE! Running AI Pipeline...
 Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
   -> Actually DEAD (Content Agent could not load it properly). Skipping.
 
-[Scanning #51] https://docs.google.com/drawings/d/18hGB9gopToRmceLtsvuuBmcAWCTbWZzKrrUi4GbHKHg/edit
+[Scanning #103] https://docs.google.com/drawings/d/18hGB9gopToRmceLtsvuuBmcAWCTbWZzKrrUi4GbHKHg/edit
   -> Pre-checking connection... LIVE! Running AI Pipeline...
   -> Actually DEAD (Content Agent could not load it properly). Skipping.
 
-[Scanning #52] https://docs.google.com/drawings/d/1h6dY851CgOj0Vq52mRuVfVxvRK0PKQjNbC4aNdZJIbQ/edit
+[Scanning #104] https://docs.google.com/drawings/d/1h6dY851CgOj0Vq52mRuVfVxvRK0PKQjNbC4aNdZJIbQ/edit
   -> Pre-checking connection... LIVE! Running AI Pipeline...
   -> Actually DEAD (Content Agent could not load it properly). Skipping.
 
-[Scanning #53] https://docs.google.com/drawings/d/1X-O_ECTm_BNgFMpc6qrLr3AofnjjcQC33Nd2hNoQIv0/edit
+[Scanning #105] https://docs.google.com/drawings/d/1X-O_ECTm_BNgFMpc6qrLr3AofnjjcQC33Nd2hNoQIv0/edit
   -> Pre-checking connection... LIVE! Running AI Pipeline...
   -> Actually DEAD (Content Agent could not load it properly). Skipping.
 
-[Scanning #54] https://docs.google.com/drawings/d/1QE-8RDQwKuswdBI8g7S6ipll3x_N9LwjQE81t2PNQhA/edit
+[Scanning #106] https://docs.google.com/drawings/d/1QE-8RDQwKuswdBI8g7S6ipll3x_N9LwjQE81t2PNQhA/edit
   -> Pre-checking connection... LIVE! Running AI Pipeline...
   -> Actually DEAD (Content Agent could not load it properly). Skipping.
 
-[Scanning #55] https://docs.google.com/drawings/d/1ky6gWNJbNtn9DEaNq-Oj9Ptosi1nCI0_Ir5Zxh5tIsQ/edit
+[Scanning #107] https://docs.google.com/drawings/d/1ky6gWNJbNtn9DEaNq-Oj9Ptosi1nCI0_Ir5Zxh5tIsQ/edit
   -> Pre-checking connection... LIVE! Running AI Pipeline...
   -> Actually DEAD (Content Agent could not load it properly). Skipping.
 
-[Scanning #56] https://l.wl.co/l?u=https://qr-codes.io/0a4n1G
+[Scanning #108] https://l.wl.co/l?u=https://qr-codes.io/0a4n1G
   -> Pre-checking connection... LIVE! Running AI Pipeline...
   -> Actually DEAD (Content Agent could not load it properly). Skipping.
 
-[Scanning #57] https://qr-codes.io/0a4n1G
+[Scanning #109] https://qr-codes.io/0a4n1G
   -> Pre-checking connection... LIVE! Running AI Pipeline...
   -> Actually DEAD (Content Agent could not load it properly). Skipping.
 
-[Scanning #58] https://managewebappasecureaccntasuytgukwsesdfg.shoon1.biz.id/?yyy
+[Scanning #110] https://managewebappasecureaccntasuytgukwsesdfg.shoon1.biz.id/?yyy
   -> Pre-checking connection... DEAD. Skipping.
 
-[Scanning #59] https://unitedairlines-alight.vercel.app/
+[Scanning #111] https://unitedairlines-alight.vercel.app/
   -> Pre-checking connection... DEAD. Skipping.
 
-[Scanning #60] http://unitedairlines-alight.vercel.app
+[Scanning #112] http://unitedairlines-alight.vercel.app
   -> Pre-checking connection... DEAD. Skipping.
 
-[Scanning #61] https://unitedairlines-worklife.vercel.app/
+[Scanning #113] https://unitedairlines-worklife.vercel.app/
   -> Pre-checking connection... DEAD. Skipping.
 
-[Scanning #62] http://unitedairlines-worklife.vercel.app
+[Scanning #114] http://unitedairlines-worklife.vercel.app
   -> Pre-checking connection... DEAD. Skipping.
 
-[Scanning #63] https://osrsjagex.gamingvote.com/portal/assisted-login-login-challenge-dc197744c4a04124a6d04da6b85adcb4-238398720-1406457486-1694086910-1863512970-169408678563454200-2-238398720-140645748/
+[Scanning #115] https://osrsjagex.gamingvote.com/portal/assisted-login-login-challenge-dc197744c4a04124a6d04da6b85adcb4-238398720-1406457486-1694086910-1863512970-169408678563454200-2-238398720-140645748/
   -> Pre-checking connection... DEAD. Skipping.
 
-[Scanning #64] https://zalmss.cn/w/2/da/ds=docomos/
+[Scanning #116] https://zalmss.cn/w/2/da/ds=docomos/
   -> Pre-checking connection... DEAD. Skipping.
 
-[Scanning #65] https://wihjgr.cn/w/2/da/ds=docomos/
+[Scanning #117] https://wihjgr.cn/w/2/da/ds=docomos/
   -> Pre-checking connection... DEAD. Skipping.
 
-[Scanning #66] https://ajdyga.cn/ds2/e/2qe=docomotiaos/
+[Scanning #118] https://ajdyga.cn/ds2/e/2qe=docomotiaos/
   -> Pre-checking connection... DEAD. Skipping.
 
-[Scanning #67] https://qft0ozkw.cn/w/2/da/ds=docomos/
+[Scanning #119] https://qft0ozkw.cn/w/2/da/ds=docomos/
   -> Pre-checking connection... DEAD. Skipping.
 
-[Scanning #68] https://gdvvpxe.cn/w/2/da/ds=docomos/
+[Scanning #120] https://gdvvpxe.cn/w/2/da/ds=docomos/
   -> Pre-checking connection... DEAD. Skipping.
 
-[Scanning #69] https://allegrolokalnie.pl-ofert63006290.click/oferta/procesor-amd-ryzen-7-5800x3d
+[Scanning #121] https://allegrolokalnie.pl-ofert63006290.click/oferta/procesor-amd-ryzen-7-5800x3d
   -> Pre-checking connection... DEAD. Skipping.
 
-[Scanning #70] https://domicilerelais.pro/
+[Scanning #122] https://domicilerelais.pro/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 21/100 LIVE DOMAIN] ======
+  ====== [SUCCESS # 38/100 LIVE DOMAIN] ======
   Classification : SAFE
   Risk Level     : INFO (Score: 0.005)
   Reasons/Explanations:
@@ -426,9 +824,9 @@ Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo fa
     - Domain has a valid SSL certificate.
     - Page structure and behavior appear legitimate (safe content).
 
-[Scanning #71] https://domicilerelais.pro/74946779
+[Scanning #123] https://domicilerelais.pro/74946779
   -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 22/100 LIVE DOMAIN] ======
+  ====== [SUCCESS # 39/100 LIVE DOMAIN] ======
   Classification : SAFE
   Risk Level     : INFO (Score: 0.005)
   Reasons/Explanations:
@@ -437,9 +835,9 @@ Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo fa
     - Domain has a valid SSL certificate.
     - Page structure and behavior appear legitimate (safe content).
 
-[Scanning #72] https://votredomicile.pro/
+[Scanning #124] https://votredomicile.pro/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 23/100 LIVE DOMAIN] ======
+  ====== [SUCCESS # 40/100 LIVE DOMAIN] ======
   Classification : SAFE
   Risk Level     : INFO (Score: 0.005)
   Reasons/Explanations:
@@ -448,9 +846,9 @@ Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo fa
     - Domain has a valid SSL certificate.
     - Page structure and behavior appear legitimate (safe content).
 
-[Scanning #73] https://votredomicile.pro/74946779
+[Scanning #125] https://votredomicile.pro/74946779
   -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 24/100 LIVE DOMAIN] ======
+  ====== [SUCCESS # 41/100 LIVE DOMAIN] ======
   Classification : SAFE
   Risk Level     : INFO (Score: 0.005)
   Reasons/Explanations:
@@ -459,9 +857,9 @@ Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo fa
     - Domain has a valid SSL certificate.
     - Page structure and behavior appear legitimate (safe content).
 
-[Scanning #74] https://sportybetreedembonus04.weebly.com/
+[Scanning #126] https://sportybetreedembonus04.weebly.com/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 25/100 LIVE DOMAIN] ======
+  ====== [SUCCESS # 42/100 LIVE DOMAIN] ======
   Classification : SUSPICIOUS
   Risk Level     : LOW (Score: 0.39)
   Reasons/Explanations:
@@ -470,23 +868,12 @@ Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo fa
     - Domain has a valid SSL certificate.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
 
-[Scanning #75] https://loud-rules-224161.framer.app/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 26/100 LIVE DOMAIN] ======
-  Classification : PHISHING
-  Risk Level     : MEDIUM (Score: 0.5175)
-  Reasons/Explanations:
-    - Final risk score 0.52 -> classified as PHISHING.
-    - Domain is highly similar to a known domain (similarity 72%).
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Login or password input form detected on the page.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+[Scanning #127] https://loud-rules-224161.framer.app/
+  -> Pre-checking connection... DEAD. Skipping.
 
-[Scanning #76] https://webrallycu.weebly.com/
+[Scanning #128] https://webrallycu.weebly.com/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 27/100 LIVE DOMAIN] ======
+  ====== [SUCCESS # 43/100 LIVE DOMAIN] ======
   Classification : SUSPICIOUS
   Risk Level     : LOW (Score: 0.365)
   Reasons/Explanations:
@@ -495,10 +882,13 @@ Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo fa
     - Domain has a valid SSL certificate.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
 
-[Scanning #77] https://navy-guest-344134.framer.app/
+[Scanning #129] https://navy-guest-344134.framer.app/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #130] https://invigorated-reason-713737.framer.app/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
 Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 28/100 LIVE DOMAIN] ======
+  ====== [SUCCESS # 44/100 LIVE DOMAIN] ======
   Classification : SAFE
   Risk Level     : INFO (Score: 0.285)
   Reasons/Explanations:
@@ -508,23 +898,10 @@ Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo fa
     - Login or password input form detected on the page.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
 
-[Scanning #78] https://invigorated-reason-713737.framer.app/
+[Scanning #131] https://expansive-skills-791819.framer.app/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
 Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 29/100 LIVE DOMAIN] ======
-  Classification : SAFE
-  Risk Level     : INFO (Score: 0.285)
-  Reasons/Explanations:
-    - Final risk score 0.29 -> classified as SAFE.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Login or password input form detected on the page.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-
-[Scanning #79] https://expansive-skills-791819.framer.app/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 30/100 LIVE DOMAIN] ======
+  ====== [SUCCESS # 45/100 LIVE DOMAIN] ======
   Classification : SUSPICIOUS
   Risk Level     : LOW (Score: 0.305)
   Reasons/Explanations:
@@ -534,231 +911,43 @@ Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo fa
     - Login or password input form detected on the page.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
 
-[Scanning #80] https://forgiving-advantage-290273.framer.app/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 31/100 LIVE DOMAIN] ======
-  Classification : SAFE
-  Risk Level     : INFO (Score: 0.285)
-  Reasons/Explanations:
-    - Final risk score 0.29 -> classified as SAFE.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Login or password input form detected on the page.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+[Scanning #132] https://forgiving-advantage-290273.framer.app/
+  -> Pre-checking connection... DEAD. Skipping.
 
-[Scanning #81] https://peringatan-pembatalan-akun-anda001.weebly.com/
+[Scanning #133] https://peringatan-pembatalan-akun-anda001.weebly.com/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
 Brand impersonation detected on peringatan-pembatalan-akun-anda001.weebly.com: page references brands ['facebook']
-Combo detected: Brand impersonation on hosted platform -> peringatan-pembatalan-akun-anda001.weebly.com (brands: ['facebook'])
-  ====== [SUCCESS # 32/100 LIVE DOMAIN] ======
+CRE: Brand-content mismatch detected (brands: ['facebook'])
+  ====== [SUCCESS # 46/100 LIVE DOMAIN] ======
   Classification : PHISHING
-  Risk Level     : HIGH (Score: 0.99)
+  Risk Level     : HIGH (Score: 0.605)
   Reasons/Explanations:
-    - Final risk score 0.99 -> classified as PHISHING.
+    - Final risk score 0.60 -> classified as PHISHING.
     - Domain has no MX (mail) records — unusual for legitimate domains.
     - Domain has a valid SSL certificate.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
     - BRAND IMPERSONATION: Page content references brand(s) [facebook] but domain does not match.
+    - Cross-Reference Engine risk score: 0.75
 
-[Scanning #82] https://tiny-approach-170185.framer.app/
+[Scanning #134] https://tiny-approach-170185.framer.app/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
 Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
 Brand impersonation detected on tiny-approach-170185.framer.app: page references brands ['yahoo']
-Combo detected: Brand impersonation + credential/payment collection -> tiny-approach-170185.framer.app
-  ====== [SUCCESS # 33/100 LIVE DOMAIN] ======
-  Classification : PHISHING
-  Risk Level     : HIGH (Score: 0.755)
-  Reasons/Explanations:
-    - Final risk score 0.76 -> classified as PHISHING.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Login or password input form detected on the page.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-    - BRAND IMPERSONATION: Page content references brand(s) [yahoo] but domain does not match.
-
-[Scanning #83] https://inventive-clicks-377633.framer.app/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 34/100 LIVE DOMAIN] ======
-  Classification : SAFE
-  Risk Level     : INFO (Score: 0.285)
-  Reasons/Explanations:
-    - Final risk score 0.29 -> classified as SAFE.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Login or password input form detected on the page.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-
-[Scanning #84] https://likely-background-072946.framer.app/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 35/100 LIVE DOMAIN] ======
-  Classification : SAFE
-  Risk Level     : INFO (Score: 0.285)
-  Reasons/Explanations:
-    - Final risk score 0.29 -> classified as SAFE.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Login or password input form detected on the page.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-
-[Scanning #85] https://predictable-functions-609084.framer.app/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 36/100 LIVE DOMAIN] ======
-  Classification : SAFE
-  Risk Level     : INFO (Score: 0.185)
-  Reasons/Explanations:
-    - Final risk score 0.18 -> classified as SAFE.
-    - Domain is highly similar to a known domain (similarity 75%).
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-
-[Scanning #86] https://dffremag.framer.wiki/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - timed out
-  ====== [SUCCESS # 37/100 LIVE DOMAIN] ======
-  Classification : SAFE
-  Risk Level     : INFO (Score: 0.285)
-  Reasons/Explanations:
-    - Final risk score 0.29 -> classified as SAFE.
-    - WHOIS privacy is enabled, hiding registrant information.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Login or password input form detected on the page.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-
-[Scanning #87] https://filepdfviewnow.weebly.com/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 38/100 LIVE DOMAIN] ======
-  Classification : SUSPICIOUS
-  Risk Level     : LOW (Score: 0.365)
-  Reasons/Explanations:
-    - Final risk score 0.37 -> classified as SUSPICIOUS.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-
-[Scanning #88] https://gleaming-guest-665722.framer.app/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 39/100 LIVE DOMAIN] ======
-  Classification : SAFE
-  Risk Level     : INFO (Score: 0.125)
-  Reasons/Explanations:
-    - Final risk score 0.12 -> classified as SAFE.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-
-[Scanning #89] https://concerned-clicks-001015.framer.app/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 40/100 LIVE DOMAIN] ======
-  Classification : SAFE
-  Risk Level     : INFO (Score: 0.285)
-  Reasons/Explanations:
-    - Final risk score 0.29 -> classified as SAFE.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Login or password input form detected on the page.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-
-[Scanning #90] https://rallycucoo.weebly.com/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 41/100 LIVE DOMAIN] ======
-  Classification : SUSPICIOUS
-  Risk Level     : LOW (Score: 0.365)
-  Reasons/Explanations:
-    - Final risk score 0.37 -> classified as SUSPICIOUS.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-
-[Scanning #91] https://glad-industry-219387.framer.app/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-Brand impersonation detected on glad-industry-219387.framer.app: page references brands ['wetransfer']
-  ====== [SUCCESS # 42/100 LIVE DOMAIN] ======
-  Classification : SUSPICIOUS
-  Risk Level     : LOW (Score: 0.365)
-  Reasons/Explanations:
-    - Final risk score 0.37 -> classified as SUSPICIOUS.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-    - BRAND IMPERSONATION: Page content references brand(s) [wetransfer] but domain does not match.
-
-[Scanning #92] https://mobile-imaginations-439080.framer.app/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 43/100 LIVE DOMAIN] ======
-  Classification : PHISHING
-  Risk Level     : MEDIUM (Score: 0.5355)
-  Reasons/Explanations:
-    - Final risk score 0.54 -> classified as PHISHING.
-    - Domain is highly similar to a known domain (similarity 83%).
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Login or password input form detected on the page.
-    - Phishing-related keywords detected: sign in to continue.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-
-[Scanning #93] https://requirments3500040142.weebly.com/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Brand impersonation detected on requirments3500040142.weebly.com: page references brands ['chase']
-Combo detected: Brand impersonation on hosted platform -> requirments3500040142.weebly.com (brands: ['chase'])
-  ====== [SUCCESS # 44/100 LIVE DOMAIN] ======
-  Classification : PHISHING
-  Risk Level     : HIGH (Score: 1.0)
-  Reasons/Explanations:
-    - Final risk score 1.00 -> classified as PHISHING.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-    - BRAND IMPERSONATION: Page content references brand(s) [chase] but domain does not match.
-
-[Scanning #94] https://daaaaaummmmkkkaaako.weebly.com/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 45/100 LIVE DOMAIN] ======
-  Classification : SUSPICIOUS
-  Risk Level     : LOW (Score: 0.365)
-  Reasons/Explanations:
-    - Final risk score 0.37 -> classified as SUSPICIOUS.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-
-[Scanning #95] https://slight-graphs-717878.framer.app/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-Brand impersonation detected on slight-graphs-717878.framer.app: page references brands ['yahoo']
-Combo detected: Brand impersonation + credential/payment collection -> slight-graphs-717878.framer.app
-  ====== [SUCCESS # 46/100 LIVE DOMAIN] ======
-  Classification : PHISHING
-  Risk Level     : HIGH (Score: 0.755)
-  Reasons/Explanations:
-    - Final risk score 0.76 -> classified as PHISHING.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Login or password input form detected on the page.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-    - BRAND IMPERSONATION: Page content references brand(s) [yahoo] but domain does not match.
-
-[Scanning #96] https://sogo31.weebly.com/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
+CRE: Brand-content mismatch detected (brands: ['yahoo'])
+CRE: Brand impersonation + credential/payment collection detected
   ====== [SUCCESS # 47/100 LIVE DOMAIN] ======
-  Classification : SUSPICIOUS
-  Risk Level     : LOW (Score: 0.365)
+  Classification : PHISHING
+  Risk Level     : HIGH (Score: 0.7125)
   Reasons/Explanations:
-    - Final risk score 0.37 -> classified as SUSPICIOUS.
+    - Final risk score 0.71 -> classified as PHISHING.
     - Domain has no MX (mail) records — unusual for legitimate domains.
     - Domain has a valid SSL certificate.
+    - Login or password input form detected on the page.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+    - BRAND IMPERSONATION: Page content references brand(s) [yahoo] but domain does not match.
+    - Cross-Reference Engine risk score: 0.80
 
-[Scanning #97] https://golden-area-464000.framer.app/
+[Scanning #135] https://inventive-clicks-377633.framer.app/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
 Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
   ====== [SUCCESS # 48/100 LIVE DOMAIN] ======
@@ -771,7 +960,7 @@ Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo fa
     - Login or password input form detected on the page.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
 
-[Scanning #98] https://zestful-studies-933895.framer.app/
+[Scanning #136] https://likely-background-072946.framer.app/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
 Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
   ====== [SUCCESS # 49/100 LIVE DOMAIN] ======
@@ -784,135 +973,146 @@ Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo fa
     - Login or password input form detected on the page.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
 
-[Scanning #99] https://msn23.weebly.com/
+[Scanning #137] https://predictable-functions-609084.framer.app/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
+Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
   ====== [SUCCESS # 50/100 LIVE DOMAIN] ======
-  Classification : SUSPICIOUS
-  Risk Level     : LOW (Score: 0.365)
-  Reasons/Explanations:
-    - Final risk score 0.37 -> classified as SUSPICIOUS.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-
-[Scanning #100] https://btmail-b0xupdate.framer.website/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 51/100 LIVE DOMAIN] ======
-  Classification : SUSPICIOUS
-  Risk Level     : LOW (Score: 0.365)
-  Reasons/Explanations:
-    - Final risk score 0.37 -> classified as SUSPICIOUS.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Login or password input form detected on the page.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-
-[Scanning #101] https://individual-reason-008163.framer.app/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 52/100 LIVE DOMAIN] ======
   Classification : SAFE
-  Risk Level     : INFO (Score: 0.285)
+  Risk Level     : INFO (Score: 0.185)
   Reasons/Explanations:
-    - Final risk score 0.29 -> classified as SAFE.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Login or password input form detected on the page.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-
-[Scanning #102] https://outlookc-tr.weebly.com/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 53/100 LIVE DOMAIN] ======
-  Classification : PHISHING
-  Risk Level     : HIGH (Score: 0.885)
-  Reasons/Explanations:
-    - Final risk score 0.89 -> classified as PHISHING.
-    - Domain resembles known brand 'outlook' with similarity 90%.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-
-[Scanning #103] https://wxfinityy.weebly.com/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 54/100 LIVE DOMAIN] ======
-  Classification : PHISHING
-  Risk Level     : HIGH (Score: 0.885)
-  Reasons/Explanations:
-    - Final risk score 0.89 -> classified as PHISHING.
-    - Domain resembles known brand 'xfinity' with similarity 90%.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-
-[Scanning #104] https://oal0is-osgv.weebly.com/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Brand impersonation detected on oal0is-osgv.weebly.com: page references brands ['xfinity']
-Combo detected: Brand impersonation on hosted platform -> oal0is-osgv.weebly.com (brands: ['xfinity'])
-  ====== [SUCCESS # 55/100 LIVE DOMAIN] ======
-  Classification : PHISHING
-  Risk Level     : HIGH (Score: 0.99)
-  Reasons/Explanations:
-    - Final risk score 0.99 -> classified as PHISHING.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-    - BRAND IMPERSONATION: Page content references brand(s) [xfinity] but domain does not match.
-
-[Scanning #105] https://oninerallycuinon.weebly.com/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 56/100 LIVE DOMAIN] ======
-  Classification : SUSPICIOUS
-  Risk Level     : LOW (Score: 0.365)
-  Reasons/Explanations:
-    - Final risk score 0.37 -> classified as SUSPICIOUS.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-
-[Scanning #106] https://nbb888898.weebly.com/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Brand impersonation detected on nbb888898.weebly.com: page references brands ['xfinity']
-Combo detected: Brand impersonation on hosted platform -> nbb888898.weebly.com (brands: ['xfinity'])
-  ====== [SUCCESS # 57/100 LIVE DOMAIN] ======
-  Classification : PHISHING
-  Risk Level     : HIGH (Score: 0.99)
-  Reasons/Explanations:
-    - Final risk score 0.99 -> classified as PHISHING.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-    - BRAND IMPERSONATION: Page content references brand(s) [xfinity] but domain does not match.
-
-[Scanning #107] https://firstsbank.weebly.com/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Brand impersonation detected on firstsbank.weebly.com: page references brands ['whatsapp']
-Combo detected: Brand impersonation on hosted platform -> firstsbank.weebly.com (brands: ['whatsapp'])
-  ====== [SUCCESS # 58/100 LIVE DOMAIN] ======
-  Classification : PHISHING
-  Risk Level     : HIGH (Score: 1.0)
-  Reasons/Explanations:
-    - Final risk score 1.00 -> classified as PHISHING.
+    - Final risk score 0.18 -> classified as SAFE.
     - Domain is highly similar to a known domain (similarity 75%).
     - Domain has no MX (mail) records — unusual for legitimate domains.
     - Domain has a valid SSL certificate.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-    - BRAND IMPERSONATION: Page content references brand(s) [whatsapp] but domain does not match.
 
-[Scanning #108] https://spinning-role-059345.framer.app/
+[Scanning #138] https://dffremag.framer.wiki/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 59/100 LIVE DOMAIN] ======
+Error trying to connect to socket: closing socket - timed out
+  ====== [SUCCESS # 51/100 LIVE DOMAIN] ======
   Classification : SAFE
   Risk Level     : INFO (Score: 0.285)
   Reasons/Explanations:
     - Final risk score 0.29 -> classified as SAFE.
+    - WHOIS privacy is enabled, hiding registrant information.
     - Domain has no MX (mail) records — unusual for legitimate domains.
     - Domain has a valid SSL certificate.
     - Login or password input form detected on the page.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
 
-[Scanning #109] https://authwebuxux.weebly.com/
+[Scanning #139] https://filepdfviewnow.weebly.com/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+  ====== [SUCCESS # 52/100 LIVE DOMAIN] ======
+  Classification : SUSPICIOUS
+  Risk Level     : LOW (Score: 0.365)
+  Reasons/Explanations:
+    - Final risk score 0.37 -> classified as SUSPICIOUS.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain has a valid SSL certificate.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+
+[Scanning #140] https://gleaming-guest-665722.framer.app/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
+  ====== [SUCCESS # 53/100 LIVE DOMAIN] ======
+  Classification : SAFE
+  Risk Level     : INFO (Score: 0.125)
+  Reasons/Explanations:
+    - Final risk score 0.12 -> classified as SAFE.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain has a valid SSL certificate.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+
+[Scanning #141] https://concerned-clicks-001015.framer.app/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #142] https://rallycucoo.weebly.com/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+  ====== [SUCCESS # 54/100 LIVE DOMAIN] ======
+  Classification : SUSPICIOUS
+  Risk Level     : LOW (Score: 0.365)
+  Reasons/Explanations:
+    - Final risk score 0.37 -> classified as SUSPICIOUS.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain has a valid SSL certificate.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+
+[Scanning #143] https://glad-industry-219387.framer.app/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
+Brand impersonation detected on glad-industry-219387.framer.app: page references brands ['wetransfer']
+CRE: Brand-content mismatch detected (brands: ['wetransfer'])
+  ====== [SUCCESS # 55/100 LIVE DOMAIN] ======
+  Classification : SUSPICIOUS
+  Risk Level     : LOW (Score: 0.355)
+  Reasons/Explanations:
+    - Final risk score 0.35 -> classified as SUSPICIOUS.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain has a valid SSL certificate.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+    - BRAND IMPERSONATION: Page content references brand(s) [wetransfer] but domain does not match.
+    - Cross-Reference Engine risk score: 0.75
+
+[Scanning #144] https://mobile-imaginations-439080.framer.app/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
+  ====== [SUCCESS # 56/100 LIVE DOMAIN] ======
+  Classification : PHISHING
+  Risk Level     : MEDIUM (Score: 0.5355)
+  Reasons/Explanations:
+    - Final risk score 0.54 -> classified as PHISHING.
+    - Domain is highly similar to a known domain (similarity 83%).
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain has a valid SSL certificate.
+    - Login or password input form detected on the page.
+    - Phishing-related keywords detected: sign in to continue.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+
+[Scanning #145] https://requirments3500040142.weebly.com/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+Brand impersonation detected on requirments3500040142.weebly.com: page references brands ['chase']
+CRE: Brand-content mismatch detected (brands: ['chase'])
+  ====== [SUCCESS # 57/100 LIVE DOMAIN] ======
+  Classification : PHISHING
+  Risk Level     : HIGH (Score: 0.6225)
+  Reasons/Explanations:
+    - Final risk score 0.62 -> classified as PHISHING.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain has a valid SSL certificate.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+    - BRAND IMPERSONATION: Page content references brand(s) [chase] but domain does not match.
+    - Cross-Reference Engine risk score: 0.75
+
+[Scanning #146] https://daaaaaummmmkkkaaako.weebly.com/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+  ====== [SUCCESS # 58/100 LIVE DOMAIN] ======
+  Classification : SUSPICIOUS
+  Risk Level     : LOW (Score: 0.365)
+  Reasons/Explanations:
+    - Final risk score 0.37 -> classified as SUSPICIOUS.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain has a valid SSL certificate.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+
+[Scanning #147] https://slight-graphs-717878.framer.app/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+Brand impersonation detected on slight-graphs-717878.framer.app: page references brands ['yahoo']
+Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
+CRE: Brand-content mismatch detected (brands: ['yahoo'])
+CRE: Brand impersonation + credential/payment collection detected
+  ====== [SUCCESS # 59/100 LIVE DOMAIN] ======
+  Classification : PHISHING
+  Risk Level     : HIGH (Score: 0.7125)
+  Reasons/Explanations:
+    - Final risk score 0.71 -> classified as PHISHING.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain has a valid SSL certificate.
+    - Login or password input form detected on the page.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+    - BRAND IMPERSONATION: Page content references brand(s) [yahoo] but domain does not match.
+    - Cross-Reference Engine risk score: 0.80
+
+[Scanning #148] https://sogo31.weebly.com/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
   ====== [SUCCESS # 60/100 LIVE DOMAIN] ======
   Classification : SUSPICIOUS
@@ -923,7 +1123,13 @@ Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo fa
     - Domain has a valid SSL certificate.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
 
-[Scanning #110] https://miuandes--cl.weebly.com/
+[Scanning #149] https://golden-area-464000.framer.app/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #150] https://zestful-studies-933895.framer.app/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #151] https://msn23.weebly.com/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
   ====== [SUCCESS # 61/100 LIVE DOMAIN] ======
   Classification : SUSPICIOUS
@@ -934,23 +1140,78 @@ Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo fa
     - Domain has a valid SSL certificate.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
 
-[Scanning #111] https://wrightpattcuuregainonl.weebly.com/
+[Scanning #152] https://btmail-b0xupdate.framer.website/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
-Brand impersonation detected on wrightpattcuuregainonl.weebly.com: page references brands ['whatsapp']
-Combo detected: Brand impersonation on hosted platform -> wrightpattcuuregainonl.weebly.com (brands: ['whatsapp'])
+Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
   ====== [SUCCESS # 62/100 LIVE DOMAIN] ======
-  Classification : PHISHING
-  Risk Level     : HIGH (Score: 0.99)
+  Classification : SUSPICIOUS
+  Risk Level     : LOW (Score: 0.365)
   Reasons/Explanations:
-    - Final risk score 0.99 -> classified as PHISHING.
+    - Final risk score 0.37 -> classified as SUSPICIOUS.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain has a valid SSL certificate.
+    - Login or password input form detected on the page.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+
+[Scanning #153] https://individual-reason-008163.framer.app/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
+  ====== [SUCCESS # 63/100 LIVE DOMAIN] ======
+  Classification : SAFE
+  Risk Level     : INFO (Score: 0.285)
+  Reasons/Explanations:
+    - Final risk score 0.29 -> classified as SAFE.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain has a valid SSL certificate.
+    - Login or password input form detected on the page.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+
+[Scanning #154] https://outlookc-tr.weebly.com/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+  ====== [SUCCESS # 64/100 LIVE DOMAIN] ======
+  Classification : PHISHING
+  Risk Level     : HIGH (Score: 1.0)
+  Reasons/Explanations:
+    - Final risk score 1.00 -> classified as PHISHING.
+    - Domain resembles known brand 'outlook' with similarity 90%.
     - Domain has no MX (mail) records — unusual for legitimate domains.
     - Domain has a valid SSL certificate.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-    - BRAND IMPERSONATION: Page content references brand(s) [whatsapp] but domain does not match.
+    - Cross-reference analysis: domain name contains brand 'outlook' on a hosted platform.
+    - Cross-Reference Engine risk score: 0.55
 
-[Scanning #112] https://webmailmtsrs.weebly.com/
+[Scanning #155] https://wxfinityy.weebly.com/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 63/100 LIVE DOMAIN] ======
+  ====== [SUCCESS # 65/100 LIVE DOMAIN] ======
+  Classification : PHISHING
+  Risk Level     : HIGH (Score: 1.0)
+  Reasons/Explanations:
+    - Final risk score 1.00 -> classified as PHISHING.
+    - Domain resembles known brand 'xfinity' with similarity 90%.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain has a valid SSL certificate.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+    - Cross-reference analysis: domain name contains brand 'xfinity' on a hosted platform.
+    - Cross-Reference Engine risk score: 0.55
+
+[Scanning #156] https://oal0is-osgv.weebly.com/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+Brand impersonation detected on oal0is-osgv.weebly.com: page references brands ['xfinity']
+CRE: Brand-content mismatch detected (brands: ['xfinity'])
+  ====== [SUCCESS # 66/100 LIVE DOMAIN] ======
+  Classification : PHISHING
+  Risk Level     : HIGH (Score: 0.605)
+  Reasons/Explanations:
+    - Final risk score 0.60 -> classified as PHISHING.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain has a valid SSL certificate.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+    - BRAND IMPERSONATION: Page content references brand(s) [xfinity] but domain does not match.
+    - Cross-Reference Engine risk score: 0.75
+
+[Scanning #157] https://oninerallycuinon.weebly.com/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+  ====== [SUCCESS # 67/100 LIVE DOMAIN] ======
   Classification : SUSPICIOUS
   Risk Level     : LOW (Score: 0.365)
   Reasons/Explanations:
@@ -959,10 +1220,95 @@ Combo detected: Brand impersonation on hosted platform -> wrightpattcuuregainonl
     - Domain has a valid SSL certificate.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
 
-[Scanning #113] https://exhilarated-talk-927451.framer.app/
+[Scanning #158] https://nbb888898.weebly.com/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+Brand impersonation detected on nbb888898.weebly.com: page references brands ['xfinity']
+CRE: Brand-content mismatch detected (brands: ['xfinity'])
+  ====== [SUCCESS # 68/100 LIVE DOMAIN] ======
+  Classification : PHISHING
+  Risk Level     : HIGH (Score: 0.605)
+  Reasons/Explanations:
+    - Final risk score 0.60 -> classified as PHISHING.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain has a valid SSL certificate.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+    - BRAND IMPERSONATION: Page content references brand(s) [xfinity] but domain does not match.
+    - Cross-Reference Engine risk score: 0.75
+
+[Scanning #159] https://firstsbank.weebly.com/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+Brand impersonation detected on firstsbank.weebly.com: page references brands ['whatsapp']
+CRE: Brand-content mismatch detected (brands: ['whatsapp'])
+  ====== [SUCCESS # 69/100 LIVE DOMAIN] ======
+  Classification : PHISHING
+  Risk Level     : HIGH (Score: 0.9825)
+  Reasons/Explanations:
+    - Final risk score 0.98 -> classified as PHISHING.
+    - Domain is highly similar to a known domain (similarity 75%).
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain has a valid SSL certificate.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+    - BRAND IMPERSONATION: Page content references brand(s) [whatsapp] but domain does not match.
+    - Cross-Reference Engine risk score: 0.75
+
+[Scanning #160] https://spinning-role-059345.framer.app/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #161] https://authwebuxux.weebly.com/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+  ====== [SUCCESS # 70/100 LIVE DOMAIN] ======
+  Classification : SUSPICIOUS
+  Risk Level     : LOW (Score: 0.365)
+  Reasons/Explanations:
+    - Final risk score 0.37 -> classified as SUSPICIOUS.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain has a valid SSL certificate.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+
+[Scanning #162] https://miuandes--cl.weebly.com/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+  ====== [SUCCESS # 71/100 LIVE DOMAIN] ======
+  Classification : SUSPICIOUS
+  Risk Level     : LOW (Score: 0.365)
+  Reasons/Explanations:
+    - Final risk score 0.37 -> classified as SUSPICIOUS.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain has a valid SSL certificate.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+
+[Scanning #163] https://wrightpattcuuregainonl.weebly.com/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+Brand impersonation detected on wrightpattcuuregainonl.weebly.com: page references brands ['whatsapp']
+CRE: Brand-content mismatch detected (brands: ['whatsapp'])
+  ====== [SUCCESS # 72/100 LIVE DOMAIN] ======
+  Classification : PHISHING
+  Risk Level     : HIGH (Score: 0.605)
+  Reasons/Explanations:
+    - Final risk score 0.60 -> classified as PHISHING.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain has a valid SSL certificate.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+    - BRAND IMPERSONATION: Page content references brand(s) [whatsapp] but domain does not match.
+    - Cross-Reference Engine risk score: 0.75
+
+[Scanning #164] https://webmailmtsrs.weebly.com/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+  ====== [SUCCESS # 73/100 LIVE DOMAIN] ======
+  Classification : SUSPICIOUS
+  Risk Level     : LOW (Score: 0.365)
+  Reasons/Explanations:
+    - Final risk score 0.37 -> classified as SUSPICIOUS.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain has a valid SSL certificate.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+
+[Scanning #165] https://exhilarated-talk-927451.framer.app/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #166] https://attractive-favorites-368884.framer.app/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
 Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 64/100 LIVE DOMAIN] ======
+  ====== [SUCCESS # 74/100 LIVE DOMAIN] ======
   Classification : SAFE
   Risk Level     : INFO (Score: 0.285)
   Reasons/Explanations:
@@ -972,23 +1318,10 @@ Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo fa
     - Login or password input form detected on the page.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
 
-[Scanning #114] https://attractive-favorites-368884.framer.app/
+[Scanning #167] https://connectzimbraredirecting.framer.ai/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
 Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 65/100 LIVE DOMAIN] ======
-  Classification : SAFE
-  Risk Level     : INFO (Score: 0.285)
-  Reasons/Explanations:
-    - Final risk score 0.29 -> classified as SAFE.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Login or password input form detected on the page.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-
-[Scanning #115] https://connectzimbraredirecting.framer.ai/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 66/100 LIVE DOMAIN] ======
+  ====== [SUCCESS # 75/100 LIVE DOMAIN] ======
   Classification : SAFE
   Risk Level     : INFO (Score: 0.27)
   Reasons/Explanations:
@@ -998,9 +1331,9 @@ Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo fa
     - Login or password input form detected on the page.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
 
-[Scanning #116] https://sp478111.sitebeat.crazydomains.com/
+[Scanning #168] https://sp478111.sitebeat.crazydomains.com/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 67/100 LIVE DOMAIN] ======
+  ====== [SUCCESS # 76/100 LIVE DOMAIN] ======
   Classification : SUSPICIOUS
   Risk Level     : LOW (Score: 0.33)
   Reasons/Explanations:
@@ -1009,37 +1342,40 @@ Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo fa
     - Domain has a valid SSL certificate.
     - Login or password input form detected on the page.
 
-[Scanning #117] https://ghbrdc.weebly.com/
+[Scanning #169] https://ghbrdc.weebly.com/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
 Brand impersonation detected on ghbrdc.weebly.com: page references brands ['xfinity']
-Combo detected: Brand impersonation on hosted platform -> ghbrdc.weebly.com (brands: ['xfinity'])
-  ====== [SUCCESS # 68/100 LIVE DOMAIN] ======
+CRE: Brand-content mismatch detected (brands: ['xfinity'])
+  ====== [SUCCESS # 77/100 LIVE DOMAIN] ======
   Classification : PHISHING
-  Risk Level     : HIGH (Score: 0.99)
+  Risk Level     : HIGH (Score: 0.605)
   Reasons/Explanations:
-    - Final risk score 0.99 -> classified as PHISHING.
+    - Final risk score 0.60 -> classified as PHISHING.
     - Domain has no MX (mail) records — unusual for legitimate domains.
     - Domain has a valid SSL certificate.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
     - BRAND IMPERSONATION: Page content references brand(s) [xfinity] but domain does not match.
+    - Cross-Reference Engine risk score: 0.75
 
-[Scanning #118] https://outlookc-fr.weebly.com/
+[Scanning #170] https://outlookc-fr.weebly.com/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 69/100 LIVE DOMAIN] ======
+  ====== [SUCCESS # 78/100 LIVE DOMAIN] ======
   Classification : PHISHING
-  Risk Level     : HIGH (Score: 0.885)
+  Risk Level     : HIGH (Score: 1.0)
   Reasons/Explanations:
-    - Final risk score 0.89 -> classified as PHISHING.
+    - Final risk score 1.00 -> classified as PHISHING.
     - Domain resembles known brand 'outlook' with similarity 90%.
     - Domain has no MX (mail) records — unusual for legitimate domains.
     - Domain has a valid SSL certificate.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+    - Cross-reference analysis: domain name contains brand 'outlook' on a hosted platform.
+    - Cross-Reference Engine risk score: 0.55
 
-[Scanning #119] https://comcastauabrn0lasjpdqmailacctvoice.weebly.com/
+[Scanning #171] https://comcastauabrn0lasjpdqmailacctvoice.weebly.com/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
 Brand impersonation detected on comcastauabrn0lasjpdqmailacctvoice.weebly.com: page references brands ['comcast']
-Combo detected: Brand impersonation on hosted platform -> comcastauabrn0lasjpdqmailacctvoice.weebly.com (brands: ['comcast'])
-  ====== [SUCCESS # 70/100 LIVE DOMAIN] ======
+CRE: Hosted brand impersonation detected (content brands: ['comcast'], domain brand: comcast, hosted: True)
+  ====== [SUCCESS # 79/100 LIVE DOMAIN] ======
   Classification : PHISHING
   Risk Level     : HIGH (Score: 1.0)
   Reasons/Explanations:
@@ -1049,28 +1385,15 @@ Combo detected: Brand impersonation on hosted platform -> comcastauabrn0lasjpdqm
     - Domain has a valid SSL certificate.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
     - BRAND IMPERSONATION: Page content references brand(s) [comcast] but domain does not match.
+    - CRITICAL: Cross-Reference Engine detected brand impersonation on a hosted platform — all signals align.
 
-[Scanning #120] https://predictable-measure-718101.framer.app/
+[Scanning #172] https://predictable-measure-718101.framer.app/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #173] https://aqua-quail-596183.framer.app/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
 Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-Brand impersonation detected on predictable-measure-718101.framer.app: page references brands ['outlook']
-Combo detected: Brand impersonation + credential/payment collection -> predictable-measure-718101.framer.app
-  ====== [SUCCESS # 71/100 LIVE DOMAIN] ======
-  Classification : PHISHING
-  Risk Level     : HIGH (Score: 1.0)
-  Reasons/Explanations:
-    - Final risk score 1.00 -> classified as PHISHING.
-    - Domain is highly similar to a known domain (similarity 75%).
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Login or password input form detected on the page.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-    - BRAND IMPERSONATION: Page content references brand(s) [outlook] but domain does not match.
-
-[Scanning #121] https://aqua-quail-596183.framer.app/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 72/100 LIVE DOMAIN] ======
+  ====== [SUCCESS # 80/100 LIVE DOMAIN] ======
   Classification : SUSPICIOUS
   Risk Level     : LOW (Score: 0.365)
   Reasons/Explanations:
@@ -1080,87 +1403,96 @@ Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo fa
     - Login or password input form detected on the page.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
 
-[Scanning #122] https://chilly-form-331063.framer.app/
+[Scanning #174] https://chilly-form-331063.framer.app/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
 Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
 Brand impersonation detected on chilly-form-331063.framer.app: page references brands ['xfinity']
-Combo detected: Brand impersonation + credential/payment collection -> chilly-form-331063.framer.app
-  ====== [SUCCESS # 73/100 LIVE DOMAIN] ======
+CRE: Brand-content mismatch detected (brands: ['xfinity'])
+CRE: Brand impersonation + credential/payment collection detected
+  ====== [SUCCESS # 81/100 LIVE DOMAIN] ======
   Classification : PHISHING
-  Risk Level     : HIGH (Score: 0.755)
+  Risk Level     : HIGH (Score: 0.7125)
   Reasons/Explanations:
-    - Final risk score 0.76 -> classified as PHISHING.
+    - Final risk score 0.71 -> classified as PHISHING.
     - Domain has no MX (mail) records — unusual for legitimate domains.
     - Domain has a valid SSL certificate.
     - Login or password input form detected on the page.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
     - BRAND IMPERSONATION: Page content references brand(s) [xfinity] but domain does not match.
+    - Cross-Reference Engine risk score: 0.80
 
-[Scanning #123] https://attractive-states-704494.framer.app/
+[Scanning #175] https://attractive-states-704494.framer.app/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
 Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
 Brand impersonation detected on attractive-states-704494.framer.app: page references brands ['dropbox']
-Combo detected: Brand impersonation + credential/payment collection -> attractive-states-704494.framer.app
-  ====== [SUCCESS # 74/100 LIVE DOMAIN] ======
+CRE: Brand-content mismatch detected (brands: ['dropbox'])
+CRE: Brand impersonation + credential/payment collection detected
+  ====== [SUCCESS # 82/100 LIVE DOMAIN] ======
   Classification : PHISHING
-  Risk Level     : HIGH (Score: 0.755)
+  Risk Level     : HIGH (Score: 0.7125)
   Reasons/Explanations:
-    - Final risk score 0.76 -> classified as PHISHING.
+    - Final risk score 0.71 -> classified as PHISHING.
     - Domain has no MX (mail) records — unusual for legitimate domains.
     - Domain has a valid SSL certificate.
     - Login or password input form detected on the page.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
     - BRAND IMPERSONATION: Page content references brand(s) [dropbox] but domain does not match.
+    - Cross-Reference Engine risk score: 0.80
 
-[Scanning #124] https://mindful-tribute-378390.framer.app/
+[Scanning #176] https://mindful-tribute-378390.framer.app/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
 Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
 Brand impersonation detected on mindful-tribute-378390.framer.app: page references brands ['yahoo']
-Combo detected: Brand impersonation + credential/payment collection -> mindful-tribute-378390.framer.app
-  ====== [SUCCESS # 75/100 LIVE DOMAIN] ======
+CRE: Brand-content mismatch detected (brands: ['yahoo'])
+CRE: Brand impersonation + credential/payment collection detected
+  ====== [SUCCESS # 83/100 LIVE DOMAIN] ======
   Classification : PHISHING
-  Risk Level     : HIGH (Score: 0.755)
+  Risk Level     : HIGH (Score: 0.7125)
   Reasons/Explanations:
-    - Final risk score 0.76 -> classified as PHISHING.
+    - Final risk score 0.71 -> classified as PHISHING.
     - Domain has no MX (mail) records — unusual for legitimate domains.
     - Domain has a valid SSL certificate.
     - Login or password input form detected on the page.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
     - BRAND IMPERSONATION: Page content references brand(s) [yahoo] but domain does not match.
+    - Cross-Reference Engine risk score: 0.80
 
-[Scanning #125] https://relaxed-status-139483.framer.app/
+[Scanning #177] https://relaxed-status-139483.framer.app/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
 Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
 Brand impersonation detected on relaxed-status-139483.framer.app: page references brands ['talktalk']
-Combo detected: Brand impersonation + credential/payment collection -> relaxed-status-139483.framer.app
-  ====== [SUCCESS # 76/100 LIVE DOMAIN] ======
+CRE: Brand-content mismatch detected (brands: ['talktalk'])
+CRE: Brand impersonation + credential/payment collection detected
+  ====== [SUCCESS # 84/100 LIVE DOMAIN] ======
   Classification : PHISHING
-  Risk Level     : HIGH (Score: 0.755)
+  Risk Level     : HIGH (Score: 0.735)
   Reasons/Explanations:
-    - Final risk score 0.76 -> classified as PHISHING.
+    - Final risk score 0.73 -> classified as PHISHING.
     - Domain has no MX (mail) records — unusual for legitimate domains.
     - Domain has a valid SSL certificate.
     - Login or password input form detected on the page.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
     - BRAND IMPERSONATION: Page content references brand(s) [talktalk] but domain does not match.
+    - Cross-Reference Engine risk score: 0.80
 
-[Scanning #126] https://wrightpattcusupporthelp.weebly.com/
+[Scanning #178] https://wrightpattcusupporthelp.weebly.com/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
 Brand impersonation detected on wrightpattcusupporthelp.weebly.com: page references brands ['whatsapp']
-Combo detected: Brand impersonation on hosted platform -> wrightpattcusupporthelp.weebly.com (brands: ['whatsapp'])
-  ====== [SUCCESS # 77/100 LIVE DOMAIN] ======
+CRE: Brand-content mismatch detected (brands: ['whatsapp'])
+  ====== [SUCCESS # 85/100 LIVE DOMAIN] ======
   Classification : PHISHING
-  Risk Level     : HIGH (Score: 1.0)
+  Risk Level     : HIGH (Score: 0.6175)
   Reasons/Explanations:
-    - Final risk score 1.00 -> classified as PHISHING.
+    - Final risk score 0.62 -> classified as PHISHING.
     - Domain has no MX (mail) records — unusual for legitimate domains.
     - Domain has a valid SSL certificate.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
     - BRAND IMPERSONATION: Page content references brand(s) [whatsapp] but domain does not match.
+    - Cross-Reference Engine risk score: 0.75
 
-[Scanning #127] https://98545785a.weebly.com/
+[Scanning #179] https://98545785a.weebly.com/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 78/100 LIVE DOMAIN] ======
+  ====== [SUCCESS # 86/100 LIVE DOMAIN] ======
   Classification : SUSPICIOUS
   Risk Level     : LOW (Score: 0.365)
   Reasons/Explanations:
@@ -1169,9 +1501,9 @@ Combo detected: Brand impersonation on hosted platform -> wrightpattcusupporthel
     - Domain has a valid SSL certificate.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
 
-[Scanning #128] https://firstberne.weebly.com/
+[Scanning #180] https://firstberne.weebly.com/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 79/100 LIVE DOMAIN] ======
+  ====== [SUCCESS # 87/100 LIVE DOMAIN] ======
   Classification : SUSPICIOUS
   Risk Level     : LOW (Score: 0.365)
   Reasons/Explanations:
@@ -1180,10 +1512,10 @@ Combo detected: Brand impersonation on hosted platform -> wrightpattcusupporthel
     - Domain has a valid SSL certificate.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
 
-[Scanning #129] https://yummy-stories-129506.framer.app/
+[Scanning #181] https://yummy-stories-129506.framer.app/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
 Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 80/100 LIVE DOMAIN] ======
+  ====== [SUCCESS # 88/100 LIVE DOMAIN] ======
   Classification : PHISHING
   Risk Level     : MEDIUM (Score: 0.5175)
   Reasons/Explanations:
@@ -1194,119 +1526,18 @@ Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo fa
     - Login or password input form detected on the page.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
 
-[Scanning #130] https://daumojjhhbuhv.weebly.com/
+[Scanning #182] https://daumojjhhbuhv.weebly.com/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 81/100 LIVE DOMAIN] ======
-  Classification : SUSPICIOUS
-  Risk Level     : LOW (Score: 0.365)
-  Reasons/Explanations:
-    - Final risk score 0.37 -> classified as SUSPICIOUS.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-
-[Scanning #131] https://brown-size-167419.framer.app/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 82/100 LIVE DOMAIN] ======
-  Classification : SAFE
-  Risk Level     : INFO (Score: 0.285)
-  Reasons/Explanations:
-    - Final risk score 0.29 -> classified as SAFE.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Login or password input form detected on the page.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-
-[Scanning #132] https://left-elements-102208.framer.app/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 83/100 LIVE DOMAIN] ======
-  Classification : SAFE
-  Risk Level     : INFO (Score: 0.125)
-  Reasons/Explanations:
-    - Final risk score 0.12 -> classified as SAFE.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-
-[Scanning #133] https://posta-uniba-it.weebly.com/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 84/100 LIVE DOMAIN] ======
-  Classification : SUSPICIOUS
-  Risk Level     : LOW (Score: 0.365)
-  Reasons/Explanations:
-    - Final risk score 0.37 -> classified as SUSPICIOUS.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-
-[Scanning #134] https://sp699027.sitebeat.crazydomains.com/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 85/100 LIVE DOMAIN] ======
-  Classification : SAFE
-  Risk Level     : INFO (Score: 0.27)
-  Reasons/Explanations:
-    - Final risk score 0.27 -> classified as SAFE.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Login or password input form detected on the page.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-
-[Scanning #135] https://pink-rule-147047.framer.app/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 86/100 LIVE DOMAIN] ======
-  Classification : SAFE
-  Risk Level     : INFO (Score: 0.285)
-  Reasons/Explanations:
-    - Final risk score 0.29 -> classified as SAFE.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Login or password input form detected on the page.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-
-[Scanning #136] https://lovely-checkbox-235949.framer.app/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 87/100 LIVE DOMAIN] ======
-  Classification : SAFE
-  Risk Level     : INFO (Score: 0.285)
-  Reasons/Explanations:
-    - Final risk score 0.29 -> classified as SAFE.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Login or password input form detected on the page.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-
-[Scanning #137] https://active-access-284978.framer.app/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 88/100 LIVE DOMAIN] ======
-  Classification : SUSPICIOUS
-  Risk Level     : LOW (Score: 0.305)
-  Reasons/Explanations:
-    - Final risk score 0.30 -> classified as SUSPICIOUS.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Login or password input form detected on the page.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-
-[Scanning #138] https://espananewlink.weebly.com/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Brand impersonation detected on espananewlink.weebly.com: page references brands ['microsoft']
-Combo detected: Brand impersonation on hosted platform -> espananewlink.weebly.com (brands: ['microsoft'])
   ====== [SUCCESS # 89/100 LIVE DOMAIN] ======
-  Classification : PHISHING
-  Risk Level     : HIGH (Score: 0.99)
+  Classification : SUSPICIOUS
+  Risk Level     : LOW (Score: 0.365)
   Reasons/Explanations:
-    - Final risk score 0.99 -> classified as PHISHING.
+    - Final risk score 0.37 -> classified as SUSPICIOUS.
     - Domain has no MX (mail) records — unusual for legitimate domains.
     - Domain has a valid SSL certificate.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-    - BRAND IMPERSONATION: Page content references brand(s) [microsoft] but domain does not match.
 
-[Scanning #139] https://holistic-diamond-738467.framer.app/
+[Scanning #183] https://brown-size-167419.framer.app/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
 Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
   ====== [SUCCESS # 90/100 LIVE DOMAIN] ======
@@ -1319,38 +1550,12 @@ Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo fa
     - Login or password input form detected on the page.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
 
-[Scanning #140] https://internal-evidence-611495.framer.app/
+[Scanning #184] https://left-elements-102208.framer.app/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #185] https://posta-uniba-it.weebly.com/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
   ====== [SUCCESS # 91/100 LIVE DOMAIN] ======
-  Classification : SAFE
-  Risk Level     : INFO (Score: 0.285)
-  Reasons/Explanations:
-    - Final risk score 0.29 -> classified as SAFE.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Login or password input form detected on the page.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-
-[Scanning #141] https://serious-kangaroo-960887.framer.app/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-Brand impersonation detected on serious-kangaroo-960887.framer.app: page references brands ['dropbox']
-Combo detected: Brand impersonation + credential/payment collection -> serious-kangaroo-960887.framer.app
-  ====== [SUCCESS # 92/100 LIVE DOMAIN] ======
-  Classification : PHISHING
-  Risk Level     : HIGH (Score: 0.755)
-  Reasons/Explanations:
-    - Final risk score 0.76 -> classified as PHISHING.
-    - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain has a valid SSL certificate.
-    - Login or password input form detected on the page.
-    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-    - BRAND IMPERSONATION: Page content references brand(s) [dropbox] but domain does not match.
-
-[Scanning #142] https://mail-sogo.weebly.com/
-  -> Pre-checking connection... LIVE! Running AI Pipeline...
-  ====== [SUCCESS # 93/100 LIVE DOMAIN] ======
   Classification : SUSPICIOUS
   Risk Level     : LOW (Score: 0.365)
   Reasons/Explanations:
@@ -1359,10 +1564,22 @@ Combo detected: Brand impersonation + credential/payment collection -> serious-k
     - Domain has a valid SSL certificate.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
 
-[Scanning #143] https://true-panda-257640.framer.app/
+[Scanning #186] https://sp699027.sitebeat.crazydomains.com/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+  ====== [SUCCESS # 92/100 LIVE DOMAIN] ======
+  Classification : SAFE
+  Risk Level     : INFO (Score: 0.27)
+  Reasons/Explanations:
+    - Final risk score 0.27 -> classified as SAFE.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain has a valid SSL certificate.
+    - Login or password input form detected on the page.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+
+[Scanning #187] https://pink-rule-147047.framer.app/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
 Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-  ====== [SUCCESS # 94/100 LIVE DOMAIN] ======
+  ====== [SUCCESS # 93/100 LIVE DOMAIN] ======
   Classification : SAFE
   Risk Level     : INFO (Score: 0.285)
   Reasons/Explanations:
@@ -1372,112 +1589,104 @@ Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo fa
     - Login or password input form detected on the page.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
 
-[Scanning #144] https://careful-learning-148364.framer.app/
+[Scanning #188] https://lovely-checkbox-235949.framer.app/
+  -> Pre-checking connection... DEAD. Skipping.
+
+[Scanning #189] https://active-access-284978.framer.app/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
 Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-Brand impersonation detected on careful-learning-148364.framer.app: page references brands ['yahoo']
-Combo detected: Brand impersonation + credential/payment collection -> careful-learning-148364.framer.app
-  ====== [SUCCESS # 95/100 LIVE DOMAIN] ======
-  Classification : PHISHING
-  Risk Level     : HIGH (Score: 0.755)
+  ====== [SUCCESS # 94/100 LIVE DOMAIN] ======
+  Classification : SUSPICIOUS
+  Risk Level     : LOW (Score: 0.305)
   Reasons/Explanations:
-    - Final risk score 0.76 -> classified as PHISHING.
+    - Final risk score 0.30 -> classified as SUSPICIOUS.
     - Domain has no MX (mail) records — unusual for legitimate domains.
     - Domain has a valid SSL certificate.
     - Login or password input form detected on the page.
     - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
-    - BRAND IMPERSONATION: Page content references brand(s) [yahoo] but domain does not match.
 
-[Scanning #145] https://receivelink0lx.cfd/processing/5A2FA9A0E
-  -> Pre-checking connection... DEAD. Skipping.
-
-[Scanning #146] https://shopee4do4.vercel.app/
+[Scanning #190] https://espananewlink.weebly.com/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
-Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
-Brand impersonation detected on shopee4do4.vercel.app: page references brands ['facebook', 'linkedin', 'instagram', 'twitter', 'tiktok']
-Combo detected: Brand impersonation on hosted platform -> shopee4do4.vercel.app (brands: ['facebook', 'linkedin', 'instagram', 'twitter', 'tiktok'])
-  ====== [SUCCESS # 96/100 LIVE DOMAIN] ======
+Brand impersonation detected on espananewlink.weebly.com: page references brands ['microsoft']
+CRE: Brand-content mismatch detected (brands: ['microsoft'])
+  ====== [SUCCESS # 95/100 LIVE DOMAIN] ======
   Classification : PHISHING
-  Risk Level     : HIGH (Score: 0.995)
+  Risk Level     : HIGH (Score: 0.605)
   Reasons/Explanations:
-    - Final risk score 0.99 -> classified as PHISHING.
+    - Final risk score 0.60 -> classified as PHISHING.
     - Domain has no MX (mail) records — unusual for legitimate domains.
     - Domain has a valid SSL certificate.
-    - BRAND IMPERSONATION: Page content references brand(s) [facebook, linkedin, instagram, twitter, tiktok] but domain does not match.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+    - BRAND IMPERSONATION: Page content references brand(s) [microsoft] but domain does not match.
+    - Cross-Reference Engine risk score: 0.75
 
-[Scanning #147] https://welcome-bhd-credi.lovable.app/
+[Scanning #191] https://holistic-diamond-738467.framer.app/
+  -> Pre-checking connection... LIVE! Running AI Pipeline...
+Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
+  ====== [SUCCESS # 96/100 LIVE DOMAIN] ======
+  Classification : SAFE
+  Risk Level     : INFO (Score: 0.285)
+  Reasons/Explanations:
+    - Final risk score 0.29 -> classified as SAFE.
+    - Domain has no MX (mail) records — unusual for legitimate domains.
+    - Domain has a valid SSL certificate.
+    - Login or password input form detected on the page.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+
+[Scanning #192] https://internal-evidence-611495.framer.app/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
 Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
   ====== [SUCCESS # 97/100 LIVE DOMAIN] ======
   Classification : SAFE
-  Risk Level     : INFO (Score: 0.195)
+  Risk Level     : INFO (Score: 0.285)
   Reasons/Explanations:
-    - Final risk score 0.20 -> classified as SAFE.
+    - Final risk score 0.29 -> classified as SAFE.
     - Domain has no MX (mail) records — unusual for legitimate domains.
     - Domain has a valid SSL certificate.
-    - Page structure and behavior appear legitimate (safe content).
+    - Login or password input form detected on the page.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
 
-[Scanning #148] https://welcome-bhd-credi.lovable.app/blocked
+[Scanning #193] https://serious-kangaroo-960887.framer.app/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
 Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
+Brand impersonation detected on serious-kangaroo-960887.framer.app: page references brands ['dropbox']
+CRE: Brand-content mismatch detected (brands: ['dropbox'])
+CRE: Brand impersonation + credential/payment collection detected
   ====== [SUCCESS # 98/100 LIVE DOMAIN] ======
-  Classification : SAFE
-  Risk Level     : INFO (Score: 0.195)
+  Classification : PHISHING
+  Risk Level     : HIGH (Score: 0.7125)
   Reasons/Explanations:
-    - Final risk score 0.20 -> classified as SAFE.
+    - Final risk score 0.71 -> classified as PHISHING.
     - Domain has no MX (mail) records — unusual for legitimate domains.
     - Domain has a valid SSL certificate.
-    - Page structure and behavior appear legitimate (safe content).
+    - Login or password input form detected on the page.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
+    - BRAND IMPERSONATION: Page content references brand(s) [dropbox] but domain does not match.
+    - Cross-Reference Engine risk score: 0.80
 
-[Scanning #149] https://enlineacreditpichincha.iceiy.com
-  -> Pre-checking connection... DEAD. Skipping.
-
-[Scanning #150] https://qfa9lufi.cn/ds2/e/2qe=docomotiaos/
-  -> Pre-checking connection... DEAD. Skipping.
-
-[Scanning #151] https://qfh6yyag.cn/w/2/da/ds=docomos/
-  -> Pre-checking connection... DEAD. Skipping.
-
-[Scanning #152] https://qfl5tjhf.cn/w/2/da/ds=docomos/
-  -> Pre-checking connection... DEAD. Skipping.
-
-[Scanning #153] https://qfw5oook.cn/w/2/da/ds=docomos/
-  -> Pre-checking connection... DEAD. Skipping.
-
-[Scanning #154] https://taocidingzhi.com/docomo/
-  -> Pre-checking connection... DEAD. Skipping.
-
-[Scanning #155] https://lightaudio728.mypi.co/
-  -> Pre-checking connection... DEAD. Skipping.
-
-[Scanning #156] https://p4s5y9.cfd/ojook3xf/9S76ud/O7bnKS
-  -> Pre-checking connection... DEAD. Skipping.
-
-[Scanning #157] http://allegro.8t238g823.rest/
+[Scanning #194] https://mail-sogo.weebly.com/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
   ====== [SUCCESS # 99/100 LIVE DOMAIN] ======
-  Classification : PHISHING
-  Risk Level     : HIGH (Score: 1.0)
+  Classification : SUSPICIOUS
+  Risk Level     : LOW (Score: 0.365)
   Reasons/Explanations:
-    - Final risk score 1.00 -> classified as PHISHING.
-    - Domain resembles known brand 'allegro' with similarity 90%.
-    - Domain registered very recently (2 days old).
+    - Final risk score 0.37 -> classified as SUSPICIOUS.
     - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain registered for minimum period (< 1 year) — common in throwaway phishing domains.
     - Domain has a valid SSL certificate.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
 
-[Scanning #158] https://allegro.8t238g823.rest/
+[Scanning #195] https://true-panda-257640.framer.app/
   -> Pre-checking connection... LIVE! Running AI Pipeline...
+Error trying to connect to socket: closing socket - [Errno 11001] getaddrinfo failed
   ====== [SUCCESS # 100/100 LIVE DOMAIN] ======
-  Classification : PHISHING
-  Risk Level     : HIGH (Score: 1.0)
+  Classification : SAFE
+  Risk Level     : INFO (Score: 0.285)
   Reasons/Explanations:
-    - Final risk score 1.00 -> classified as PHISHING.
-    - Domain resembles known brand 'allegro' with similarity 90%.
-    - Domain registered very recently (2 days old).
+    - Final risk score 0.29 -> classified as SAFE.
     - Domain has no MX (mail) records — unusual for legitimate domains.
-    - Domain registered for minimum period (< 1 year) — common in throwaway phishing domains.
     - Domain has a valid SSL certificate.
+    - Login or password input form detected on the page.
+    - Page contains redirect mechanisms (meta-refresh or JavaScript redirect).
 
 ============================================================
 BATCH TEST SUMMARY (LIVE LINKS ONLY - EXTERNAL APIs OFF)
@@ -1485,25 +1694,43 @@ BATCH TEST SUMMARY (LIVE LINKS ONLY - EXTERNAL APIs OFF)
 Total LIVE links successfully tested: 100
 
 --- By Classification ---
-SAFE:       43
-SUSPICIOUS: 23
-PHISHING:   34
+SAFE:       27
+SUSPICIOUS: 26
+PHISHING:   47
 
 --- By Risk Level (Severity) ---
-INFO:       43
-LOW:        23
-MEDIUM:     5
-HIGH:       29
+INFO:       27
+LOW:        26
+MEDIUM:     9
+HIGH:       38
 CRITICAL:   0
 
 --- Links classified as PHISHING (Detected by AI Agents) ---
+ - https://robloxmodsapk.com/
+ - https://krk-telegram.com.cn/
+ - https://ton-telegram.network/
+ - https://managesuite-trezor.com/?input_24=u9gF7CLkbfiDdHpefDWOG8AxaGKzbat2X%5B...%5DlttwpJ0Pl760qn14RBLLN6qx9K0JbpU5CE03qBQQn2SksdRadvYlqTSBA%3D%3D
+ - https://www.robloxhack.cheatmodonline.com/
+ - https://zoom.murigu.com/
+ - https://www.binancebooster.com/
+ - https://binancebooster.com/
+ - https://blogread-trezor.com/index_blog.html?input_24=u9gF7CLkbfiDdHpefDWOG8AxaGKzbat2X[...]lttwpJ0Pl760qn14RBLLN6qx9K0JbpU5CE03qBQQn2SksdRadvYlqTSBA==
+ - https://gazing.pp.ua/
+ - https://creditagricole-mescompte.com/
+ - https://creditagricole-mescompte.com/pages/asset.php
+ - https://aigemini.zeabur.app/
+ - https://get-started-desktop.wixstudio.com/en-us
+ - https://52479-santander.com/
+ - https://52479-santander.com/payment/
+ - https://gmxauthe.vercel.app/
+ - http://allegro-lokalnie.9g89w23823g.cfd/
+ - http://allegro.343984y398h.bond/
+ - https://allegro.343984y398h.bond/
  - http://suite-trezor.netlify.app
  - https://suite-trezor.netlify.app/
- - http://dhl-info.ru/
  - https://ipfs.io/ipfs/bafkreierdp22iqo7a2nw3jo6hg5ieohxvvxwz36md2frplebv72mpasewy#{email}
  - https://linkurl.pk/LmJyUxqA
  - https://bafkreieuwxsau5sl7xlrjqlplgz3dfcuyrb3myf7oimnxivbjlntdp22dy.ipfs.dweb.link/
- - https://loud-rules-224161.framer.app/
  - https://peringatan-pembatalan-akun-anda001.weebly.com/
  - https://tiny-approach-170185.framer.app/
  - https://mobile-imaginations-439080.framer.app/
@@ -1518,7 +1745,6 @@ CRITICAL:   0
  - https://ghbrdc.weebly.com/
  - https://outlookc-fr.weebly.com/
  - https://comcastauabrn0lasjpdqmailacctvoice.weebly.com/
- - https://predictable-measure-718101.framer.app/
  - https://chilly-form-331063.framer.app/
  - https://attractive-states-704494.framer.app/
  - https://mindful-tribute-378390.framer.app/
@@ -1527,12 +1753,11 @@ CRITICAL:   0
  - https://yummy-stories-129506.framer.app/
  - https://espananewlink.weebly.com/
  - https://serious-kangaroo-960887.framer.app/
- - https://careful-learning-148364.framer.app/
- - https://shopee4do4.vercel.app/
- - http://allegro.8t238g823.rest/
- - https://allegro.8t238g823.rest/
 
 --- Links classified as SUSPICIOUS (Evaded model partially) ---
+ - https://tydytdytyddyi484ytfty.blogspot.com/
+ - https://email-member-and-password-update.webflow.io/
+ - https://sso-io-ndaxx-auth.webflow.io/
  - https://panel.standard.us-east-1.oortstorages.com/fitsal.sg
  - https://sportybetreedembonus04.weebly.com/
  - https://webrallycu.weebly.com/
@@ -1558,49 +1783,33 @@ CRITICAL:   0
  - https://mail-sogo.weebly.com/
 
 --- Links classified as SAFE (Evaded model completely) ---
+ - https://okx-web3-tron-usdt-trc20-000000313.pages.dev/
+ - https://okx-web3-tron-usdt-trc20-000000475.pages.dev/
  - https://eurogenerale.rscad.com.br/sgx/fs/
- - http://seedphrasefinder.xyz
- - https://seedphrasefinder.xyz/
- - http://emergencydatarequest.shop/
  - https://buonobuono.jp/zribpuf/amlcnqt/1itzfnu/FFBB/fb.php
- - https://emergencydatarequest.shop/
- - http://web3-appconnect.pages.dev/
- - https://web3-appconnect.pages.dev/
  - https://qrco.de/bgiDqY
  - https://q-r.to/bgiDqY
  - https://l.ead.me/bgiDqY
- - https://tinyurl.com/dfgyydftyrewr
  - https://roblox.com.ge/games/79798983053805/Untitled-Game?privateServerLinkCode=38045816557110881882093339372296
  - https://domicilerelais.pro/
  - https://domicilerelais.pro/74946779
  - https://votredomicile.pro/
  - https://votredomicile.pro/74946779
- - https://navy-guest-344134.framer.app/
  - https://invigorated-reason-713737.framer.app/
- - https://forgiving-advantage-290273.framer.app/
  - https://inventive-clicks-377633.framer.app/
  - https://likely-background-072946.framer.app/
  - https://predictable-functions-609084.framer.app/
  - https://dffremag.framer.wiki/
  - https://gleaming-guest-665722.framer.app/
- - https://concerned-clicks-001015.framer.app/
- - https://golden-area-464000.framer.app/
- - https://zestful-studies-933895.framer.app/
  - https://individual-reason-008163.framer.app/
- - https://spinning-role-059345.framer.app/
- - https://exhilarated-talk-927451.framer.app/
  - https://attractive-favorites-368884.framer.app/
  - https://connectzimbraredirecting.framer.ai/
  - https://brown-size-167419.framer.app/
- - https://left-elements-102208.framer.app/
  - https://sp699027.sitebeat.crazydomains.com/
  - https://pink-rule-147047.framer.app/
- - https://lovely-checkbox-235949.framer.app/
  - https://holistic-diamond-738467.framer.app/
  - https://internal-evidence-611495.framer.app/
  - https://true-panda-257640.framer.app/
- - https://welcome-bhd-credi.lovable.app/
- - https://welcome-bhd-credi.lovable.app/blocked
 
 Saving complete detailed results...
 Saved 100 analyzed links detailed records to batch_test_detailed_results.json

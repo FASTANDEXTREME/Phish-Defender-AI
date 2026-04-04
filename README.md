@@ -14,13 +14,14 @@ The latest version features a **completely reworked modern UI** and integrated *
 
 ---
 
-## 🔥 Key Features (v2.2.0)
+## 🔥 Key Features (v2.5.0)
 
 - ✅ **New UI / Command Center**: Rebuilt from the ground up using **Vite, React, and Tailwind CSS** for a premium, high-performance experience.
+- ✅ **Cross-Reference Engine (CRE)**: Dedicated correlation module that cross-references brand impersonation signals across content, infrastructure, and domain heuristics.
 - ✅ **PhishTank Integration**: Real-time cross-referencing against the PhishTank global phishing database.
 - ✅ **Dynamic API Toggles**: Ability to enable/disable **Google Safe Browsing** and **PhishTank** intelligence layers on-the-fly.
-- ✅ **5-Way Parallel Pipeline**: Concurrent execution of all intelligence agents with per-agent error isolation.
-- ✅ **Headless JS Rendering**: Full JavaScript execution via Playwright Chromium to catch obfuscated phishing kits.
+- ✅ **6-Agent Parallel Pipeline**: Concurrent execution of all intelligence agents, ending in a cross-reference synchronization step and per-agent error isolation.
+- ✅ **Headless JS Rendering**: Full JavaScript execution via Playwright Chromium (with a 4-tier fallback) to catch obfuscated phishing kits.
 - ✅ **Production-Ready**: Gunicorn WSGI server support, rate limiting, request timeouts, and health check endpoints.
 - ✅ **Headless Linux Deployment**: Fully compatible with terminal-only servers — no GUI required.
 
@@ -29,7 +30,7 @@ The latest version features a **completely reworked modern UI** and integrated *
 ## 🏗️ System Architecture & Workflow
 
 ### 1. The Pipeline (`core/pipeline.py`)
-When a scan initializes, the pipeline starts a `ThreadPoolExecutor` to run all specialized intelligence agents fully in parallel. It isolates errors per agent—meaning if one agent fails (e.g., a network timeout), it falls back to a safe default rather than crashing the scan. It also calculates granular latency metadata for the frontend.
+When a scan initializes, the pipeline starts a `ThreadPoolExecutor` to run all specialized intelligence agents fully in parallel. It isolates errors per agent—meaning if one agent fails (e.g., a network timeout), it falls back to a safe default rather than crashing the scan. It then aggregates their results using the **Cross-Reference Engine (CRE)** before passing them to the final Decision Engine. It also calculates granular latency metadata for the frontend.
 
 ### 2. The Specialized Agents
 - **PhishTank Intelligence Agent (`phishtank_agent.py`)**
@@ -52,20 +53,28 @@ When a scan initializes, the pipeline starts a `ThreadPoolExecutor` to run all s
   - Checks for the presence of Mail Exchange (MX) records, Name Servers (NS), and DNSSEC configurations.
   - Identifies contextual WHOIS privacy protections and short-expiry domains (registered for only 1 year and expiring within 30 days).
 - **Website Content Agent (`website_content_agent.py`)** 
-  - Utilizes **Playwright Headless Chromium** to render obfuscated, dynamically loaded, or JavaScript-heavy pages fully before analysis.
-  - Recognizes generic `email`, `tel`, and `code` inputs frequently abused for OTPs and credential harvesting.
+  - Utilizes **Playwright Headless Chromium** to render obfuscated, dynamically loaded, or JavaScript-heavy pages fully before analysis (with a robust 4-tier fallback: `networkidle` → `domcontentloaded` → `selectors` → `text`).
+  - Features **Brand Impersonation Detection** by scanning page content (titles, alt text, meta tags) to ensure they match the domain.
+  - Recognizes generic `email`, `tel`, and `code` inputs frequently abused for OTPs and credential harvesting, featuring a new 3-layer detection check for payment/credit card forms (including iframes like Stripe).
+  - Identifies **Tech Support Scams** using deep keyword matching and regex-based toll-free phone number correlation.
   - Tracks cross-domain `<form>` submissions, iframe injections, and automated Meta/JS redirects.
 
-### 3. The Decision Engine (`decision_agent.py`)
-- Aggregates the numerical risk scores (0.0 to 1.0) from all **five** specialized agents.
-- **Deadly Combo Multipliers:** Applies immediate, massive risk multipliers for known zero-day heuristics (e.g., New Domain + Login Form, or Brand Similarity + Free Hosting Platform), instantly bypassing simple algorithm masking to score as `PHISHING/SUSPICIOUS`.
-- **Dynamic Weight Redistribution:** If Google Safe Browsing returns "safe", the algorithm dynamically redistributes its mathematical weight entirely to the custom Intelligence (45%), Content (40%), and Similarity (15%) agents, allowing them to independently catch zero-day attacks.
-- Applies a **50% Corroboration Boost** to the final score if two or more agents independently detect high risk (score `>= 0.40`).
+### 3. The Cross-Reference Engine (`core/cross_reference_engine.py`)
+- Acts as a dedicated stage between the parallel analysis agents and the decision agent.
+- Explicitly correlates signals across Content, Similarity, and Intelligence agents (e.g., matching a brand impersonation signal from the Content Agent against a free-hosting indicator from the Intelligence Agent).
+- Produces an independent `cross_ref_risk_score` (0.0 to 1.0) along with context on brand/content mismatches.
+
+### 4. The Decision Engine (`decision_agent.py`)
+- Aggregates the numerical risk scores (0.0 to 1.0) from all agents, including the new **Cross-Reference Engine**.
+- **Deadly Combo Multipliers:** Applies immediate, massive risk multipliers for known zero-day heuristics instantly bypassing simple algorithm masking to score as `PHISHING/SUSPICIOUS`.
+- **Dynamic Weight Redistribution:** If Google Safe Browsing returns "safe", the algorithm dynamically redistributes its mathematical weight to the custom Intelligence, Content, Similarity, and CRE agents. Uses a 4-way weight distribution explicitly factoring in the CRE signal when non-zero.
+- Applies a **50% Corroboration Boost** to the final score if multiple agents independently detect high risk.
 - Outputs the classification based on strict thresholds (`>=0.45`: PHISHING, `>=0.30`: SUSPICIOUS, `<0.30`: SAFE) alongside severity labels (LOW to CRITICAL).
 
-### 4. The Frontend Command Center
+### 5. The Frontend Command Center
 - A glassmorphic, cyberpunk-style dashboard served directly by the backend as a pre-built Vite/React SPA.
 - Features live, real-world metrics (no hardcoded/fake stats), including session **Scans Completed**, **Live Pipeline Latency (MS)**, and **API Key Configuration Status**.
+- Displays the new **Cross-Reference Engine** metric card for brand impersonation context.
 - No Node.js or npm is required on the server — the frontend is pre-compiled and served as static files.
 
 ---
@@ -451,18 +460,19 @@ Phish-Defender-AI/
 ├── requirements.txt            # Python dependencies (pinned)
 ├── .env.example                # Environment variable template
 ├── .gitignore
-├── core/
-│   ├── config.py               # Centralized configuration constants
-│   ├── pipeline.py             # Concurrent agent orchestration
-│   └── user_input_domain.py    # Input validation & cleaning
 ├── agents/
 │   ├── decision_agent.py       # Final risk aggregation & classification
 │   ├── domain_similarity_agent.py  # Brand impersonation detection
 │   ├── domain_intelligence_agent.py # WHOIS/DNS/SSL analysis
 │   ├── website_content_agent.py    # HTML + Playwright content analysis
 │   ├── safe_browsing_agent.py      # Google Safe Browsing API
-│   └── phishtank_agent.py         # PhishTank database lookup
-├── frontend/
+│   └── phishtank_agent.py          # PhishTank database lookup
+├── core/
+│   ├── config.py               # Centralized configuration constants
+│   ├── cross_reference_engine.py # Brand signal correlation across agents
+│   ├── pipeline.py             # Concurrent agent orchestration
+│   └── user_input_domain.py    # Input validation & cleaning
+├── data/
 │   ├── dist/                   # Pre-built SPA (served in production)
 │   │   ├── index.html
 │   │   └── assets/

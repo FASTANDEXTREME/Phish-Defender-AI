@@ -5,12 +5,26 @@ This changelog documents all structural, architectural, algorithmic, and UI impr
 ## [2.5.0] - 4th April 2026
 
 ### 🚀 Major Upgrades & Audit Remediations
+- **Cross-Reference Engine (`core/cross_reference_engine.py`)**: 
+  - Introduced a dedicated Cross-Reference Engine (CRE) as a new pipeline stage between analysis agents and the Decision Agent.
+  - Correlates brand signals across Content, Similarity, and Intelligence agents to detect impersonation patterns that no single agent can identify alone.
+  - Produces an independent `cross_ref_risk_score` (0.0–1.0) that feeds into the Decision Agent as a 4th scoring dimension.
+  - Moved Combos 6–9 (brand impersonation + hosted platform, payment on disposable, scam indicators) from the Decision Agent into the CRE for cleaner separation of concerns.
 - **Content Brand Impersonation Engine**: 
   - Added robust detection for brand impersonation by scanning page content (title, text, image alt tags, meta tags) and cross-referencing it against the actual domain.
 - **Enhanced Sensitive Field Detection**: 
   - Added 3-layer detection for payment/credit card forms (including iframes like Stripe/Braintree) and OTP/verification codes.
 - **Tech Support Scam Detection**: 
   - Implemented advanced tech support scam detection featuring keyword matching and regex-based toll-free phone number correlation.
+
+### 🏗️ Architecture
+- **6-Agent Pipeline with CRE**:
+  - Pipeline now runs: 5 concurrent agents → Cross-Reference Engine → Decision Agent (was: 5 agents → Decision Agent).
+  - CRE execution adds <1ms latency (pure CPU computation, no I/O).
+  - Decision Agent scoring now supports 4-way weight distribution (Similarity/Intelligence/Content/CRE) when CRE has a non-zero signal.
+- **Frontend: CRE Dashboard Card**:
+  - Added a new "Cross-Reference Engine" metric card to the results dashboard showing brand impersonation status and CRE risk percentage.
+  - New `cross_reference` category in the Risk Factor Breakdown explanation list.
 
 ### 🛡️ Algorithmic Improvements
 - **Playwright Reliability & Fallbacks**: 
@@ -22,10 +36,17 @@ This changelog documents all structural, architectural, algorithmic, and UI impr
   - Added key heavily-phished brands including AT&T, Xfinity, OpenAI, and many others.
 - **Rebalanced Scoring & Combos**: 
   - Adjusted base scoring weights (`0.30` Similarity, `0.30` Intelligence, `0.40` Content) and implemented dynamic reallocation when hosted platforms are detected.
+  - CRE-aware weight distribution: `0.20` Similarity, `0.20` Intelligence, `0.30` Content, `0.30` CRE when cross-reference signals are present.
 - **Tightened Legitimate App Guardrails**: 
   - Hardened the `legitimate_app_behavior` check with 4 new blockers (blocking reduction if critical vectors like brand impersonation or payment forms are detected).
 - **URL Path Analytics**: 
   - Added deep URL path analysis including suspicious path mapping and Shannon entropy scoring to detect randomized throwaway endpoints.
+
+### 🧰 Tooling & Data Fixes
+
+- **PhishTank Data Synchronization (`agents/phishtank_agent.py`)**: 
+  - Resolved a critical bug causing the background update thread to fail to propagate the refreshed in-memory cache to the live agent, resulting in the use of stale intelligence.
+
 
 ---
 

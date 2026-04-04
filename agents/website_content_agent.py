@@ -158,21 +158,45 @@ class _BrowserPool:
                 try:
                     page.goto(url, timeout=timeout_ms, wait_until="domcontentloaded")
                     try:
-                        # Aggressively wait for high-risk phishing elements
-                        page.wait_for_selector('input[type="password"], input[name*="password"], input[name*="login"], iframe', timeout=2500)
+                        # Aggressively wait for high-risk phishing elements and generic OTP text fields
+                        page.wait_for_selector('input[type="password"], input[name*="pass"], input[name*="login"], input[type="text"], input[type="tel"], iframe', timeout=2000)
                     except Exception:
-                        try:
-                            # Final fallback: wait for meaningful text content if JS renders slowly
-                            page.wait_for_function('document.body.innerText.length > 300', timeout=2000)
-                        except Exception:
-                            page.wait_for_timeout(1000)
+                        pass
+                    # DOM Stability Mutation Observer (waits up to 3 seconds for Base64 injection/SPA hydration to stop)
+                    try:
+                        page.evaluate('''() => {
+                            return new Promise(resolve => {
+                                let lastLength = document.body ? document.body.innerHTML.length : 0;
+                                let stableCount = 0;
+                                let iter = 0;
+                                const timer = setInterval(() => {
+                                    let curLength = document.body ? document.body.innerHTML.length : 0;
+                                    if (curLength === lastLength) stableCount++;
+                                    else stableCount = 0;
+                                    lastLength = curLength;
+                                    iter++;
+                                    if (stableCount >= 2 || iter >= 6) {
+                                        clearInterval(timer);
+                                        resolve();
+                                    }
+                                }, 500);
+                            });
+                        }''')
+                    except Exception:
+                        page.wait_for_timeout(1000)
                 except Exception:
                     pass
             content = page.evaluate("""
                 () => {
-                    document.querySelectorAll('*').forEach(el => {
-                        if (el.shadowRoot) el.innerHTML += el.shadowRoot.innerHTML;
-                    });
+                    function pierce(root) {
+                        root.querySelectorAll('*').forEach(el => {
+                            if (el.shadowRoot) {
+                                pierce(el.shadowRoot);
+                                el.innerHTML += el.shadowRoot.innerHTML;
+                            }
+                        });
+                    }
+                    pierce(document);
                     return document.documentElement.outerHTML;
                 }
             """)
@@ -238,6 +262,9 @@ class WebsiteContentResult:
     payment_form_detected: bool
     scam_indicators_found: List[str]
     otp_detected: bool
+    final_url: str
+    final_domain: str
+    is_provider_blocklisted: bool
     # --- C5: Playwright availability ---
     playwright_available: bool
 
@@ -262,6 +289,9 @@ class WebsiteContentResult:
             "payment_form_detected": self.payment_form_detected,
             "scam_indicators_found": self.scam_indicators_found,
             "otp_detected": self.otp_detected,
+            "final_url": self.final_url,
+            "final_domain": self.final_domain,
+            "is_provider_blocklisted": self.is_provider_blocklisted,
             "playwright_available": self.playwright_available,
         }
 
@@ -308,6 +338,9 @@ class WebsiteContentAgent:
                 payment_form_detected=False,
                 scam_indicators_found=[],
                 otp_detected=False,
+                final_url="",
+                final_domain="",
+                is_provider_blocklisted=False,
                 playwright_available=pw_available,
             )
 
@@ -343,7 +376,10 @@ class WebsiteContentAgent:
             has_suspicious_txt = False
             for inp in form.find_all("input", {"type": ["text", "email", "tel", ""]}) + form.find_all("input", class_=True):
                 combined = f"{inp.get('name','')} {inp.get('id','')} {inp.get('placeholder','')} {inp.get('class','')} ".lower()
-                if any(kw in combined for kw in ["email", "user", "otp", "code", "card"]):
+                # Fuzzy keyword matching for obfuscations like "pass**rd"
+                if re.search(r"p[a-z@*.,]+s[a-z*.,]+[w*.,]*r[a-z*.,]+d", combined):
+                    has_pw = True
+                if any(kw in combined for kw in ["email", "user", "otp", "code", "card", "anmeld"]):
                     has_suspicious_txt = True
                     break
             
@@ -426,12 +462,30 @@ class WebsiteContentAgent:
         )
 
         # --- Redirect detection ---
-        has_meta_refresh = bool(soup.find("meta", attrs={"http-equiv": re.compile(r"refresh", re.I)}))
+        # Look for meta refresh that redirects specifically
+        has_meta_refresh = False
+        meta_refresh = soup.find("meta", attrs={"http-equiv": re.compile(r"refresh", re.I)})
+        if meta_refresh:
+            content_attr = meta_refresh.get("content", "")
+            if "url=" in str(content_attr).lower():
+                has_meta_refresh = True
+
         raw_html = str(soup)
         has_js_redirect = bool(re.search(
             r"window\.location|document\.location|location\.href|location\.replace",
             raw_html,
         ))
+
+        # =============================================================
+        # BLOCK PAGE INTERCEPTION
+        # Correctly identify mitigation pages that block phishing links
+        # we treat a blocked link as confirmed malicious
+        # =============================================================
+        is_provider_blocklisted = False
+        if ("tinyurl" in page_domain or "bit.ly" in page_domain or "qrco.de" in page_domain or "framer" in page_domain):
+            if "blocked" in page_title.lower() or "blacklisted" in page_title.lower() or "phishing" in page_title.lower():
+                is_provider_blocklisted = True
+                scam_indicators_found.append("Provider Blocklisted")
 
         # =============================================================
         # I4: URL PATH ANALYSIS
@@ -458,6 +512,7 @@ class WebsiteContentAgent:
             not payment_form_detected and        # C6: payment fields block legitimate
             not scam_indicators_found and        # C6: scam indicators block legitimate
             not otp_detected and                 # C6: OTP fields block legitimate
+            not is_provider_blocklisted and      # Block pages are NEVER legitimate apps
             cross_domain_forms == 0 and
             hidden_inputs_count < 3 and
             suspicious_iframes == 0 and
@@ -485,6 +540,7 @@ class WebsiteContentAgent:
             scam_indicators_count=len(scam_indicators_found),
             otp_detected=otp_detected,
             path_risk=path_risk,
+            is_provider_blocklisted=is_provider_blocklisted,
         )
 
         return WebsiteContentResult(
@@ -507,6 +563,9 @@ class WebsiteContentAgent:
             payment_form_detected=payment_form_detected,
             scam_indicators_found=scam_indicators_found,
             otp_detected=otp_detected,
+            final_url=final_url or input_domain,
+            final_domain=page_domain,
+            is_provider_blocklisted=is_provider_blocklisted,
             playwright_available=pw_available,
         )
 
@@ -711,12 +770,14 @@ class WebsiteContentAgent:
         scam_indicators_count: int = 0,
         otp_detected: bool = False,
         path_risk: float = 0.0,
+        is_provider_blocklisted: bool = False,
     ) -> float:
         risk = 0.0
         risk += path_risk
 
         if is_legitimate_app:
-            pass  # Baseline risk reduction handled securely in DecisionAgent now
+            # Baseline risk reduction handled securely in DecisionAgent now
+            risk += 0.0
 
         # Login form and password field — merged to avoid double-counting.
         # login_form_detected implies password_field_detected, so treat as one signal.
@@ -733,12 +794,15 @@ class WebsiteContentAgent:
                 risk += 0.20
 
         # =============================================================
-        # C1: Brand impersonation — THE most critical signal
+        # C1: Brand impersonation — defense-in-depth signal
+        # Primary scoring now handled by Cross-Reference Engine.
+        # Content agent retains a reduced signal so detection still works
+        # if CRE is unavailable (graceful degradation).
         # =============================================================
         if brand_impersonation_count >= 2:
-            risk += 0.70  # Multiple brands impersonated = near certain phishing
+            risk += 0.15  # Reduced from 0.70 — CRE handles the heavy scoring
         elif brand_impersonation_count == 1:
-            risk += 0.55  # Single brand impersonation = very strong signal
+            risk += 0.10  # Reduced from 0.55 — CRE handles the heavy scoring
 
         # =============================================================
         # C6: Payment form detection — collecting financial data
@@ -777,13 +841,16 @@ class WebsiteContentAgent:
         if hidden_inputs_count > 3:
             risk += 0.05
 
+        if is_provider_blocklisted:
+            risk = 1.0  # Bypass all other scoring
+
         if suspicious_iframes > 0:
             risk += 0.10
 
         if has_meta_refresh or has_js_redirect:
             risk += 0.05
 
-        return max(-0.20, min(1.0, risk))
+        return max(0.0, min(1.0, risk))
 
 
 __all__ = ["WebsiteContentAgent", "WebsiteContentResult"]

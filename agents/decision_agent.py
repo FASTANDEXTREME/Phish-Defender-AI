@@ -22,6 +22,7 @@ from core.config import (
     PHISHING_THRESHOLD,
     SCORING_WEIGHTS_WITH_SB,
     SCORING_WEIGHTS_WITHOUT_SB,
+    SCORING_WEIGHTS_WITHOUT_SB_WITH_CRE,
     SUSPICIOUS_THRESHOLD,
 )
 
@@ -98,6 +99,15 @@ class PhishTankAgentOutput(TypedDict, total=False):
     is_disabled: bool
 
 
+class CrossReferenceOutput(TypedDict, total=False):
+    brand_content_mismatch: bool
+    brand_domain_mismatch: bool
+    hosted_brand_impersonation: bool
+    content_brand_names: List[str]
+    domain_brand_name: str | None
+    cross_ref_risk_score: float
+
+
 # ---------------------------------------------------------------------------
 # Structured explanation item
 # ---------------------------------------------------------------------------
@@ -119,6 +129,7 @@ class DecisionAgentResult:
     content_risk: float
     safe_browsing_risk: float
     phishtank_risk: float
+    cross_reference_risk: float
     final_risk_score: float
     classification: ClassificationLabel
     confidence: ConfidenceLabel
@@ -130,6 +141,7 @@ class DecisionAgentResult:
     raw_content: WebsiteContentAgentOutput
     raw_safe_browsing: SafeBrowsingAgentOutput
     raw_phishtank: PhishTankAgentOutput
+    raw_cross_reference: CrossReferenceOutput
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -139,6 +151,7 @@ class DecisionAgentResult:
             "content_risk": self.content_risk,
             "safe_browsing_risk": self.safe_browsing_risk,
             "phishtank_risk": self.phishtank_risk,
+            "cross_reference_risk": self.cross_reference_risk,
             "final_risk_score": self.final_risk_score,
             "classification": self.classification,
             "confidence": self.confidence,
@@ -150,6 +163,7 @@ class DecisionAgentResult:
             "raw_content": self.raw_content,
             "raw_safe_browsing": self.raw_safe_browsing,
             "raw_phishtank": self.raw_phishtank,
+            "raw_cross_reference": self.raw_cross_reference,
         }
 
 
@@ -159,7 +173,8 @@ class DecisionAgentResult:
 class DecisionAgent:
     """
     Aggregates output from Similarity, Domain Intelligence, Website Content,
-    and Safe Browsing agents to produce a final phishing classification.
+    Safe Browsing, PhishTank, and Cross-Reference Engine to produce a
+    final phishing classification.
     """
 
     def run(
@@ -169,6 +184,7 @@ class DecisionAgent:
         content: WebsiteContentAgentOutput,
         safe_browsing: SafeBrowsingAgentOutput,
         phishtank: PhishTankAgentOutput,
+        cross_reference: CrossReferenceOutput | None = None,
     ) -> DecisionAgentResult:
 
         input_domain = self._resolve_input_domain(similarity, intelligence, content, safe_browsing, phishtank)
@@ -178,6 +194,8 @@ class DecisionAgent:
         content_risk = float(content.get("risk_score", 0.0) or 0.0)
         sb_risk = float(safe_browsing.get("risk_score", 0.0) or 0.0)
         pt_risk = float(phishtank.get("risk_score", 0.0) or 0.0)
+        cre = cross_reference or {}
+        cre_risk = float(cre.get("cross_ref_risk_score", 0.0) or 0.0)
 
         # -----------------------------------------------------------------
         # OVERRIDE: Google Safe Browsing is an authoritative trust layer
@@ -185,7 +203,7 @@ class DecisionAgent:
         if not safe_browsing.get("is_safe", True):
             logger.warning("Safe Browsing override: %s flagged as malicious", input_domain)
             explanation_items = self._build_explanation_items(
-                similarity, intelligence, content, safe_browsing, phishtank, 1.0, "PHISHING"
+                similarity, intelligence, content, safe_browsing, phishtank, cre, 1.0, "PHISHING"
             )
             # Prepend the critical override message
             override_item = ExplanationItem(
@@ -203,6 +221,7 @@ class DecisionAgent:
                 content_risk=content_risk,
                 sb_risk=sb_risk,
                 pt_risk=pt_risk,
+                cre_risk=cre_risk,
                 final_risk_score=1.0,
                 classification="PHISHING",
                 confidence="HIGH",
@@ -213,6 +232,7 @@ class DecisionAgent:
                 content=content,
                 safe_browsing=safe_browsing,
                 phishtank=phishtank,
+                cross_reference=cre,
             )
 
         # -----------------------------------------------------------------
@@ -229,19 +249,32 @@ class DecisionAgent:
                 + sb_risk * w["safe_browsing"]
             )
         else:
-            w = dict(SCORING_WEIGHTS_WITHOUT_SB)
-            
-            # I2: Dynamic weighting for hosted platforms (intelligence is useless here)
-            if intelligence.get("is_hosted_platform"):
-                w["intelligence"] = 0.10
-                w["similarity"] = 0.40
-                w["content"] = 0.50
-                
-            score = (
-                sim_risk * w["similarity"]
-                + intel_risk * w["intelligence"]
-                + content_risk * w["content"]
-            )
+            if cre_risk > 0.0:
+                # CRE has a signal — use 4-way weights including cross-reference
+                w = dict(SCORING_WEIGHTS_WITHOUT_SB_WITH_CRE)
+                if intelligence.get("is_hosted_platform"):
+                    w["intelligence"] = 0.05
+                    w["similarity"] = 0.25
+                    w["content"] = 0.35
+                    w["cross_reference"] = 0.35
+                score = (
+                    sim_risk * w["similarity"]
+                    + intel_risk * w["intelligence"]
+                    + content_risk * w["content"]
+                    + cre_risk * w["cross_reference"]
+                )
+            else:
+                # No CRE signal — use existing 3-way weights
+                w = dict(SCORING_WEIGHTS_WITHOUT_SB)
+                if intelligence.get("is_hosted_platform"):
+                    w["intelligence"] = 0.10
+                    w["similarity"] = 0.40
+                    w["content"] = 0.50
+                score = (
+                    sim_risk * w["similarity"]
+                    + intel_risk * w["intelligence"]
+                    + content_risk * w["content"]
+                )
 
         # -----------------------------------------------------------------
         # Direct Combo Multipliers (Deadly Phishing Signatures)
@@ -269,6 +302,21 @@ class DecisionAgent:
             logger.info("Combo detected: Impersonation on Hosted Platform -> %s", input_domain)
             score += 0.20
 
+        # Combo 3.5: Open Redirect / Provider Blocklisting
+        final_domain = content.get("final_domain", "")
+        # If the page actually served ends up on a vastly different domain and has a login form
+        # (Exclude subdomains, e.g., 'auth.google.com' vs 'google.com')
+        if final_domain and final_domain != input_domain:
+            if final_domain.split('.')[-2:] != input_domain.split('.')[-2:]:
+                if has_login:
+                    logger.info("Combo detected: Open Redirect with Login Form -> final_domain=%s", final_domain)
+                    score += 0.35
+
+        # Provider blocklisting triggers immediate CRITICAL scoring (shorteners with block pages)
+        if content.get("is_provider_blocklisted"):
+            logger.info("Combo detected: Provider explicitly blocked this link -> %s", input_domain)
+            score = 1.0
+
         # Combo 4: Pure impersonation (Sim risk very high)
         if sim_risk >= 0.75:
             logger.info("Combo detected: Very high similarity risk -> %s", input_domain)
@@ -279,28 +327,12 @@ class DecisionAgent:
             logger.info("Combo detected: Login Form with Suspicious Intelligence -> %s", input_domain)
             score += 0.15
 
-        # Combo 6: Brand impersonation on a hosted platform (C1 + C3/C4)
+        # NOTE: Combos 6-9 (brand impersonation, payment on hosted, scam indicators)
+        # have been moved to the Cross-Reference Engine (core/cross_reference_engine.py).
+        # The CRE score is already integrated into the weighted score above.
         brand_impersonation = content.get("brand_impersonation_brands", [])
-        if brand_impersonation and is_hosted:
-            logger.warning("Combo detected: Brand impersonation on hosted platform -> %s (brands: %s)", input_domain, brand_impersonation)
-            score += 0.35
-
-        # Combo 7: Brand impersonation + login/payment form (C1 + C6)
         has_payment = content.get("payment_form_detected", False)
-        if brand_impersonation and (has_login or has_payment):
-            logger.warning("Combo detected: Brand impersonation + credential/payment collection -> %s", input_domain)
-            score += 0.25
-
-        # Combo 8: Payment form on non-legitimate domain (C6)
-        if has_payment and (is_new or is_hosted):
-            logger.warning("Combo detected: Payment form on new/hosted domain -> %s", input_domain)
-            score += 0.20
-
-        # Combo 9: Tech support scam indicators (C6)
         scam_indicators = content.get("scam_indicators_found", [])
-        if len(scam_indicators) >= 2 and (is_new or is_hosted):
-            logger.warning("Combo detected: Scam indicators on new/hosted domain -> %s", input_domain)
-            score += 0.20
 
         # -----------------------------------------------------------------
         # PhishTank Override (High Suspicion / High Risk)
@@ -318,9 +350,14 @@ class DecisionAgent:
         # The old -0.30 would zero out scores from intel/sim agents,
         # causing phishing sites with no detected forms to pass as SAFE.
         # -----------------------------------------------------------------
-        any_agent_high_risk = any(r >= 0.40 for r in [sim_risk, intel_risk, content_risk])
-        has_critical_signals = bool(brand_impersonation) or has_payment or len(scam_indicators) >= 2
+        any_agent_high_risk = any(r >= 0.40 for r in [sim_risk, intel_risk, content_risk, cre_risk])
+        has_critical_signals = bool(brand_impersonation) or has_payment or len(scam_indicators) >= 2 or cre_risk >= 0.50
         
+        # NEVER apply legitimate app reductions to Hosted App Builders (they have 0 inherent phishing defense)
+        # or domains blocked by providers.
+        if is_hosted or content.get("is_provider_blocklisted"):
+            legitimate_app = False
+
         if legitimate_app and ssl_valid and not any_agent_high_risk and not has_critical_signals:
             logger.info("Graceful degradation: legitimate behavior and valid SSL -> %s", input_domain)
             score = max(0.0, score - 0.10)  # I1: reduced from -0.30 → -0.10
@@ -330,7 +367,7 @@ class DecisionAgent:
         # Signal amplification — when multiple agents agree on high risk
         # Lowered threshold from 0.5 to 0.4 so combinations of mid-risk signals still trigger the boost
         high_risk_agents = sum(
-            1 for r in [sim_risk, intel_risk, content_risk] if r >= 0.40
+            1 for r in [sim_risk, intel_risk, content_risk, cre_risk] if r >= 0.40
         )
         if high_risk_agents >= CORROBORATION_THRESHOLD:
             logger.info("Corroboration: %d agents >= 0.40 -> Applying boost for %s", high_risk_agents, input_domain)
@@ -343,7 +380,7 @@ class DecisionAgent:
         severity = self._compute_severity(score, classification, safe_browsing)
 
         explanation_items = self._build_explanation_items(
-            similarity, intelligence, content, safe_browsing, phishtank, score, classification
+            similarity, intelligence, content, safe_browsing, phishtank, cre, score, classification
         )
 
         return self._build_result(
@@ -353,6 +390,7 @@ class DecisionAgent:
             content_risk=content_risk,
             sb_risk=sb_risk,
             pt_risk=pt_risk,
+            cre_risk=cre_risk,
             final_risk_score=round(score, 4),
             classification=classification,
             confidence=confidence,
@@ -363,6 +401,7 @@ class DecisionAgent:
             content=content,
             safe_browsing=safe_browsing,
             phishtank=phishtank,
+            cross_reference=cre,
         )
 
     # ------------------------------------------------------------------
@@ -415,6 +454,7 @@ class DecisionAgent:
         content_risk: float,
         sb_risk: float,
         pt_risk: float,
+        cre_risk: float,
         final_risk_score: float,
         classification: ClassificationLabel,
         confidence: ConfidenceLabel,
@@ -425,6 +465,7 @@ class DecisionAgent:
         content: WebsiteContentAgentOutput,
         safe_browsing: SafeBrowsingAgentOutput,
         phishtank: PhishTankAgentOutput,
+        cross_reference: CrossReferenceOutput,
     ) -> DecisionAgentResult:
         # Build both a flat human-readable list and a structured detail list
         explanation_strings = [item.signal for item in explanation_items]
@@ -440,6 +481,7 @@ class DecisionAgent:
             content_risk=content_risk,
             safe_browsing_risk=sb_risk,
             phishtank_risk=pt_risk,
+            cross_reference_risk=cre_risk,
             final_risk_score=final_risk_score,
             classification=classification,
             confidence=confidence,
@@ -451,6 +493,7 @@ class DecisionAgent:
             raw_content=content,
             raw_safe_browsing=safe_browsing,
             raw_phishtank=phishtank,
+            raw_cross_reference=cross_reference,
         )
 
     # ------------------------------------------------------------------
@@ -464,6 +507,7 @@ class DecisionAgent:
         content: WebsiteContentAgentOutput,
         safe_browsing: SafeBrowsingAgentOutput,
         phishtank: PhishTankAgentOutput,
+        cross_reference: CrossReferenceOutput,
         final_score: float,
         classification: ClassificationLabel,
     ) -> List[ExplanationItem]:
@@ -634,7 +678,7 @@ class DecisionAgent:
                 impact="low",  # positive
             ))
 
-        # --- C1: Brand impersonation ---
+        # --- C1: Brand impersonation (content-level signal) ---
         impersonated_brands = content.get("brand_impersonation_brands", [])
         if impersonated_brands:
             brands_str = ", ".join(impersonated_brands[:5])
@@ -643,6 +687,35 @@ class DecisionAgent:
                 signal=f"BRAND IMPERSONATION: Page content references brand(s) [{brands_str}] but domain does not match.",
                 impact="critical",
             ))
+
+        # --- Cross-Reference Engine ---
+        if cross_reference:
+            cre_score = float(cross_reference.get("cross_ref_risk_score", 0.0) or 0.0)
+            if cross_reference.get("hosted_brand_impersonation"):
+                items.append(ExplanationItem(
+                    category="cross_reference",
+                    signal="CRITICAL: Cross-Reference Engine detected brand impersonation on a hosted platform — all signals align.",
+                    impact="critical",
+                ))
+            elif cross_reference.get("brand_content_mismatch") and not impersonated_brands:
+                cre_brands = ", ".join((cross_reference.get("content_brand_names") or [])[:3])
+                items.append(ExplanationItem(
+                    category="cross_reference",
+                    signal=f"Cross-reference analysis: page references brand(s) [{cre_brands}] on a non-matching domain.",
+                    impact="high",
+                ))
+            elif cross_reference.get("brand_domain_mismatch"):
+                items.append(ExplanationItem(
+                    category="cross_reference",
+                    signal=f"Cross-reference analysis: domain name contains brand '{cross_reference.get('domain_brand_name', '?')}' on a hosted platform.",
+                    impact="high",
+                ))
+            if cre_score > 0.0 and not cross_reference.get("hosted_brand_impersonation"):
+                items.append(ExplanationItem(
+                    category="cross_reference",
+                    signal=f"Cross-Reference Engine risk score: {cre_score:.2f}",
+                    impact="high" if cre_score >= 0.65 else "medium",
+                ))
 
         # --- C6: Payment form ---
         if content.get("payment_form_detected"):
@@ -695,6 +768,7 @@ __all__ = [
     "WebsiteContentAgentOutput",
     "SafeBrowsingAgentOutput",
     "PhishTankAgentOutput",
+    "CrossReferenceOutput",
     "DecisionAgentResult",
     "DecisionAgent",
     "ExplanationItem",

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Fingerprint, Globe, ServerCrash, Database } from 'lucide-react';
+import { Shield, Fingerprint, Globe, ServerCrash, Database, Link2 } from 'lucide-react';
 import RiskGauge from './RiskGauge';
 import MetricCard from './MetricCard';
 import ExplanationList from './ExplanationList';
@@ -18,7 +18,8 @@ const Dashboard = ({ result }) => {
     raw_intelligence,
     raw_content,
     raw_safe_browsing,
-    raw_phishtank
+    raw_phishtank,
+    raw_cross_reference
   } = result;
 
   return (
@@ -138,6 +139,28 @@ const Dashboard = ({ result }) => {
                     </span>
                 </div>
             </MetricCard>
+
+            {raw_cross_reference && raw_cross_reference.cross_ref_risk_score > 0 && (
+            <MetricCard 
+                title="Cross-Reference Engine" 
+                icon={Link2} 
+                statusColor={raw_cross_reference?.cross_ref_risk_score >= 0.65 ? "text-primary-500" : raw_cross_reference?.cross_ref_risk_score > 0 ? "text-orange-500" : "text-emerald-400"}
+                detailRow
+            >
+                <div className="flex justify-between border-b border-white/[0.05] pb-2">
+                    <span>Brand Impersonation:</span>
+                    <span className={raw_cross_reference?.brand_content_mismatch ? 'text-primary-500 font-bold' : 'text-white'}>
+                        {raw_cross_reference?.brand_content_mismatch ? 'Detected' : 'None'}
+                    </span>
+                </div>
+                <div className="flex justify-between pt-1">
+                    <span>CRE Risk:</span>
+                    <span className={raw_cross_reference?.cross_ref_risk_score >= 0.65 ? 'text-primary-500 font-bold' : 'text-orange-400'}>
+                        {Math.round((raw_cross_reference?.cross_ref_risk_score || 0) * 100)}%
+                    </span>
+                </div>
+            </MetricCard>
+            )}
         </div>
 
       </div>

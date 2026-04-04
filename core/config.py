@@ -293,6 +293,24 @@ SCORING_WEIGHTS_WITHOUT_SB = {
 }
 
 # ---------------------------------------------------------------------------
+# Cross-Reference Engine (CRE) scoring parameters
+# ---------------------------------------------------------------------------
+CRE_BRAND_CONTENT_MISMATCH_RISK: float = 0.75   # Brand in content, not in domain
+CRE_BRAND_DOMAIN_MISMATCH_RISK: float = 0.55    # Brand in subdomain on hosted platform
+CRE_HOSTED_BRAND_IMPERSONATION_RISK: float = 0.90  # All 3 signals = near certain phishing
+CRE_BRAND_PLUS_CREDENTIAL_RISK: float = 0.80    # Brand impersonation + credential collection
+CRE_PAYMENT_ON_DISPOSABLE_RISK: float = 0.70    # Payment form on new/hosted domain
+CRE_SCAM_ON_DISPOSABLE_RISK: float = 0.65       # Scam indicators on new/hosted domain
+
+# When CRE has a nonzero signal, use these weights (4-way split)
+SCORING_WEIGHTS_WITHOUT_SB_WITH_CRE = {
+    "similarity": 0.20,
+    "intelligence": 0.20,
+    "content": 0.30,
+    "cross_reference": 0.30,
+}
+
+# ---------------------------------------------------------------------------
 # Classification thresholds
 # Max possible score without SB is 1.0 now (with new sim scoring).
 # Lowered from 0.7/0.4 so agents can trigger classification independently.
@@ -319,8 +337,16 @@ __all__ = [
     "OTP_KEYWORDS",
     "SCORING_WEIGHTS_WITH_SB",
     "SCORING_WEIGHTS_WITHOUT_SB",
+    "SCORING_WEIGHTS_WITHOUT_SB_WITH_CRE",
+    "CRE_BRAND_CONTENT_MISMATCH_RISK",
+    "CRE_BRAND_DOMAIN_MISMATCH_RISK",
+    "CRE_HOSTED_BRAND_IMPERSONATION_RISK",
+    "CRE_BRAND_PLUS_CREDENTIAL_RISK",
+    "CRE_PAYMENT_ON_DISPOSABLE_RISK",
+    "CRE_SCAM_ON_DISPOSABLE_RISK",
     "PHISHING_THRESHOLD",
     "SUSPICIOUS_THRESHOLD",
     "CORROBORATION_THRESHOLD",
     "CORROBORATION_BOOST",
 ]
+

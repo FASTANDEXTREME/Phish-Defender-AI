@@ -1,30 +1,433 @@
 [
     {
-        "link": "http://suite-trezor.netlify.app",
-        "classification": "PHISHING",
-        "severity": "HIGH",
-        "score": 0.815,
+        "link": "https://tydytdytyddyi484ytfty.blogspot.com/",
+        "classification": "SUSPICIOUS",
+        "severity": "LOW",
+        "score": 0.34,
         "sb_safe": true,
         "explanations": [
-            "Final risk score 0.81 \u2192 classified as PHISHING.",
+            "Final risk score 0.34 \u2192 classified as SUSPICIOUS.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain has a valid SSL certificate.",
+            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect)."
+        ]
+    },
+    {
+        "link": "https://robloxmodsapk.com/",
+        "classification": "PHISHING",
+        "severity": "HIGH",
+        "score": 1.0,
+        "sb_safe": true,
+        "explanations": [
+            "Final risk score 1.00 \u2192 classified as PHISHING.",
+            "Domain resembles known brand 'roblox' with similarity 90%.",
+            "Domain is relatively young (309 days old).",
+            "WHOIS privacy is enabled, hiding registrant information.",
+            "Domain registered for minimum period (< 1 year) \u2014 common in throwaway phishing domains.",
+            "Domain has a valid SSL certificate.",
+            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
+            "BRAND IMPERSONATION: Page content references brand(s) [meta] but domain does not match.",
+            "Cross-Reference Engine risk score: 0.75"
+        ]
+    },
+    {
+        "link": "https://krk-telegram.com.cn/",
+        "classification": "PHISHING",
+        "severity": "HIGH",
+        "score": 1.0,
+        "sb_safe": true,
+        "explanations": [
+            "Final risk score 1.00 \u2192 classified as PHISHING.",
+            "Domain resembles known brand 'telegram' with similarity 90%.",
+            "Domain is relatively young (67 days old).",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain registered for minimum period (< 1 year) \u2014 common in throwaway phishing domains.",
+            "Domain has a valid SSL certificate.",
+            "BRAND IMPERSONATION: Page content references brand(s) [apple] but domain does not match.",
+            "Cross-Reference Engine risk score: 0.75"
+        ]
+    },
+    {
+        "link": "https://ton-telegram.network/",
+        "classification": "PHISHING",
+        "severity": "HIGH",
+        "score": 1.0,
+        "sb_safe": true,
+        "explanations": [
+            "Final risk score 1.00 \u2192 classified as PHISHING.",
+            "Domain resembles known brand 'telegram' with similarity 90%.",
+            "Domain has a valid SSL certificate.",
+            "Suspicious iframe(s) embedding external content.",
+            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
+            "BRAND IMPERSONATION: Page content references brand(s) [google, instagram, twitter, github, chase] but domain does not match.",
+            "Cross-Reference Engine risk score: 0.75"
+        ]
+    },
+    {
+        "link": "https://managesuite-trezor.com/?input_24=u9gF7CLkbfiDdHpefDWOG8AxaGKzbat2X%5B...%5DlttwpJ0Pl760qn14RBLLN6qx9K0JbpU5CE03qBQQn2SksdRadvYlqTSBA%3D%3D",
+        "classification": "PHISHING",
+        "severity": "HIGH",
+        "score": 1.0,
+        "sb_safe": true,
+        "explanations": [
+            "Final risk score 1.00 \u2192 classified as PHISHING.",
             "Domain resembles known brand 'trezor' with similarity 90%.",
+            "Domain registered very recently (0 days old).",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain registered for minimum period (< 1 year) \u2014 common in throwaway phishing domains.",
+            "Domain has a valid SSL certificate.",
+            "Page structure and behavior appear legitimate (safe content)."
+        ]
+    },
+    {
+        "link": "https://www.robloxhack.cheatmodonline.com/",
+        "classification": "PHISHING",
+        "severity": "MEDIUM",
+        "score": 0.545,
+        "sb_safe": true,
+        "explanations": [
+            "Final risk score 0.54 \u2192 classified as PHISHING.",
+            "Domain resembles known brand 'roblox' with similarity 90%.",
+            "WHOIS privacy is enabled, hiding registrant information.",
             "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
             "Domain has a valid SSL certificate.",
             "Page structure and behavior appear legitimate (safe content)."
         ]
     },
     {
-        "link": "https://suite-trezor.netlify.app/",
-        "classification": "PHISHING",
-        "severity": "HIGH",
-        "score": 0.815,
+        "link": "https://okx-web3-tron-usdt-trc20-000000313.pages.dev/",
+        "classification": "SAFE",
+        "severity": "INFO",
+        "score": 0.295,
         "sb_safe": true,
         "explanations": [
-            "Final risk score 0.81 \u2192 classified as PHISHING.",
+            "Final risk score 0.30 \u2192 classified as SAFE.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain has a valid SSL certificate."
+        ]
+    },
+    {
+        "link": "https://zoom.murigu.com/",
+        "classification": "PHISHING",
+        "severity": "MEDIUM",
+        "score": 0.575,
+        "sb_safe": true,
+        "explanations": [
+            "Final risk score 0.57 \u2192 classified as PHISHING.",
+            "Domain resembles known brand 'zoom' with similarity 90%.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain lacks a valid SSL certificate.",
+            "Page structure and behavior appear legitimate (safe content)."
+        ]
+    },
+    {
+        "link": "https://okx-web3-tron-usdt-trc20-000000475.pages.dev/",
+        "classification": "SAFE",
+        "severity": "INFO",
+        "score": 0.095,
+        "sb_safe": true,
+        "explanations": [
+            "Final risk score 0.10 \u2192 classified as SAFE.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain has a valid SSL certificate."
+        ]
+    },
+    {
+        "link": "https://www.binancebooster.com/",
+        "classification": "PHISHING",
+        "severity": "MEDIUM",
+        "score": 0.58,
+        "sb_safe": true,
+        "explanations": [
+            "Final risk score 0.58 \u2192 classified as PHISHING.",
+            "Domain resembles known brand 'binance' with similarity 90%.",
+            "Domain is relatively young (257 days old).",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain registered for minimum period (< 1 year) \u2014 common in throwaway phishing domains.",
+            "Domain has a valid SSL certificate.",
+            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect)."
+        ]
+    },
+    {
+        "link": "https://binancebooster.com/",
+        "classification": "PHISHING",
+        "severity": "MEDIUM",
+        "score": 0.58,
+        "sb_safe": true,
+        "explanations": [
+            "Final risk score 0.58 \u2192 classified as PHISHING.",
+            "Domain resembles known brand 'binance' with similarity 90%.",
+            "Domain is relatively young (257 days old).",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain registered for minimum period (< 1 year) \u2014 common in throwaway phishing domains.",
+            "Domain has a valid SSL certificate.",
+            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect)."
+        ]
+    },
+    {
+        "link": "https://blogread-trezor.com/index_blog.html?input_24=u9gF7CLkbfiDdHpefDWOG8AxaGKzbat2X[...]lttwpJ0Pl760qn14RBLLN6qx9K0JbpU5CE03qBQQn2SksdRadvYlqTSBA==",
+        "classification": "PHISHING",
+        "severity": "HIGH",
+        "score": 1.0,
+        "sb_safe": true,
+        "explanations": [
+            "Final risk score 1.00 \u2192 classified as PHISHING.",
             "Domain resembles known brand 'trezor' with similarity 90%.",
+            "Domain registered very recently (0 days old).",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain registered for minimum period (< 1 year) \u2014 common in throwaway phishing domains.",
+            "Domain has a valid SSL certificate.",
+            "Phishing-related keywords detected: within 24 hours, unauthorized access, action required.",
+            "BRAND IMPERSONATION: Page content references brand(s) [meta] but domain does not match.",
+            "Cross-Reference Engine risk score: 0.75"
+        ]
+    },
+    {
+        "link": "https://gazing.pp.ua/",
+        "classification": "PHISHING",
+        "severity": "HIGH",
+        "score": 0.72,
+        "sb_safe": true,
+        "explanations": [
+            "Final risk score 0.72 \u2192 classified as PHISHING.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain has a valid SSL certificate.",
+            "Login or password input form detected on the page.",
+            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
+            "BRAND IMPERSONATION: Page content references brand(s) [github, gemini] but domain does not match.",
+            "Cross-Reference Engine risk score: 0.80"
+        ]
+    },
+    {
+        "link": "https://creditagricole-mescompte.com/",
+        "classification": "PHISHING",
+        "severity": "HIGH",
+        "score": 0.8625,
+        "sb_safe": true,
+        "explanations": [
+            "Final risk score 0.86 \u2192 classified as PHISHING.",
+            "Domain is highly similar to a known domain (similarity 75%).",
+            "Domain is relatively young (33 days old).",
+            "WHOIS privacy is enabled, hiding registrant information.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain registered for minimum period (< 1 year) \u2014 common in throwaway phishing domains.",
+            "Domain has a valid SSL certificate.",
+            "Login or password input form detected on the page.",
+            "High number of external scripts (15).",
+            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
+            "BRAND IMPERSONATION: Page content references brand(s) [apple] but domain does not match.",
+            "Cross-Reference Engine risk score: 0.80"
+        ]
+    },
+    {
+        "link": "https://creditagricole-mescompte.com/pages/asset.php",
+        "classification": "PHISHING",
+        "severity": "HIGH",
+        "score": 0.8625,
+        "sb_safe": true,
+        "explanations": [
+            "Final risk score 0.86 \u2192 classified as PHISHING.",
+            "Domain is highly similar to a known domain (similarity 75%).",
+            "Domain is relatively young (33 days old).",
+            "WHOIS privacy is enabled, hiding registrant information.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain registered for minimum period (< 1 year) \u2014 common in throwaway phishing domains.",
+            "Domain has a valid SSL certificate.",
+            "Login or password input form detected on the page.",
+            "High number of external scripts (15).",
+            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
+            "BRAND IMPERSONATION: Page content references brand(s) [apple] but domain does not match.",
+            "Cross-Reference Engine risk score: 0.80"
+        ]
+    },
+    {
+        "link": "https://aigemini.zeabur.app/",
+        "classification": "PHISHING",
+        "severity": "HIGH",
+        "score": 1.0,
+        "sb_safe": true,
+        "explanations": [
+            "Final risk score 1.00 \u2192 classified as PHISHING.",
+            "Domain resembles known brand 'gemini' with similarity 90%.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain has a valid SSL certificate.",
+            "Login or password input form detected on the page.",
+            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
+            "BRAND IMPERSONATION: Page content references brand(s) [github] but domain does not match.",
+            "Cross-Reference Engine risk score: 0.80"
+        ]
+    },
+    {
+        "link": "https://get-started-desktop.wixstudio.com/en-us",
+        "classification": "PHISHING",
+        "severity": "MEDIUM",
+        "score": 0.5875,
+        "sb_safe": true,
+        "explanations": [
+            "Final risk score 0.59 \u2192 classified as PHISHING.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain has a valid SSL certificate.",
+            "High number of external scripts (11).",
+            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
+            "BRAND IMPERSONATION: Page content references brand(s) [ledger] but domain does not match.",
+            "Cross-Reference Engine risk score: 0.75"
+        ]
+    },
+    {
+        "link": "https://52479-santander.com/",
+        "classification": "PHISHING",
+        "severity": "HIGH",
+        "score": 0.8175,
+        "sb_safe": true,
+        "explanations": [
+            "Final risk score 0.82 \u2192 classified as PHISHING.",
+            "Domain registered very recently (2 days old).",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain registered for minimum period (< 1 year) \u2014 common in throwaway phishing domains.",
+            "Domain has a valid SSL certificate.",
+            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
+            "BRAND IMPERSONATION: Page content references brand(s) [irs] but domain does not match.",
+            "Cross-Reference Engine risk score: 0.75"
+        ]
+    },
+    {
+        "link": "https://52479-santander.com/payment/",
+        "classification": "PHISHING",
+        "severity": "HIGH",
+        "score": 0.8175,
+        "sb_safe": true,
+        "explanations": [
+            "Final risk score 0.82 \u2192 classified as PHISHING.",
+            "Domain registered very recently (2 days old).",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain registered for minimum period (< 1 year) \u2014 common in throwaway phishing domains.",
+            "Domain has a valid SSL certificate.",
+            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
+            "BRAND IMPERSONATION: Page content references brand(s) [irs] but domain does not match.",
+            "Cross-Reference Engine risk score: 0.75"
+        ]
+    },
+    {
+        "link": "https://email-member-and-password-update.webflow.io/",
+        "classification": "SUSPICIOUS",
+        "severity": "LOW",
+        "score": 0.355,
+        "sb_safe": true,
+        "explanations": [
+            "Final risk score 0.35 \u2192 classified as SUSPICIOUS.",
+            "WHOIS privacy is enabled, hiding registrant information.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain has a valid SSL certificate.",
+            "Login or password input form detected on the page."
+        ]
+    },
+    {
+        "link": "https://gmxauthe.vercel.app/",
+        "classification": "PHISHING",
+        "severity": "HIGH",
+        "score": 0.99,
+        "sb_safe": true,
+        "explanations": [
+            "Final risk score 0.99 \u2192 classified as PHISHING.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain has a valid SSL certificate.",
+            "Login or password input form detected on the page.",
+            "Form submits data to a different domain (1 cross-domain form(s)).",
+            "Suspicious iframe(s) embedding external content.",
+            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
+            "BRAND IMPERSONATION: Page content references brand(s) [apple, amazon, instagram, tiktok] but domain does not match.",
+            "Cross-Reference Engine risk score: 0.80"
+        ]
+    },
+    {
+        "link": "https://sso-io-ndaxx-auth.webflow.io/",
+        "classification": "SUSPICIOUS",
+        "severity": "LOW",
+        "score": 0.395,
+        "sb_safe": true,
+        "explanations": [
+            "Final risk score 0.40 \u2192 classified as SUSPICIOUS.",
+            "WHOIS privacy is enabled, hiding registrant information.",
             "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
             "Domain has a valid SSL certificate.",
             "Page structure and behavior appear legitimate (safe content)."
+        ]
+    },
+    {
+        "link": "http://allegro-lokalnie.9g89w23823g.cfd/",
+        "classification": "PHISHING",
+        "severity": "HIGH",
+        "score": 1.0,
+        "sb_safe": true,
+        "explanations": [
+            "Final risk score 1.00 \u2192 classified as PHISHING.",
+            "Domain resembles known brand 'allegro' with similarity 90%.",
+            "Domain registered very recently (5 days old).",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain registered for minimum period (< 1 year) \u2014 common in throwaway phishing domains.",
+            "Domain has a valid SSL certificate."
+        ]
+    },
+    {
+        "link": "http://allegro.343984y398h.bond/",
+        "classification": "PHISHING",
+        "severity": "HIGH",
+        "score": 1.0,
+        "sb_safe": true,
+        "explanations": [
+            "Final risk score 1.00 \u2192 classified as PHISHING.",
+            "Domain resembles known brand 'allegro' with similarity 90%.",
+            "Domain registered very recently (4 days old).",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain registered for minimum period (< 1 year) \u2014 common in throwaway phishing domains.",
+            "Domain has a valid SSL certificate."
+        ]
+    },
+    {
+        "link": "https://allegro.343984y398h.bond/",
+        "classification": "PHISHING",
+        "severity": "HIGH",
+        "score": 1.0,
+        "sb_safe": true,
+        "explanations": [
+            "Final risk score 1.00 \u2192 classified as PHISHING.",
+            "Domain resembles known brand 'allegro' with similarity 90%.",
+            "Domain registered very recently (4 days old).",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain registered for minimum period (< 1 year) \u2014 common in throwaway phishing domains.",
+            "Domain has a valid SSL certificate."
+        ]
+    },
+    {
+        "link": "http://suite-trezor.netlify.app",
+        "classification": "PHISHING",
+        "severity": "HIGH",
+        "score": 1.0,
+        "sb_safe": true,
+        "explanations": [
+            "Final risk score 1.00 \u2192 classified as PHISHING.",
+            "Domain resembles known brand 'trezor' with similarity 90%.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain has a valid SSL certificate.",
+            "Page structure and behavior appear legitimate (safe content).",
+            "Cross-reference analysis: domain name contains brand 'trezor' on a hosted platform.",
+            "Cross-Reference Engine risk score: 0.55"
+        ]
+    },
+    {
+        "link": "https://suite-trezor.netlify.app/",
+        "classification": "PHISHING",
+        "severity": "HIGH",
+        "score": 1.0,
+        "sb_safe": true,
+        "explanations": [
+            "Final risk score 1.00 \u2192 classified as PHISHING.",
+            "Domain resembles known brand 'trezor' with similarity 90%.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain has a valid SSL certificate.",
+            "Page structure and behavior appear legitimate (safe content).",
+            "Cross-reference analysis: domain name contains brand 'trezor' on a hosted platform.",
+            "Cross-Reference Engine risk score: 0.55"
         ]
     },
     {
@@ -55,50 +458,6 @@
         ]
     },
     {
-        "link": "http://seedphrasefinder.xyz",
-        "classification": "SAFE",
-        "severity": "INFO",
-        "score": 0.165,
-        "sb_safe": true,
-        "explanations": [
-            "Final risk score 0.17 \u2192 classified as SAFE.",
-            "Domain is highly similar to a known domain (similarity 72%).",
-            "Domain is relatively young (124 days old).",
-            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
-            "Domain registered for minimum period (< 1 year) \u2014 common in throwaway phishing domains.",
-            "Domain has a valid SSL certificate.",
-            "Page structure and behavior appear legitimate (safe content)."
-        ]
-    },
-    {
-        "link": "https://seedphrasefinder.xyz/",
-        "classification": "SAFE",
-        "severity": "INFO",
-        "score": 0.165,
-        "sb_safe": true,
-        "explanations": [
-            "Final risk score 0.17 \u2192 classified as SAFE.",
-            "Domain is highly similar to a known domain (similarity 72%).",
-            "Domain is relatively young (124 days old).",
-            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
-            "Domain registered for minimum period (< 1 year) \u2014 common in throwaway phishing domains.",
-            "Domain has a valid SSL certificate.",
-            "Page structure and behavior appear legitimate (safe content)."
-        ]
-    },
-    {
-        "link": "http://emergencydatarequest.shop/",
-        "classification": "SAFE",
-        "severity": "INFO",
-        "score": 0.095,
-        "sb_safe": true,
-        "explanations": [
-            "Final risk score 0.10 \u2192 classified as SAFE.",
-            "Domain has a valid SSL certificate.",
-            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect)."
-        ]
-    },
-    {
         "link": "https://buonobuono.jp/zribpuf/amlcnqt/1itzfnu/FFBB/fb.php",
         "classification": "SAFE",
         "severity": "INFO",
@@ -108,60 +467,6 @@
             "Final risk score 0.07 \u2192 classified as SAFE.",
             "WHOIS privacy is enabled, hiding registrant information.",
             "Domain has a valid SSL certificate."
-        ]
-    },
-    {
-        "link": "http://dhl-info.ru/",
-        "classification": "PHISHING",
-        "severity": "HIGH",
-        "score": 0.6375,
-        "sb_safe": true,
-        "explanations": [
-            "Final risk score 0.64 \u2192 classified as PHISHING.",
-            "Domain contains brand name 'dhl' in a suspicious context.",
-            "Domain registered very recently (4 days old).",
-            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
-            "Domain registered for minimum period (< 1 year) \u2014 common in throwaway phishing domains.",
-            "Domain has a valid SSL certificate.",
-            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect)."
-        ]
-    },
-    {
-        "link": "https://emergencydatarequest.shop/",
-        "classification": "SAFE",
-        "severity": "INFO",
-        "score": 0.095,
-        "sb_safe": true,
-        "explanations": [
-            "Final risk score 0.10 \u2192 classified as SAFE.",
-            "Domain has a valid SSL certificate.",
-            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect)."
-        ]
-    },
-    {
-        "link": "http://web3-appconnect.pages.dev/",
-        "classification": "SAFE",
-        "severity": "INFO",
-        "score": 0.195,
-        "sb_safe": true,
-        "explanations": [
-            "Final risk score 0.20 \u2192 classified as SAFE.",
-            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
-            "Domain has a valid SSL certificate.",
-            "Page structure and behavior appear legitimate (safe content)."
-        ]
-    },
-    {
-        "link": "https://web3-appconnect.pages.dev/",
-        "classification": "SAFE",
-        "severity": "INFO",
-        "score": 0.195,
-        "sb_safe": true,
-        "explanations": [
-            "Final risk score 0.20 \u2192 classified as SAFE.",
-            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
-            "Domain has a valid SSL certificate.",
-            "Page structure and behavior appear legitimate (safe content)."
         ]
     },
     {
@@ -223,32 +528,20 @@
         ]
     },
     {
-        "link": "https://tinyurl.com/dfgyydftyrewr",
-        "classification": "SAFE",
-        "severity": "INFO",
-        "score": 0.24,
-        "sb_safe": true,
-        "explanations": [
-            "Final risk score 0.24 \u2192 classified as SAFE.",
-            "Domain has a valid SSL certificate.",
-            "Login or password input form detected on the page.",
-            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect)."
-        ]
-    },
-    {
         "link": "https://linkurl.pk/LmJyUxqA",
         "classification": "PHISHING",
         "severity": "HIGH",
-        "score": 0.78,
+        "score": 0.6975,
         "sb_safe": true,
         "explanations": [
-            "Final risk score 0.78 \u2192 classified as PHISHING.",
+            "Final risk score 0.70 \u2192 classified as PHISHING.",
             "Domain registered very recently (19 days old).",
             "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
             "Domain has a valid SSL certificate.",
             "High number of external scripts (115).",
             "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
-            "BRAND IMPERSONATION: Page content references brand(s) [chase] but domain does not match."
+            "BRAND IMPERSONATION: Page content references brand(s) [chase] but domain does not match.",
+            "Cross-Reference Engine risk score: 0.75"
         ]
     },
     {
@@ -346,21 +639,6 @@
         ]
     },
     {
-        "link": "https://loud-rules-224161.framer.app/",
-        "classification": "PHISHING",
-        "severity": "MEDIUM",
-        "score": 0.5175,
-        "sb_safe": true,
-        "explanations": [
-            "Final risk score 0.52 \u2192 classified as PHISHING.",
-            "Domain is highly similar to a known domain (similarity 72%).",
-            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
-            "Domain has a valid SSL certificate.",
-            "Login or password input form detected on the page.",
-            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect)."
-        ]
-    },
-    {
         "link": "https://webrallycu.weebly.com/",
         "classification": "SUSPICIOUS",
         "severity": "LOW",
@@ -370,20 +648,6 @@
             "Final risk score 0.37 \u2192 classified as SUSPICIOUS.",
             "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
             "Domain has a valid SSL certificate.",
-            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect)."
-        ]
-    },
-    {
-        "link": "https://navy-guest-344134.framer.app/",
-        "classification": "SAFE",
-        "severity": "INFO",
-        "score": 0.285,
-        "sb_safe": true,
-        "explanations": [
-            "Final risk score 0.29 \u2192 classified as SAFE.",
-            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
-            "Domain has a valid SSL certificate.",
-            "Login or password input form detected on the page.",
             "Page contains redirect mechanisms (meta-refresh or JavaScript redirect)."
         ]
     },
@@ -416,46 +680,34 @@
         ]
     },
     {
-        "link": "https://forgiving-advantage-290273.framer.app/",
-        "classification": "SAFE",
-        "severity": "INFO",
-        "score": 0.285,
-        "sb_safe": true,
-        "explanations": [
-            "Final risk score 0.29 \u2192 classified as SAFE.",
-            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
-            "Domain has a valid SSL certificate.",
-            "Login or password input form detected on the page.",
-            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect)."
-        ]
-    },
-    {
         "link": "https://peringatan-pembatalan-akun-anda001.weebly.com/",
         "classification": "PHISHING",
         "severity": "HIGH",
-        "score": 0.99,
+        "score": 0.605,
         "sb_safe": true,
         "explanations": [
-            "Final risk score 0.99 \u2192 classified as PHISHING.",
+            "Final risk score 0.60 \u2192 classified as PHISHING.",
             "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
             "Domain has a valid SSL certificate.",
             "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
-            "BRAND IMPERSONATION: Page content references brand(s) [facebook] but domain does not match."
+            "BRAND IMPERSONATION: Page content references brand(s) [facebook] but domain does not match.",
+            "Cross-Reference Engine risk score: 0.75"
         ]
     },
     {
         "link": "https://tiny-approach-170185.framer.app/",
         "classification": "PHISHING",
         "severity": "HIGH",
-        "score": 0.755,
+        "score": 0.7125,
         "sb_safe": true,
         "explanations": [
-            "Final risk score 0.76 \u2192 classified as PHISHING.",
+            "Final risk score 0.71 \u2192 classified as PHISHING.",
             "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
             "Domain has a valid SSL certificate.",
             "Login or password input form detected on the page.",
             "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
-            "BRAND IMPERSONATION: Page content references brand(s) [yahoo] but domain does not match."
+            "BRAND IMPERSONATION: Page content references brand(s) [yahoo] but domain does not match.",
+            "Cross-Reference Engine risk score: 0.80"
         ]
     },
     {
@@ -542,20 +794,6 @@
         ]
     },
     {
-        "link": "https://concerned-clicks-001015.framer.app/",
-        "classification": "SAFE",
-        "severity": "INFO",
-        "score": 0.285,
-        "sb_safe": true,
-        "explanations": [
-            "Final risk score 0.29 \u2192 classified as SAFE.",
-            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
-            "Domain has a valid SSL certificate.",
-            "Login or password input form detected on the page.",
-            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect)."
-        ]
-    },
-    {
         "link": "https://rallycucoo.weebly.com/",
         "classification": "SUSPICIOUS",
         "severity": "LOW",
@@ -572,14 +810,15 @@
         "link": "https://glad-industry-219387.framer.app/",
         "classification": "SUSPICIOUS",
         "severity": "LOW",
-        "score": 0.365,
+        "score": 0.355,
         "sb_safe": true,
         "explanations": [
-            "Final risk score 0.37 \u2192 classified as SUSPICIOUS.",
+            "Final risk score 0.35 \u2192 classified as SUSPICIOUS.",
             "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
             "Domain has a valid SSL certificate.",
             "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
-            "BRAND IMPERSONATION: Page content references brand(s) [wetransfer] but domain does not match."
+            "BRAND IMPERSONATION: Page content references brand(s) [wetransfer] but domain does not match.",
+            "Cross-Reference Engine risk score: 0.75"
         ]
     },
     {
@@ -602,14 +841,15 @@
         "link": "https://requirments3500040142.weebly.com/",
         "classification": "PHISHING",
         "severity": "HIGH",
-        "score": 1.0,
+        "score": 0.6225,
         "sb_safe": true,
         "explanations": [
-            "Final risk score 1.00 \u2192 classified as PHISHING.",
+            "Final risk score 0.62 \u2192 classified as PHISHING.",
             "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
             "Domain has a valid SSL certificate.",
             "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
-            "BRAND IMPERSONATION: Page content references brand(s) [chase] but domain does not match."
+            "BRAND IMPERSONATION: Page content references brand(s) [chase] but domain does not match.",
+            "Cross-Reference Engine risk score: 0.75"
         ]
     },
     {
@@ -629,15 +869,16 @@
         "link": "https://slight-graphs-717878.framer.app/",
         "classification": "PHISHING",
         "severity": "HIGH",
-        "score": 0.755,
+        "score": 0.7125,
         "sb_safe": true,
         "explanations": [
-            "Final risk score 0.76 \u2192 classified as PHISHING.",
+            "Final risk score 0.71 \u2192 classified as PHISHING.",
             "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
             "Domain has a valid SSL certificate.",
             "Login or password input form detected on the page.",
             "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
-            "BRAND IMPERSONATION: Page content references brand(s) [yahoo] but domain does not match."
+            "BRAND IMPERSONATION: Page content references brand(s) [yahoo] but domain does not match.",
+            "Cross-Reference Engine risk score: 0.80"
         ]
     },
     {
@@ -650,34 +891,6 @@
             "Final risk score 0.37 \u2192 classified as SUSPICIOUS.",
             "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
             "Domain has a valid SSL certificate.",
-            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect)."
-        ]
-    },
-    {
-        "link": "https://golden-area-464000.framer.app/",
-        "classification": "SAFE",
-        "severity": "INFO",
-        "score": 0.285,
-        "sb_safe": true,
-        "explanations": [
-            "Final risk score 0.29 \u2192 classified as SAFE.",
-            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
-            "Domain has a valid SSL certificate.",
-            "Login or password input form detected on the page.",
-            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect)."
-        ]
-    },
-    {
-        "link": "https://zestful-studies-933895.framer.app/",
-        "classification": "SAFE",
-        "severity": "INFO",
-        "score": 0.285,
-        "sb_safe": true,
-        "explanations": [
-            "Final risk score 0.29 \u2192 classified as SAFE.",
-            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
-            "Domain has a valid SSL certificate.",
-            "Login or password input form detected on the page.",
             "Page contains redirect mechanisms (meta-refresh or JavaScript redirect)."
         ]
     },
@@ -726,42 +939,47 @@
         "link": "https://outlookc-tr.weebly.com/",
         "classification": "PHISHING",
         "severity": "HIGH",
-        "score": 0.885,
+        "score": 1.0,
         "sb_safe": true,
         "explanations": [
-            "Final risk score 0.89 \u2192 classified as PHISHING.",
+            "Final risk score 1.00 \u2192 classified as PHISHING.",
             "Domain resembles known brand 'outlook' with similarity 90%.",
             "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
             "Domain has a valid SSL certificate.",
-            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect)."
+            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
+            "Cross-reference analysis: domain name contains brand 'outlook' on a hosted platform.",
+            "Cross-Reference Engine risk score: 0.55"
         ]
     },
     {
         "link": "https://wxfinityy.weebly.com/",
         "classification": "PHISHING",
         "severity": "HIGH",
-        "score": 0.885,
+        "score": 1.0,
         "sb_safe": true,
         "explanations": [
-            "Final risk score 0.89 \u2192 classified as PHISHING.",
+            "Final risk score 1.00 \u2192 classified as PHISHING.",
             "Domain resembles known brand 'xfinity' with similarity 90%.",
             "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
             "Domain has a valid SSL certificate.",
-            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect)."
+            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
+            "Cross-reference analysis: domain name contains brand 'xfinity' on a hosted platform.",
+            "Cross-Reference Engine risk score: 0.55"
         ]
     },
     {
         "link": "https://oal0is-osgv.weebly.com/",
         "classification": "PHISHING",
         "severity": "HIGH",
-        "score": 0.99,
+        "score": 0.605,
         "sb_safe": true,
         "explanations": [
-            "Final risk score 0.99 \u2192 classified as PHISHING.",
+            "Final risk score 0.60 \u2192 classified as PHISHING.",
             "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
             "Domain has a valid SSL certificate.",
             "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
-            "BRAND IMPERSONATION: Page content references brand(s) [xfinity] but domain does not match."
+            "BRAND IMPERSONATION: Page content references brand(s) [xfinity] but domain does not match.",
+            "Cross-Reference Engine risk score: 0.75"
         ]
     },
     {
@@ -781,43 +999,31 @@
         "link": "https://nbb888898.weebly.com/",
         "classification": "PHISHING",
         "severity": "HIGH",
-        "score": 0.99,
+        "score": 0.605,
         "sb_safe": true,
         "explanations": [
-            "Final risk score 0.99 \u2192 classified as PHISHING.",
+            "Final risk score 0.60 \u2192 classified as PHISHING.",
             "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
             "Domain has a valid SSL certificate.",
             "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
-            "BRAND IMPERSONATION: Page content references brand(s) [xfinity] but domain does not match."
+            "BRAND IMPERSONATION: Page content references brand(s) [xfinity] but domain does not match.",
+            "Cross-Reference Engine risk score: 0.75"
         ]
     },
     {
         "link": "https://firstsbank.weebly.com/",
         "classification": "PHISHING",
         "severity": "HIGH",
-        "score": 1.0,
+        "score": 0.9825,
         "sb_safe": true,
         "explanations": [
-            "Final risk score 1.00 \u2192 classified as PHISHING.",
+            "Final risk score 0.98 \u2192 classified as PHISHING.",
             "Domain is highly similar to a known domain (similarity 75%).",
             "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
             "Domain has a valid SSL certificate.",
             "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
-            "BRAND IMPERSONATION: Page content references brand(s) [whatsapp] but domain does not match."
-        ]
-    },
-    {
-        "link": "https://spinning-role-059345.framer.app/",
-        "classification": "SAFE",
-        "severity": "INFO",
-        "score": 0.285,
-        "sb_safe": true,
-        "explanations": [
-            "Final risk score 0.29 \u2192 classified as SAFE.",
-            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
-            "Domain has a valid SSL certificate.",
-            "Login or password input form detected on the page.",
-            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect)."
+            "BRAND IMPERSONATION: Page content references brand(s) [whatsapp] but domain does not match.",
+            "Cross-Reference Engine risk score: 0.75"
         ]
     },
     {
@@ -850,14 +1056,15 @@
         "link": "https://wrightpattcuuregainonl.weebly.com/",
         "classification": "PHISHING",
         "severity": "HIGH",
-        "score": 0.99,
+        "score": 0.605,
         "sb_safe": true,
         "explanations": [
-            "Final risk score 0.99 \u2192 classified as PHISHING.",
+            "Final risk score 0.60 \u2192 classified as PHISHING.",
             "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
             "Domain has a valid SSL certificate.",
             "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
-            "BRAND IMPERSONATION: Page content references brand(s) [whatsapp] but domain does not match."
+            "BRAND IMPERSONATION: Page content references brand(s) [whatsapp] but domain does not match.",
+            "Cross-Reference Engine risk score: 0.75"
         ]
     },
     {
@@ -870,20 +1077,6 @@
             "Final risk score 0.37 \u2192 classified as SUSPICIOUS.",
             "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
             "Domain has a valid SSL certificate.",
-            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect)."
-        ]
-    },
-    {
-        "link": "https://exhilarated-talk-927451.framer.app/",
-        "classification": "SAFE",
-        "severity": "INFO",
-        "score": 0.285,
-        "sb_safe": true,
-        "explanations": [
-            "Final risk score 0.29 \u2192 classified as SAFE.",
-            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
-            "Domain has a valid SSL certificate.",
-            "Login or password input form detected on the page.",
             "Page contains redirect mechanisms (meta-refresh or JavaScript redirect)."
         ]
     },
@@ -932,28 +1125,31 @@
         "link": "https://ghbrdc.weebly.com/",
         "classification": "PHISHING",
         "severity": "HIGH",
-        "score": 0.99,
+        "score": 0.605,
         "sb_safe": true,
         "explanations": [
-            "Final risk score 0.99 \u2192 classified as PHISHING.",
+            "Final risk score 0.60 \u2192 classified as PHISHING.",
             "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
             "Domain has a valid SSL certificate.",
             "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
-            "BRAND IMPERSONATION: Page content references brand(s) [xfinity] but domain does not match."
+            "BRAND IMPERSONATION: Page content references brand(s) [xfinity] but domain does not match.",
+            "Cross-Reference Engine risk score: 0.75"
         ]
     },
     {
         "link": "https://outlookc-fr.weebly.com/",
         "classification": "PHISHING",
         "severity": "HIGH",
-        "score": 0.885,
+        "score": 1.0,
         "sb_safe": true,
         "explanations": [
-            "Final risk score 0.89 \u2192 classified as PHISHING.",
+            "Final risk score 1.00 \u2192 classified as PHISHING.",
             "Domain resembles known brand 'outlook' with similarity 90%.",
             "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
             "Domain has a valid SSL certificate.",
-            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect)."
+            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
+            "Cross-reference analysis: domain name contains brand 'outlook' on a hosted platform.",
+            "Cross-Reference Engine risk score: 0.55"
         ]
     },
     {
@@ -968,23 +1164,8 @@
             "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
             "Domain has a valid SSL certificate.",
             "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
-            "BRAND IMPERSONATION: Page content references brand(s) [comcast] but domain does not match."
-        ]
-    },
-    {
-        "link": "https://predictable-measure-718101.framer.app/",
-        "classification": "PHISHING",
-        "severity": "HIGH",
-        "score": 1.0,
-        "sb_safe": true,
-        "explanations": [
-            "Final risk score 1.00 \u2192 classified as PHISHING.",
-            "Domain is highly similar to a known domain (similarity 75%).",
-            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
-            "Domain has a valid SSL certificate.",
-            "Login or password input form detected on the page.",
-            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
-            "BRAND IMPERSONATION: Page content references brand(s) [outlook] but domain does not match."
+            "BRAND IMPERSONATION: Page content references brand(s) [comcast] but domain does not match.",
+            "CRITICAL: Cross-Reference Engine detected brand impersonation on a hosted platform \u2014 all signals align."
         ]
     },
     {
@@ -1005,74 +1186,79 @@
         "link": "https://chilly-form-331063.framer.app/",
         "classification": "PHISHING",
         "severity": "HIGH",
-        "score": 0.755,
+        "score": 0.7125,
         "sb_safe": true,
         "explanations": [
-            "Final risk score 0.76 \u2192 classified as PHISHING.",
+            "Final risk score 0.71 \u2192 classified as PHISHING.",
             "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
             "Domain has a valid SSL certificate.",
             "Login or password input form detected on the page.",
             "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
-            "BRAND IMPERSONATION: Page content references brand(s) [xfinity] but domain does not match."
+            "BRAND IMPERSONATION: Page content references brand(s) [xfinity] but domain does not match.",
+            "Cross-Reference Engine risk score: 0.80"
         ]
     },
     {
         "link": "https://attractive-states-704494.framer.app/",
         "classification": "PHISHING",
         "severity": "HIGH",
-        "score": 0.755,
+        "score": 0.7125,
         "sb_safe": true,
         "explanations": [
-            "Final risk score 0.76 \u2192 classified as PHISHING.",
+            "Final risk score 0.71 \u2192 classified as PHISHING.",
             "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
             "Domain has a valid SSL certificate.",
             "Login or password input form detected on the page.",
             "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
-            "BRAND IMPERSONATION: Page content references brand(s) [dropbox] but domain does not match."
+            "BRAND IMPERSONATION: Page content references brand(s) [dropbox] but domain does not match.",
+            "Cross-Reference Engine risk score: 0.80"
         ]
     },
     {
         "link": "https://mindful-tribute-378390.framer.app/",
         "classification": "PHISHING",
         "severity": "HIGH",
-        "score": 0.755,
+        "score": 0.7125,
         "sb_safe": true,
         "explanations": [
-            "Final risk score 0.76 \u2192 classified as PHISHING.",
+            "Final risk score 0.71 \u2192 classified as PHISHING.",
             "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
             "Domain has a valid SSL certificate.",
             "Login or password input form detected on the page.",
             "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
-            "BRAND IMPERSONATION: Page content references brand(s) [yahoo] but domain does not match."
+            "BRAND IMPERSONATION: Page content references brand(s) [yahoo] but domain does not match.",
+            "Cross-Reference Engine risk score: 0.80"
         ]
     },
     {
         "link": "https://relaxed-status-139483.framer.app/",
         "classification": "PHISHING",
         "severity": "HIGH",
-        "score": 0.755,
+        "score": 0.735,
         "sb_safe": true,
         "explanations": [
-            "Final risk score 0.76 \u2192 classified as PHISHING.",
+            "Final risk score 0.73 \u2192 classified as PHISHING.",
             "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
             "Domain has a valid SSL certificate.",
             "Login or password input form detected on the page.",
             "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
-            "BRAND IMPERSONATION: Page content references brand(s) [talktalk] but domain does not match."
+            "BRAND IMPERSONATION: Page content references brand(s) [talktalk] but domain does not match.",
+            "Cross-Reference Engine risk score: 0.80"
         ]
     },
     {
         "link": "https://wrightpattcusupporthelp.weebly.com/",
         "classification": "PHISHING",
         "severity": "HIGH",
-        "score": 1.0,
+        "score": 0.6175,
         "sb_safe": true,
         "explanations": [
-            "Final risk score 1.00 \u2192 classified as PHISHING.",
+            "Final risk score 0.62 \u2192 classified as PHISHING.",
             "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
             "Domain has a valid SSL certificate.",
             "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
-            "BRAND IMPERSONATION: Page content references brand(s) [whatsapp] but domain does not match."
+            "BRAND IMPERSONATION: Page content references brand(s) [whatsapp] but domain does not match.",
+            "Cross-Reference Engine risk score: 0.75"
         ]
     },
     {
@@ -1144,19 +1330,6 @@
         ]
     },
     {
-        "link": "https://left-elements-102208.framer.app/",
-        "classification": "SAFE",
-        "severity": "INFO",
-        "score": 0.125,
-        "sb_safe": true,
-        "explanations": [
-            "Final risk score 0.12 \u2192 classified as SAFE.",
-            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
-            "Domain has a valid SSL certificate.",
-            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect)."
-        ]
-    },
-    {
         "link": "https://posta-uniba-it.weebly.com/",
         "classification": "SUSPICIOUS",
         "severity": "LOW",
@@ -1198,20 +1371,6 @@
         ]
     },
     {
-        "link": "https://lovely-checkbox-235949.framer.app/",
-        "classification": "SAFE",
-        "severity": "INFO",
-        "score": 0.285,
-        "sb_safe": true,
-        "explanations": [
-            "Final risk score 0.29 \u2192 classified as SAFE.",
-            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
-            "Domain has a valid SSL certificate.",
-            "Login or password input form detected on the page.",
-            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect)."
-        ]
-    },
-    {
         "link": "https://active-access-284978.framer.app/",
         "classification": "SUSPICIOUS",
         "severity": "LOW",
@@ -1229,14 +1388,15 @@
         "link": "https://espananewlink.weebly.com/",
         "classification": "PHISHING",
         "severity": "HIGH",
-        "score": 0.99,
+        "score": 0.605,
         "sb_safe": true,
         "explanations": [
-            "Final risk score 0.99 \u2192 classified as PHISHING.",
+            "Final risk score 0.60 \u2192 classified as PHISHING.",
             "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
             "Domain has a valid SSL certificate.",
             "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
-            "BRAND IMPERSONATION: Page content references brand(s) [microsoft] but domain does not match."
+            "BRAND IMPERSONATION: Page content references brand(s) [microsoft] but domain does not match.",
+            "Cross-Reference Engine risk score: 0.75"
         ]
     },
     {
@@ -1271,15 +1431,16 @@
         "link": "https://serious-kangaroo-960887.framer.app/",
         "classification": "PHISHING",
         "severity": "HIGH",
-        "score": 0.755,
+        "score": 0.7125,
         "sb_safe": true,
         "explanations": [
-            "Final risk score 0.76 \u2192 classified as PHISHING.",
+            "Final risk score 0.71 \u2192 classified as PHISHING.",
             "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
             "Domain has a valid SSL certificate.",
             "Login or password input form detected on the page.",
             "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
-            "BRAND IMPERSONATION: Page content references brand(s) [dropbox] but domain does not match."
+            "BRAND IMPERSONATION: Page content references brand(s) [dropbox] but domain does not match.",
+            "Cross-Reference Engine risk score: 0.80"
         ]
     },
     {
@@ -1307,90 +1468,6 @@
             "Domain has a valid SSL certificate.",
             "Login or password input form detected on the page.",
             "Page contains redirect mechanisms (meta-refresh or JavaScript redirect)."
-        ]
-    },
-    {
-        "link": "https://careful-learning-148364.framer.app/",
-        "classification": "PHISHING",
-        "severity": "HIGH",
-        "score": 0.755,
-        "sb_safe": true,
-        "explanations": [
-            "Final risk score 0.76 \u2192 classified as PHISHING.",
-            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
-            "Domain has a valid SSL certificate.",
-            "Login or password input form detected on the page.",
-            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
-            "BRAND IMPERSONATION: Page content references brand(s) [yahoo] but domain does not match."
-        ]
-    },
-    {
-        "link": "https://shopee4do4.vercel.app/",
-        "classification": "PHISHING",
-        "severity": "HIGH",
-        "score": 0.995,
-        "sb_safe": true,
-        "explanations": [
-            "Final risk score 0.99 \u2192 classified as PHISHING.",
-            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
-            "Domain has a valid SSL certificate.",
-            "BRAND IMPERSONATION: Page content references brand(s) [facebook, linkedin, instagram, twitter, tiktok] but domain does not match."
-        ]
-    },
-    {
-        "link": "https://welcome-bhd-credi.lovable.app/",
-        "classification": "SAFE",
-        "severity": "INFO",
-        "score": 0.195,
-        "sb_safe": true,
-        "explanations": [
-            "Final risk score 0.20 \u2192 classified as SAFE.",
-            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
-            "Domain has a valid SSL certificate.",
-            "Page structure and behavior appear legitimate (safe content)."
-        ]
-    },
-    {
-        "link": "https://welcome-bhd-credi.lovable.app/blocked",
-        "classification": "SAFE",
-        "severity": "INFO",
-        "score": 0.195,
-        "sb_safe": true,
-        "explanations": [
-            "Final risk score 0.20 \u2192 classified as SAFE.",
-            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
-            "Domain has a valid SSL certificate.",
-            "Page structure and behavior appear legitimate (safe content)."
-        ]
-    },
-    {
-        "link": "http://allegro.8t238g823.rest/",
-        "classification": "PHISHING",
-        "severity": "HIGH",
-        "score": 1.0,
-        "sb_safe": true,
-        "explanations": [
-            "Final risk score 1.00 \u2192 classified as PHISHING.",
-            "Domain resembles known brand 'allegro' with similarity 90%.",
-            "Domain registered very recently (2 days old).",
-            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
-            "Domain registered for minimum period (< 1 year) \u2014 common in throwaway phishing domains.",
-            "Domain has a valid SSL certificate."
-        ]
-    },
-    {
-        "link": "https://allegro.8t238g823.rest/",
-        "classification": "PHISHING",
-        "severity": "HIGH",
-        "score": 1.0,
-        "sb_safe": true,
-        "explanations": [
-            "Final risk score 1.00 \u2192 classified as PHISHING.",
-            "Domain resembles known brand 'allegro' with similarity 90%.",
-            "Domain registered very recently (2 days old).",
-            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
-            "Domain registered for minimum period (< 1 year) \u2014 common in throwaway phishing domains.",
-            "Domain has a valid SSL certificate."
         ]
     }
 ]
