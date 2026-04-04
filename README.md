@@ -187,7 +187,6 @@ playwright install-deps
 ### Step 5 — Configure Environment Variables
 
 ```bash
-cp .env.example .env
 nano .env
 ```
 
@@ -221,7 +220,7 @@ chmod 755 data
 
 ```bash
 # Activate venv if not already
-source .venv/bin/activate
+. .venv/bin/activate
 
 # Start the production server
 gunicorn \
