@@ -2,6 +2,33 @@
 
 This changelog documents all structural, architectural, algorithmic, and UI improvements made to transform the Intelligent Phishing Domain Detection System MVP into a robust, production-ready security tool.
 
+## [2.5.0] - 4th April 2026
+
+### 🚀 Major Upgrades & Audit Remediations
+- **Content Brand Impersonation Engine**: 
+  - Added robust detection for brand impersonation by scanning page content (title, text, image alt tags, meta tags) and cross-referencing it against the actual domain.
+- **Enhanced Sensitive Field Detection**: 
+  - Added 3-layer detection for payment/credit card forms (including iframes like Stripe/Braintree) and OTP/verification codes.
+- **Tech Support Scam Detection**: 
+  - Implemented advanced tech support scam detection featuring keyword matching and regex-based toll-free phone number correlation.
+
+### 🛡️ Algorithmic Improvements
+- **Playwright Reliability & Fallbacks**: 
+  - Added a 4-tier fallback retry mechanism (`networkidle` → `domcontentloaded` → `selectors` → `text`) to ensure reliable JS rendering, along with shadow DOM extraction. Added visible warnings when Playwright is unavailable.
+- **Hosted Platform Suffix Matching**: 
+  - Improved `is_hosted_platform` to match via suffix/endswith, correctly identifying subdomains on free hosting platforms. 
+  - Expanded `KNOWN_HOSTING_PLATFORMS` with several new services (weeblysite.com, vercel, r2.dev, etc.).
+- **Expanded Brand Catalog**: 
+  - Added key heavily-phished brands including AT&T, Xfinity, OpenAI, and many others.
+- **Rebalanced Scoring & Combos**: 
+  - Adjusted base scoring weights (`0.30` Similarity, `0.30` Intelligence, `0.40` Content) and implemented dynamic reallocation when hosted platforms are detected.
+- **Tightened Legitimate App Guardrails**: 
+  - Hardened the `legitimate_app_behavior` check with 4 new blockers (blocking reduction if critical vectors like brand impersonation or payment forms are detected).
+- **URL Path Analytics**: 
+  - Added deep URL path analysis including suspicious path mapping and Shannon entropy scoring to detect randomized throwaway endpoints.
+
+---
+
 ## [2.2.0] - 3rd April 2026
 
 ### 🚀 Major Features & Architectural Changes

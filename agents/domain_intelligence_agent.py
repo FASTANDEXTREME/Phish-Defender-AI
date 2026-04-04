@@ -96,8 +96,12 @@ class DomainIntelligenceAgent:
         ext = tldextract.extract(safe_domain)
         root_domain = f"{ext.domain}.{ext.suffix}" if ext.domain and ext.suffix else safe_domain
         
-        # Check if the root domain is a known hosting platform
-        is_hosted_platform = root_domain in KNOWN_HOSTING_PLATFORMS
+        # Check if the root domain is a known hosting platform (suffix match
+        # so "web.core.windows.net" matches "core.windows.net" in the list)
+        is_hosted_platform = any(
+            root_domain == p or root_domain.endswith(f".{p}")
+            for p in KNOWN_HOSTING_PLATFORMS
+        )
 
         whois_data = self._safe_fetch_whois(root_domain)
         domain_age_days = self._compute_domain_age_days(whois_data)

@@ -27,7 +27,14 @@ import requests
 from bs4 import BeautifulSoup
 
 from agents.decision_agent import WebsiteContentAgentOutput
-from core.config import SUSPICIOUS_CONTENT_KEYWORDS
+from core.config import (
+    KNOWN_BRANDS,
+    SUSPICIOUS_CONTENT_KEYWORDS,
+    PAYMENT_KEYWORDS,
+    SCAM_KEYWORDS,
+    OTP_KEYWORDS,
+    SUSPICIOUS_PATHS,
+)
 
 # Suppress InsecureRequestWarning once at module level
 import warnings
@@ -147,8 +154,28 @@ class _BrowserPool:
             try:
                 page.goto(url, timeout=timeout_ms, wait_until="networkidle")
             except Exception:
-                pass  # Fallback — page may have partially loaded
-            content = page.content()
+                # Second attempt: Stop waiting for network silence, wait for DOM content
+                try:
+                    page.goto(url, timeout=timeout_ms, wait_until="domcontentloaded")
+                    try:
+                        # Aggressively wait for high-risk phishing elements
+                        page.wait_for_selector('input[type="password"], input[name*="password"], input[name*="login"], iframe', timeout=2500)
+                    except Exception:
+                        try:
+                            # Final fallback: wait for meaningful text content if JS renders slowly
+                            page.wait_for_function('document.body.innerText.length > 300', timeout=2000)
+                        except Exception:
+                            page.wait_for_timeout(1000)
+                except Exception:
+                    pass
+            content = page.evaluate("""
+                () => {
+                    document.querySelectorAll('*').forEach(el => {
+                        if (el.shadowRoot) el.innerHTML += el.shadowRoot.innerHTML;
+                    });
+                    return document.documentElement.outerHTML;
+                }
+            """)
             final_url = page.url
             return content, final_url
         except Exception as exc:
@@ -205,6 +232,14 @@ class WebsiteContentResult:
     page_title: Optional[str]
     legitimate_app_behavior: bool
     risk_score: float
+    # --- C1: Brand impersonation ---
+    brand_impersonation_brands: List[str]
+    # --- C6: Sensitive field detection ---
+    payment_form_detected: bool
+    scam_indicators_found: List[str]
+    otp_detected: bool
+    # --- C5: Playwright availability ---
+    playwright_available: bool
 
     def to_dict(self) -> WebsiteContentAgentOutput:
         return {
@@ -223,6 +258,11 @@ class WebsiteContentResult:
             "page_title": self.page_title,
             "legitimate_app_behavior": self.legitimate_app_behavior,
             "risk_score": self.risk_score,
+            "brand_impersonation_brands": self.brand_impersonation_brands,
+            "payment_form_detected": self.payment_form_detected,
+            "scam_indicators_found": self.scam_indicators_found,
+            "otp_detected": self.otp_detected,
+            "playwright_available": self.playwright_available,
         }
 
 
@@ -238,6 +278,13 @@ class WebsiteContentAgent:
 
     def run(self, domain: str) -> WebsiteContentResult:
         input_domain = domain.strip().lower()
+
+        pw_available = _browser_pool.is_available
+        if not pw_available:
+            logger.warning(
+                "⚠️ PLAYWRIGHT UNAVAILABLE — JS-rendered content will NOT be analyzed. "
+                "Detection accuracy is severely degraded for JS-heavy sites (Weebly, Webflow, Vercel, etc.)."
+            )
 
         html, final_url = self._fetch_html(input_domain)
         if html is None:
@@ -257,6 +304,11 @@ class WebsiteContentAgent:
                 page_title=None,
                 legitimate_app_behavior=False,
                 risk_score=0.0,
+                brand_impersonation_brands=[],
+                payment_form_detected=False,
+                scam_indicators_found=[],
+                otp_detected=False,
+                playwright_available=pw_available,
             )
 
         page_domain = self._extract_domain(final_url or input_domain)
@@ -314,11 +366,47 @@ class WebsiteContentAgent:
         hidden_inputs = soup.find_all("input", {"type": "hidden"})
         hidden_inputs_count = len(hidden_inputs)
 
-        # --- Suspicious keywords ---
+        # --- Full visible text for multiple analyses ---
         text = soup.get_text(separator=" ").lower()
+
+        # --- Suspicious keywords ---
         suspicious_found: List[str] = [
             keyword for keyword in SUSPICIOUS_CONTENT_KEYWORDS if keyword in text
         ]
+
+        # =============================================================
+        # C1: BRAND IMPERSONATION DETECTION
+        # Scans page text, title, img alt/src for brand names.
+        # If brand found on a non-brand domain → impersonation.
+        # =============================================================
+        brand_impersonation_brands = self._detect_brand_impersonation(soup, text, page_title, page_domain)
+        if brand_impersonation_brands:
+            logger.warning(
+                "Brand impersonation detected on %s: page references brands %s",
+                page_domain, brand_impersonation_brands,
+            )
+
+        # =============================================================
+        # C6: PAYMENT / CREDIT CARD DETECTION
+        # =============================================================
+        payment_form_detected = self._detect_payment_fields(soup, text)
+
+        # =============================================================
+        # C6: TECH SUPPORT SCAM DETECTION
+        # =============================================================
+        scam_indicators_found: List[str] = [
+            kw for kw in SCAM_KEYWORDS if kw in text
+        ]
+        
+        # Scan for Toll-Free US numbers adjacent to support/scare text (I5)
+        if re.search(r'(?i)(?:apple|microsoft|support|windows|virus).*?(?:1[-.\s]?)?8[0-9]{2}[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}', text) or \
+           re.search(r'(?i)(?:1[-.\s]?)?8[0-9]{2}[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}.*?(?:apple|microsoft|support|windows|virus)', text):
+            scam_indicators_found.append("toll-free phone number")
+
+        # =============================================================
+        # C6: OTP / VERIFICATION CODE DETECTION
+        # =============================================================
+        otp_detected = any(kw in text for kw in OTP_KEYWORDS)
 
         # --- External scripts ---
         scripts = soup.find_all("script")
@@ -345,16 +433,38 @@ class WebsiteContentAgent:
             raw_html,
         ))
 
+        # =============================================================
+        # I4: URL PATH ANALYSIS
+        # =============================================================
+        path = urlparse(final_url or input_domain).path.lower()
+        path_risk = min(0.30, sum(0.15 for p in SUSPICIOUS_PATHS if re.search(p, path)))
+        import math
+        from collections import Counter
+        def domain_entropy(s: str) -> float:
+            if not s: return 0.0
+            freq = Counter(s)
+            return -sum((c/len(s)) * math.log2(c/len(s)) for c in freq.values())
+            
+        if path and len(path) > 10 and domain_entropy(path) > 4.0:
+            path_risk += 0.20
+
+        # Tightened: brand impersonation, payment forms, and scam indicators
+        # now also prevent legitimate_app_behavior classification.
         is_legitimate_app = (
             not login_form_detected and
             not password_field_detected and
             not suspicious_found and
+            not brand_impersonation_brands and   # C1: brand mismatch blocks legitimate
+            not payment_form_detected and        # C6: payment fields block legitimate
+            not scam_indicators_found and        # C6: scam indicators block legitimate
+            not otp_detected and                 # C6: OTP fields block legitimate
             cross_domain_forms == 0 and
             hidden_inputs_count < 3 and
             suspicious_iframes == 0 and
             not has_meta_refresh and
             not has_js_redirect and
-            bool(page_title)
+            bool(page_title) and
+            len(page_title) > 5                  # Trivial titles like "Page" are suspicious
         )
 
         risk_score = self._compute_risk_score(
@@ -370,6 +480,11 @@ class WebsiteContentAgent:
             has_js_redirect=has_js_redirect,
             page_title=page_title,
             is_legitimate_app=is_legitimate_app,
+            brand_impersonation_count=len(brand_impersonation_brands),
+            payment_form_detected=payment_form_detected,
+            scam_indicators_count=len(scam_indicators_found),
+            otp_detected=otp_detected,
+            path_risk=path_risk,
         )
 
         return WebsiteContentResult(
@@ -388,6 +503,11 @@ class WebsiteContentAgent:
             page_title=page_title,
             legitimate_app_behavior=is_legitimate_app,
             risk_score=risk_score,
+            brand_impersonation_brands=brand_impersonation_brands,
+            payment_form_detected=payment_form_detected,
+            scam_indicators_found=scam_indicators_found,
+            otp_detected=otp_detected,
+            playwright_available=pw_available,
         )
 
     # ------------------------------------------------------------------
@@ -465,6 +585,110 @@ class WebsiteContentAgent:
         return count
 
     # ------------------------------------------------------------------
+    # C1: Brand impersonation detection
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _detect_brand_impersonation(
+        soup: BeautifulSoup,
+        visible_text: str,
+        page_title: str,
+        page_domain: str,
+    ) -> List[str]:
+        """
+        Scan page text, title, and image alt/src for known brand names.
+        If a brand is found but the page domain does NOT match the brand's
+        canonical domain, flag it as brand impersonation.
+
+        Returns list of impersonated brand names.
+        """
+        # Build a single searchable blob: visible text + title + img alt/src filenames
+        search_text = f"{visible_text} {page_title.lower()}"
+        for img in soup.find_all("img"):
+            alt = img.get("alt", "")
+            src = img.get("src", "").split("/")[-1].split("?")[0]  # filename only
+            search_text += f" {alt.lower()} {src.lower()}"
+
+        # Also include meta og:title and description
+        for meta in soup.find_all("meta"):
+            prop = meta.get("property", "").lower()
+            name_attr = meta.get("name", "").lower()
+            if prop in ("og:title", "og:description") or name_attr == "description":
+                content = meta.get("content", "")
+                search_text += f" {content.lower()}"
+
+        detected: List[str] = []
+        for brand, canonical_domain in KNOWN_BRANDS.items():
+            # Skip very short brand names (≤2 chars) — too many false positives
+            if len(brand) <= 2:
+                continue
+
+            # Check if this brand's canonical domain is part of the page's domain.
+            # If it is, this is the real site — not impersonation.
+            canon_root = canonical_domain.split(".")[0]  # e.g. "facebook" from "facebook.com"
+            if canon_root in page_domain:
+                continue
+
+            # For short brands (3 chars), require word boundary matches
+            if len(brand) == 3:
+                if re.search(rf'(?:^|\s|[^a-z]){re.escape(brand)}(?:$|\s|[^a-z])', search_text):
+                    detected.append(brand)
+            else:
+                # For longer brands, simple substring is fine
+                if brand in search_text:
+                    detected.append(brand)
+
+        # Deduplicate brands that share a canonical domain
+        # e.g. if both "att" and "bellsouth" match, keep both but no duplicates
+        return list(dict.fromkeys(detected))
+
+    # ------------------------------------------------------------------
+    # C6: Payment / sensitive field detection
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _detect_payment_fields(soup: BeautifulSoup, visible_text: str) -> bool:
+        """
+        Detect payment/credit card collection beyond just input attributes.
+        Checks:
+        1. Input attributes (name, id, placeholder, autocomplete)
+        2. Visible text for payment-related phrases
+        3. Stripe/payment iframe patterns
+        """
+        # 1. Check input field attributes for payment-specific patterns
+        payment_input_keywords = [
+            "card", "cvv", "cvc", "ccnum", "cc-num", "cc_num",
+            "cardnumber", "card-number", "card_number",
+            "expir", "exp-date", "exp_date",
+            "cardholder", "card-holder",
+            "billing", "payment",
+        ]
+        for inp in soup.find_all("input"):
+            attrs_text = " ".join([
+                str(inp.get("name", "")),
+                str(inp.get("id", "")),
+                str(inp.get("placeholder", "")),
+                str(inp.get("autocomplete", "")),
+                str(inp.get("aria-label", "")),
+                " ".join(inp.get("class", [])) if isinstance(inp.get("class"), list) else str(inp.get("class", "")),
+            ]).lower()
+            if any(kw in attrs_text for kw in payment_input_keywords):
+                return True
+
+        # 2. Check for Stripe / payment iframes
+        for iframe in soup.find_all("iframe"):
+            src = iframe.get("src", "").lower()
+            if "stripe" in src or "braintree" in src or "checkout" in src or "payment" in src:
+                return True
+
+        # 3. Check visible text for payment keyword phrases
+        matches = sum(1 for kw in PAYMENT_KEYWORDS if kw in visible_text)
+        if matches >= 2:  # At least 2 payment phrases to avoid false positives
+            return True
+
+        return False
+
+    # ------------------------------------------------------------------
     # Risk scoring
     # ------------------------------------------------------------------
 
@@ -482,12 +706,17 @@ class WebsiteContentAgent:
         has_js_redirect: bool,
         page_title: str,
         is_legitimate_app: bool,
+        brand_impersonation_count: int = 0,
+        payment_form_detected: bool = False,
+        scam_indicators_count: int = 0,
+        otp_detected: bool = False,
+        path_risk: float = 0.0,
     ) -> float:
         risk = 0.0
+        risk += path_risk
 
         if is_legitimate_app:
-            # Baseline risk reduction for normal pages
-            risk -= 0.20
+            pass  # Baseline risk reduction handled securely in DecisionAgent now
 
         # Login form and password field — merged to avoid double-counting.
         # login_form_detected implies password_field_detected, so treat as one signal.
@@ -502,6 +731,34 @@ class WebsiteContentAgent:
             lower_title = page_title.lower()
             if any(kw in lower_title for kw in ["secure", "login", "auth", "verify", "account", "webmail", "reward"]):
                 risk += 0.20
+
+        # =============================================================
+        # C1: Brand impersonation — THE most critical signal
+        # =============================================================
+        if brand_impersonation_count >= 2:
+            risk += 0.70  # Multiple brands impersonated = near certain phishing
+        elif brand_impersonation_count == 1:
+            risk += 0.55  # Single brand impersonation = very strong signal
+
+        # =============================================================
+        # C6: Payment form detection — collecting financial data
+        # =============================================================
+        if payment_form_detected:
+            risk += 0.45  # Payment collection on non-brand domain is high risk
+
+        # =============================================================
+        # C6: Tech support scam indicators
+        # =============================================================
+        if scam_indicators_count >= 3:
+            risk += 0.60  # Strong scam signals
+        elif scam_indicators_count >= 1:
+            risk += 0.35  # Some scam signals
+
+        # =============================================================
+        # C6: OTP/verification code page
+        # =============================================================
+        if otp_detected:
+            risk += 0.25
 
         # Cross-domain form submissions — strongest credential-harvesting indicator
         if cross_domain_forms > 0:

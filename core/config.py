@@ -40,6 +40,23 @@ KNOWN_BRANDS: Dict[str, str] = {
     "yahoo": "yahoo.com",
     "outlook": "outlook.com",
     "icloud": "icloud.com",
+    # AI / Cloud
+    "openai": "openai.com",
+    "chatgpt": "openai.com",
+    "claude": "anthropic.com",
+    "gemini": "gemini.google.com",
+    # Telecom / ISP
+    "att": "att.com",
+    "xfinity": "xfinity.com",
+    "comcast": "xfinity.com",
+    "verizon": "verizon.com",
+    "tmobile": "t-mobile.com",
+    "t-mobile": "t-mobile.com",
+    "talktalk": "talktalk.co.uk",
+    "bellsouth": "att.com",
+    "vodafone": "vodafone.com",
+    "spectrum": "spectrum.net",
+    "centurylink": "centurylink.com",
     # Finance / Banking
     "paypal": "paypal.com",
     "chase": "chase.com",
@@ -57,6 +74,12 @@ KNOWN_BRANDS: Dict[str, str] = {
     "wise": "wise.com",
     "venmo": "venmo.com",
     "cashapp": "cash.app",
+    "mtb": "mtb.com",
+    "regions": "regions.com",
+    "capitalone": "capitalone.com",
+    "usbank": "usbank.com",
+    "schwab": "schwab.com",
+    "pnc": "pnc.com",
     # Crypto
     "coinbase": "coinbase.com",
     "binance": "binance.com",
@@ -76,6 +99,14 @@ KNOWN_BRANDS: Dict[str, str] = {
     "alibaba": "alibaba.com",
     "allegro": "allegro.pl",
     "heb": "heb.com",
+    "americanas": "americanas.com.br",
+    "mercadolibre": "mercadolibre.com",
+    # Hosting / Cloud services (for content impersonation detection)
+    "dreamhost": "dreamhost.com",
+    "godaddy": "godaddy.com",
+    "bluehost": "bluehost.com",
+    "hostgator": "hostgator.com",
+    "wetransfer": "wetransfer.com",
     # Government / Services
     "irs": "irs.gov",
     "usps": "usps.com",
@@ -96,11 +127,27 @@ KNOWN_BRANDS: Dict[str, str] = {
 # Free Hosting Platforms (commonly abused for throwaway subdomains)
 # ---------------------------------------------------------------------------
 KNOWN_HOSTING_PLATFORMS: List[str] = [
-    "vercel.app", "webflow.io", "wixstudio.com", "github.io", "pages.dev",
-    "zapier.app", "lovable.app", "godaddysites.com", "web.app", "replit.dev",
-    "edgeone.app", "weebly.com", "mystagingwebsite.com", "kesug.com",
-    "amazonaws.com", "cloudflare.net", "herokuapp.com", "firebaseapp.com",
-    "netlify.app", "glitch.me", "onrender.com", "site123.me", "pantheonsite.io"
+    # Website builders
+    "vercel.app", "webflow.io", "wixstudio.com", "wix.com",
+    "weebly.com", "weeblysite.com",  # Both Weebly domains
+    "squarespace.com", "godaddysites.com", "site123.me",
+    "wordpress.com", "blogspot.com",
+    # Developer / PaaS platforms
+    "github.io", "pages.dev", "netlify.app", "herokuapp.com",
+    "firebaseapp.com", "web.app", "replit.dev", "glitch.me",
+    "onrender.com", "railway.app", "fly.dev", "surge.sh",
+    "pythonanywhere.com", "ondigitalocean.app",
+    # Cloud storage / CDN (commonly abused for static phishing pages)
+    "amazonaws.com", "cloudflare.net", "r2.dev",
+    "core.windows.net", "blob.core.windows.net", "web.core.windows.net",
+    "azurewebsites.net", "azurestaticapps.net",
+    # Automation / low-code
+    "zapier.app", "lovable.app", "edgeone.app", "appwrite.network",
+    # Dynamic DNS (throwaway subdomains)
+    "duckdns.org", "ddns.net", "no-ip.com", "freedns.afraid.org",
+    # Other free hosting
+    "mystagingwebsite.com", "kesug.com", "pantheonsite.io",
+    "tiiny.site", "000webhostapp.com", "infinityfreeapp.com",
 ]
 
 # ---------------------------------------------------------------------------
@@ -147,6 +194,14 @@ PHISHING_DOMAIN_KEYWORDS: List[str] = [
 ]
 
 # ---------------------------------------------------------------------------
+# Suspicious path patterns (I4)
+# ---------------------------------------------------------------------------
+SUSPICIOUS_PATHS: List[str] = [
+    r"/checkpoint", r"/verify", r"/wp-forms", r"/auth", r"/secure",
+    r"/login", r"/signin", r"/account", r"/update", r"/billing", r"/payment"
+]
+
+# ---------------------------------------------------------------------------
 # Suspicious keywords in page content
 # ---------------------------------------------------------------------------
 SUSPICIOUS_CONTENT_KEYWORDS: List[str] = [
@@ -185,6 +240,42 @@ SUSPICIOUS_CONTENT_KEYWORDS: List[str] = [
 ]
 
 # ---------------------------------------------------------------------------
+# Payment / Credit card keywords (C6: sensitive field detection)
+# ---------------------------------------------------------------------------
+PAYMENT_KEYWORDS: List[str] = [
+    "card number", "card info", "card information", "credit card", "debit card",
+    "cvv", "cvc", "security code", "expiry", "exp date", "expiration date",
+    "mm/yy", "mm / yy", "mm/yyyy", "cardholder", "card holder",
+    "billing address", "payment method", "pay now", "checkout",
+    "subscribe with obligation", "add payment", "enter card",
+]
+
+# ---------------------------------------------------------------------------
+# Tech support scam indicators (C6)
+# ---------------------------------------------------------------------------
+SCAM_KEYWORDS: List[str] = [
+    "call support", "tech help", "tech support", "system warning",
+    "virus detected", "virus found", "computer locked", "computer infected",
+    "call microsoft", "call apple", "call windows",
+    "toll free", "toll-free",
+    "your computer has been", "windows alert", "windows defender",
+    "system alert", "security alert",
+    "malware detected", "malware found",
+    "system operation suspended", "activate your license",
+    "manual scan is required",
+]
+
+# ---------------------------------------------------------------------------
+# OTP / Verification code keywords (C6)
+# ---------------------------------------------------------------------------
+OTP_KEYWORDS: List[str] = [
+    "verification code", "one-time password", "one-time code",
+    "otp", "6-digit code", "4-digit code", "authentication code",
+    "security code", "enter the code", "enter code",
+    "code sent to", "we sent a code",
+]
+
+# ---------------------------------------------------------------------------
 # Scoring weights for the Decision Agent
 # When Safe Browsing returns no threat (risk=0.0), its weight is dead weight
 # that suppresses other agents. Use separate weight sets.
@@ -196,9 +287,9 @@ SCORING_WEIGHTS_WITH_SB = {
     "safe_browsing": 0.35,
 }
 SCORING_WEIGHTS_WITHOUT_SB = {
-    "similarity": 0.15,
-    "intelligence": 0.45,
-    "content": 0.40,
+    "similarity": 0.30,       # I2: Was 0.15 — brand detection needs higher weight
+    "intelligence": 0.30,     # I2: Was 0.45 — useless for hosted platform subdomains
+    "content": 0.40,          # Unchanged — content analysis remains primary signal
 }
 
 # ---------------------------------------------------------------------------
@@ -221,7 +312,11 @@ __all__ = [
     "UNICODE_HOMOGLYPHS",
     "HOMOGLYPH_TRANSLATE",
     "PHISHING_DOMAIN_KEYWORDS",
+    "SUSPICIOUS_PATHS",
     "SUSPICIOUS_CONTENT_KEYWORDS",
+    "PAYMENT_KEYWORDS",
+    "SCAM_KEYWORDS",
+    "OTP_KEYWORDS",
     "SCORING_WEIGHTS_WITH_SB",
     "SCORING_WEIGHTS_WITHOUT_SB",
     "PHISHING_THRESHOLD",

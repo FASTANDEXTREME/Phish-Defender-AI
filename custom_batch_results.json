@@ -1,0 +1,336 @@
+[
+    {
+        "link": "http://mtbrewards.click",
+        "classification": "PHISHING",
+        "score": 0.0,
+        "explanations": [
+            "Final risk score 1.00 \u2192 classified as PHISHING.",
+            "Domain registered very recently (3 days old).",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain registered for minimum period (< 1 year) \u2014 common in throwaway phishing domains.",
+            "Domain has a valid SSL certificate.",
+            "BRAND IMPERSONATION: Page content references brand(s) [facebook, linkedin, twitter, wise] but domain does not match.",
+            "Payment/credit card collection form detected on the page."
+        ]
+    },
+    {
+        "link": "http://pub-5f42dfaab80a4e1583ad07d911dd504d.r2.dev/ofifceaccesseslogologoinsonnlicrozotft.html",
+        "classification": "SAFE",
+        "score": 0.0,
+        "explanations": [
+            "Final risk score 0.10 \u2192 classified as SAFE.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain has a valid SSL certificate."
+        ]
+    },
+    {
+        "link": "http://tandan-sawit.github.io/in",
+        "classification": "SAFE",
+        "score": 0.0,
+        "explanations": [
+            "Final risk score 0.23 \u2192 classified as SAFE.",
+            "Domain contains brand name 'github' in a suspicious context.",
+            "WHOIS privacy is enabled, hiding registrant information.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain has a valid SSL certificate.",
+            "Login or password input form detected on the page."
+        ]
+    },
+    {
+        "link": "http://trzsute.zapier.app",
+        "classification": "PHISHING",
+        "score": 0.0,
+        "explanations": [
+            "Final risk score 0.70 \u2192 classified as PHISHING.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain has a valid SSL certificate.",
+            "High number of external scripts (34).",
+            "Payment/credit card collection form detected on the page."
+        ]
+    },
+    {
+        "link": "https://americanas-rho.vercel.app/",
+        "classification": "PHISHING",
+        "score": 0.0,
+        "explanations": [
+            "Final risk score 0.62 \u2192 classified as PHISHING.",
+            "Domain resembles known brand 'americanas' with similarity 90%.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain has a valid SSL certificate."
+        ]
+    },
+    {
+        "link": "https://arrangehimalayas.com/wp-forms/2/",
+        "classification": "SAFE",
+        "score": 0.0,
+        "explanations": [
+            "Final risk score 0.27 \u2192 classified as SAFE.",
+            "WHOIS privacy is enabled, hiding registrant information.",
+            "Domain has a valid SSL certificate.",
+            "BRAND IMPERSONATION: Page content references brand(s) [wetransfer] but domain does not match."
+        ]
+    },
+    {
+        "link": "https://att-sgin100145.weeblysite.com/",
+        "classification": "PHISHING",
+        "score": 0.0,
+        "explanations": [
+            "Final risk score 1.00 \u2192 classified as PHISHING.",
+            "Domain contains brand name 'att' in a suspicious context.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain has a valid SSL certificate.",
+            "Login or password input form detected on the page.",
+            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
+            "BRAND IMPERSONATION: Page content references brand(s) [google] but domain does not match."
+        ]
+    },
+    {
+        "link": "https://bellsouth-att-signing-22025d.webflow.io/",
+        "classification": "PHISHING",
+        "score": 0.0,
+        "explanations": [
+            "Final risk score 0.62 \u2192 classified as PHISHING.",
+            "Domain resembles known brand 'att' with similarity 90%.",
+            "WHOIS privacy is enabled, hiding registrant information.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain has a valid SSL certificate.",
+            "Website is not reachable."
+        ]
+    },
+    {
+        "link": "https://buonobuono.jp/zribpuf/amlcnqt/1itzfnu/FFBB/checkpoint.php",
+        "classification": "SAFE",
+        "score": 0.0,
+        "explanations": [
+            "Final risk score 0.05 \u2192 classified as SAFE.",
+            "WHOIS privacy is enabled, hiding registrant information.",
+            "Domain has a valid SSL certificate."
+        ]
+    },
+    {
+        "link": "https://dodilolaw.z38.web.core.windows.net/",
+        "classification": "SAFE",
+        "score": 0.0,
+        "explanations": [
+            "Final risk score 0.10 \u2192 classified as SAFE.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain has a valid SSL certificate.",
+            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect)."
+        ]
+    },
+    {
+        "link": "https://dodilolaw.z38.web.core.windows.net/center-output/action-boot.html",
+        "classification": "PHISHING",
+        "score": 0.0,
+        "explanations": [
+            "Final risk score 0.73 \u2192 classified as PHISHING.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain has a valid SSL certificate.",
+            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
+            "BRAND IMPERSONATION: Page content references brand(s) [chase, ups] but domain does not match.",
+            "Payment/credit card collection form detected on the page.",
+            "OTP / verification code input detected on the page."
+        ]
+    },
+    {
+        "link": "https://dre-us.cnapess-gouv.com",
+        "classification": "SUSPICIOUS",
+        "score": 0.0,
+        "explanations": [
+            "Final risk score 0.43 \u2192 classified as SUSPICIOUS.",
+            "Domain is relatively young (32 days old).",
+            "WHOIS privacy is enabled, hiding registrant information.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain registered for minimum period (< 1 year) \u2014 common in throwaway phishing domains.",
+            "Domain has a valid SSL certificate.",
+            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
+            "BRAND IMPERSONATION: Page content references brand(s) [dreamhost] but domain does not match."
+        ]
+    },
+    {
+        "link": "https://etruio.weeblysite.com/",
+        "classification": "SUSPICIOUS",
+        "score": 0.0,
+        "explanations": [
+            "Final risk score 0.32 \u2192 classified as SUSPICIOUS.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain has a valid SSL certificate.",
+            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect)."
+        ]
+    },
+    {
+        "link": "https://fintshisher.blogspot.com/",
+        "classification": "SAFE",
+        "score": 0.0,
+        "explanations": [
+            "Final risk score 0.28 \u2192 classified as SAFE.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain has a valid SSL certificate.",
+            "Website is not reachable."
+        ]
+    },
+    {
+        "link": "https://fintshisher.blogspot.com/?m=1",
+        "classification": "SAFE",
+        "score": 0.0,
+        "explanations": [
+            "Final risk score 0.28 \u2192 classified as SAFE.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain has a valid SSL certificate.",
+            "Website is not reachable."
+        ]
+    },
+    {
+        "link": "https://gravatar.com/casually6710dce55d",
+        "classification": "SAFE",
+        "score": 0.0,
+        "explanations": [
+            "Final risk score 0.03 \u2192 classified as SAFE.",
+            "Domain has a valid SSL certificate.",
+            "Website is not reachable."
+        ]
+    },
+    {
+        "link": "https://gravatar.com/cyberearthquake36e2e12106",
+        "classification": "SAFE",
+        "score": 0.0,
+        "explanations": [
+            "Final risk score 0.03 \u2192 classified as SAFE.",
+            "Domain has a valid SSL certificate.",
+            "Website is not reachable."
+        ]
+    },
+    {
+        "link": "https://gravatar.com/profoundlyhumble27442d4ac5",
+        "classification": "SAFE",
+        "score": 0.0,
+        "explanations": [
+            "Final risk score 0.03 \u2192 classified as SAFE.",
+            "Domain has a valid SSL certificate.",
+            "Website is not reachable."
+        ]
+    },
+    {
+        "link": "https://ipfs.io/ipfs/bafybeia5u6j2nce2pssuyf3os3yrgp5xlazy6fpzsayqsanutkz4npur5q?filename=Ondedriveokp.html",
+        "classification": "PHISHING",
+        "score": 0.0,
+        "explanations": [
+            "Final risk score 0.68 \u2192 classified as PHISHING.",
+            "WHOIS privacy is enabled, hiding registrant information.",
+            "Domain has a valid SSL certificate.",
+            "Login or password input form detected on the page.",
+            "BRAND IMPERSONATION: Page content references brand(s) [wetransfer] but domain does not match."
+        ]
+    },
+    {
+        "link": "https://openai-onlineayx.dafleek.com/ai/app/key.php",
+        "classification": "PHISHING",
+        "score": 0.0,
+        "explanations": [
+            "Final risk score 1.00 \u2192 classified as PHISHING.",
+            "Domain resembles known brand 'openai' with similarity 90%.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain has a valid SSL certificate.",
+            "Login or password input form detected on the page.",
+            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
+            "BRAND IMPERSONATION: Page content references brand(s) [stripe] but domain does not match.",
+            "Payment/credit card collection form detected on the page."
+        ]
+    },
+    {
+        "link": "https://pub-5f42dfaab80a4e1583ad07d911dd504d.r2.dev/ofifceaccesseslogologoinsonnlicrozotft.html",
+        "classification": "SAFE",
+        "score": 0.0,
+        "explanations": [
+            "Final risk score 0.10 \u2192 classified as SAFE.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain has a valid SSL certificate."
+        ]
+    },
+    {
+        "link": "https://regis-bbiq-jp.duckdns.org",
+        "classification": "SUSPICIOUS",
+        "score": 0.0,
+        "explanations": [
+            "Final risk score 0.32 \u2192 classified as SUSPICIOUS.",
+            "Domain is highly similar to a known domain (similarity 75%).",
+            "Domain has a valid SSL certificate.",
+            "Suspicious iframe(s) embedding external content."
+        ]
+    },
+    {
+        "link": "https://sign-in-to-xfinity-101463.weeblysite.com/",
+        "classification": "PHISHING",
+        "score": 0.0,
+        "explanations": [
+            "Final risk score 0.64 \u2192 classified as PHISHING.",
+            "Domain resembles known brand 'xfinity' with similarity 90%.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain has a valid SSL certificate.",
+            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect)."
+        ]
+    },
+    {
+        "link": "https://talktalknet-104275.weeblysite.com/",
+        "classification": "PHISHING",
+        "score": 0.0,
+        "explanations": [
+            "Final risk score 0.64 \u2192 classified as PHISHING.",
+            "Domain resembles known brand 'talktalk' with similarity 90%.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain has a valid SSL certificate.",
+            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect)."
+        ]
+    },
+    {
+        "link": "https://tandan-sawit.github.io/in/",
+        "classification": "SAFE",
+        "score": 0.0,
+        "explanations": [
+            "Final risk score 0.23 \u2192 classified as SAFE.",
+            "Domain contains brand name 'github' in a suspicious context.",
+            "WHOIS privacy is enabled, hiding registrant information.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain has a valid SSL certificate.",
+            "Login or password input form detected on the page."
+        ]
+    },
+    {
+        "link": "https://trans-personal-projects.appwrite.network/",
+        "classification": "PHISHING",
+        "score": 0.0,
+        "explanations": [
+            "Final risk score 0.74 \u2192 classified as PHISHING.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain has a valid SSL certificate.",
+            "Login or password input form detected on the page.",
+            "Phishing-related keywords detected: unauthorized access.",
+            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect)."
+        ]
+    },
+    {
+        "link": "https://transcorpbank.com/accounts_subdomain/product/online-banking-and-bill-pay/_26_osid_1_hl_en.html",
+        "classification": "PHISHING",
+        "score": 0.0,
+        "explanations": [
+            "Final risk score 0.60 \u2192 classified as PHISHING.",
+            "Domain is highly similar to a known domain (similarity 72%).",
+            "WHOIS privacy is enabled, hiding registrant information.",
+            "Domain has a valid SSL certificate.",
+            "Page contains redirect mechanisms (meta-refresh or JavaScript redirect).",
+            "BRAND IMPERSONATION: Page content references brand(s) [google] but domain does not match."
+        ]
+    },
+    {
+        "link": "https://trzsute.zapier.app/",
+        "classification": "PHISHING",
+        "score": 0.0,
+        "explanations": [
+            "Final risk score 0.70 \u2192 classified as PHISHING.",
+            "Domain has no MX (mail) records \u2014 unusual for legitimate domains.",
+            "Domain has a valid SSL certificate.",
+            "High number of external scripts (34).",
+            "Payment/credit card collection form detected on the page."
+        ]
+    }
+]

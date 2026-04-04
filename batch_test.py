@@ -2,6 +2,7 @@ import os
 import json
 import sys
 import requests
+import gzip
 from collections import Counter
 import time
 
@@ -28,20 +29,7 @@ sys.stderr = sys.stdout
 from core.pipeline import run_pipeline
 import core.pipeline
 
-# ==============================================================================
-# MONKEY-PATCH: Disable Safe Browsing to test purely AI agent logic
-# ==============================================================================
-original_safe_run = core.pipeline._safe_run_agent
 
-def dummy_safe_run_agent(agent, method_name: str, arg: str):
-    # Intercept just the safe browsing agent
-    if agent == core.pipeline._safe_browsing_agent:
-        return {"input_domain": arg, "is_safe": True, "threat_matches": [], "risk_score": 0.0}, 0.0, None
-    
-    # Otherwise map to original
-    return original_safe_run(agent, method_name, arg)
-
-core.pipeline._safe_run_agent = dummy_safe_run_agent
 
 # ==============================================================================
 # FAST PRE-CHECK helper
@@ -56,15 +44,18 @@ def is_live(url: str) -> bool:
 # ==============================================================================
 # BATCH TEST LOGIC
 # ==============================================================================
-def run_batch_test(file_path: str, max_live_links: int = 50):
+def run_batch_test(file_path: str, max_live_links: int = 100):
     if not os.path.exists(file_path):
         print(f"Error: Could not find '{file_path}'.")
         return
 
     print("Loading links from file...")
     all_links = []
-    with open(file_path, 'r', encoding='utf-8', errors='replace') as f:
-        if file_path.endswith('.json'):
+    
+    open_func = gzip.open if file_path.endswith('.gz') else open
+    
+    with open_func(file_path, 'rt', encoding='utf-8', errors='replace') as f:
+        if file_path.endswith('.json') or file_path.endswith('.json.gz'):
             try:
                 data = json.load(f)
                 for item in data:
@@ -80,7 +71,7 @@ def run_batch_test(file_path: str, max_live_links: int = 50):
         return
 
     print(f"Loaded {len(all_links)} total links.")
-    print(f"Bypassing SafeBrowsing & sweeping file for {max_live_links} LIVE links...")
+    print(f"Bypassing SafeBrowsing & PhishTank & sweeping file for {max_live_links} LIVE links...")
     print("="*80)
     
     classification_counts = Counter()
@@ -104,7 +95,7 @@ def run_batch_test(file_path: str, max_live_links: int = 50):
         print(" LIVE! Running AI Pipeline...")
         
         try:
-            output = run_pipeline(link)
+            output = run_pipeline(link, safebrowsing_enabled=False, phishtank_enabled=False)
             
             # Double check that the website content agent actually reached the page
             page_reachable = output.get("raw_content", {}).get("page_reachable", False)
@@ -147,7 +138,7 @@ def run_batch_test(file_path: str, max_live_links: int = 50):
             print(f"  Error analyzing {link}: {e}")
 
     print("\n" + "="*60)
-    print("BATCH TEST SUMMARY (LIVE LINKS ONLY - SAFE BROWSING OFF)")
+    print("BATCH TEST SUMMARY (LIVE LINKS ONLY - EXTERNAL APIs OFF)")
     print("="*60)
     print(f"Total LIVE links successfully tested: {live_tested}")
     
@@ -171,9 +162,31 @@ def run_batch_test(file_path: str, max_live_links: int = 50):
     else:
         print(" None")
 
+    print("\n--- Links classified as SUSPICIOUS (Evaded model partially) ---")
+    suspicious_links = [r["link"] for r in results if r["classification"] == "SUSPICIOUS"]
+    if suspicious_links:
+        for sl in suspicious_links:
+            print(f" - {sl}")
+    else:
+        print(" None")
+
+    print("\n--- Links classified as SAFE (Evaded model completely) ---")
+    safe_links = [r["link"] for r in results if r["classification"] == "SAFE"]
+    if safe_links:
+        for sl in safe_links:
+            print(f" - {sl}")
+    else:
+        print(" None")
+        
+    print("\nSaving complete detailed results...")
+    detailed_file = "batch_test_detailed_results.json"
+    with open(detailed_file, "w", encoding="utf-8") as f:
+        json.dump(results, f, indent=4)
+    print(f"Saved {len(results)} analyzed links detailed records to {detailed_file}")
+
 if __name__ == '__main__':
-    input_file = sys.argv[1] if len(sys.argv) > 1 else 'verified_online.json'
-    # Default to 50 live links to ensure test finishes in reasonable timeframe
+    input_file = sys.argv[1] if len(sys.argv) > 1 else os.path.join('data', 'phishtank.json.gz')
+    # Default to 100 live links to ensure test finishes in reasonable timeframe
     max_live = 100
     if len(sys.argv) > 2:
         try:

@@ -73,6 +73,14 @@ class WebsiteContentAgentOutput(TypedDict, total=False):
     has_js_redirect: bool
     legitimate_app_behavior: bool
     risk_score: float
+    # C1: Brand impersonation
+    brand_impersonation_brands: List[str]
+    # C6: Sensitive field detection
+    payment_form_detected: bool
+    scam_indicators_found: List[str]
+    otp_detected: bool
+    # C5: Playwright availability
+    playwright_available: bool
 
 
 class SafeBrowsingAgentOutput(TypedDict, total=False):
@@ -221,7 +229,14 @@ class DecisionAgent:
                 + sb_risk * w["safe_browsing"]
             )
         else:
-            w = SCORING_WEIGHTS_WITHOUT_SB
+            w = dict(SCORING_WEIGHTS_WITHOUT_SB)
+            
+            # I2: Dynamic weighting for hosted platforms (intelligence is useless here)
+            if intelligence.get("is_hosted_platform"):
+                w["intelligence"] = 0.10
+                w["similarity"] = 0.40
+                w["content"] = 0.50
+                
             score = (
                 sim_risk * w["similarity"]
                 + intel_risk * w["intelligence"]
@@ -264,6 +279,29 @@ class DecisionAgent:
             logger.info("Combo detected: Login Form with Suspicious Intelligence -> %s", input_domain)
             score += 0.15
 
+        # Combo 6: Brand impersonation on a hosted platform (C1 + C3/C4)
+        brand_impersonation = content.get("brand_impersonation_brands", [])
+        if brand_impersonation and is_hosted:
+            logger.warning("Combo detected: Brand impersonation on hosted platform -> %s (brands: %s)", input_domain, brand_impersonation)
+            score += 0.35
+
+        # Combo 7: Brand impersonation + login/payment form (C1 + C6)
+        has_payment = content.get("payment_form_detected", False)
+        if brand_impersonation and (has_login or has_payment):
+            logger.warning("Combo detected: Brand impersonation + credential/payment collection -> %s", input_domain)
+            score += 0.25
+
+        # Combo 8: Payment form on non-legitimate domain (C6)
+        if has_payment and (is_new or is_hosted):
+            logger.warning("Combo detected: Payment form on new/hosted domain -> %s", input_domain)
+            score += 0.20
+
+        # Combo 9: Tech support scam indicators (C6)
+        scam_indicators = content.get("scam_indicators_found", [])
+        if len(scam_indicators) >= 2 and (is_new or is_hosted):
+            logger.warning("Combo detected: Scam indicators on new/hosted domain -> %s", input_domain)
+            score += 0.20
+
         # -----------------------------------------------------------------
         # PhishTank Override (High Suspicion / High Risk)
         # -----------------------------------------------------------------
@@ -276,13 +314,18 @@ class DecisionAgent:
 
         # -----------------------------------------------------------------
         # Graceful Degradation (Positive Signals)
+        # I1: Tightened — only apply if NO agent flags significant risk.
+        # The old -0.30 would zero out scores from intel/sim agents,
+        # causing phishing sites with no detected forms to pass as SAFE.
         # -----------------------------------------------------------------
-        if legitimate_app and ssl_valid:
+        any_agent_high_risk = any(r >= 0.40 for r in [sim_risk, intel_risk, content_risk])
+        has_critical_signals = bool(brand_impersonation) or has_payment or len(scam_indicators) >= 2
+        
+        if legitimate_app and ssl_valid and not any_agent_high_risk and not has_critical_signals:
             logger.info("Graceful degradation: legitimate behavior and valid SSL -> %s", input_domain)
-            # significantly reduce the score since it behaves completely like a valid app
-            score = max(0.0, score - 0.30)
-        elif legitimate_app:
-            score = max(0.0, score - 0.15)
+            score = max(0.0, score - 0.10)  # I1: reduced from -0.30 → -0.10
+        elif legitimate_app and not any_agent_high_risk and not has_critical_signals:
+            score = max(0.0, score - 0.05)  # I1: reduced from -0.15 → -0.05
 
         # Signal amplification — when multiple agents agree on high risk
         # Lowered threshold from 0.5 to 0.4 so combinations of mid-risk signals still trigger the boost
@@ -589,6 +632,50 @@ class DecisionAgent:
                 category="content",
                 signal="Page structure and behavior appear legitimate (safe content).",
                 impact="low",  # positive
+            ))
+
+        # --- C1: Brand impersonation ---
+        impersonated_brands = content.get("brand_impersonation_brands", [])
+        if impersonated_brands:
+            brands_str = ", ".join(impersonated_brands[:5])
+            items.append(ExplanationItem(
+                category="content",
+                signal=f"BRAND IMPERSONATION: Page content references brand(s) [{brands_str}] but domain does not match.",
+                impact="critical",
+            ))
+
+        # --- C6: Payment form ---
+        if content.get("payment_form_detected"):
+            items.append(ExplanationItem(
+                category="content",
+                signal="Payment/credit card collection form detected on the page.",
+                impact="high",
+            ))
+
+        # --- C6: Scam indicators ---
+        scam_indicators = content.get("scam_indicators_found", [])
+        if scam_indicators:
+            sample = ", ".join(scam_indicators[:3])
+            items.append(ExplanationItem(
+                category="content",
+                signal=f"Tech support scam indicators detected: {sample}.",
+                impact="high",
+            ))
+
+        # --- C6: OTP detection ---
+        if content.get("otp_detected"):
+            items.append(ExplanationItem(
+                category="content",
+                signal="OTP / verification code input detected on the page.",
+                impact="medium",
+            ))
+
+        # --- C5: Playwright unavailable ---
+        if not content.get("playwright_available", True) and content.get("page_reachable", False):
+            items.append(ExplanationItem(
+                category="content",
+                signal="⚠️ Playwright unavailable — JS-rendered content was NOT analyzed (detection may be incomplete).",
+                impact="medium",
             ))
 
         # Fallback
