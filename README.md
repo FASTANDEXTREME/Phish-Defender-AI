@@ -56,11 +56,11 @@ For this rigorous stress test, **Google Safe Browsing was completely disabled**,
 
 | Classification | Count | Description |
 |:---|:---:|:---|
-| 🔴 **PHISHING** | 65 | Confirmed immediate threats triggered by high-risk indicators. |
-| 🟡 **SUSPICIOUS** | 16 | Moderate-to-high risk indicators requiring extreme caution. |
-| 🟢 **SAFE** | 19 | Successfully evaded detection heuristics. |
+| 🔴 **PHISHING** | 68 | Confirmed immediate threats triggered by high-risk indicators. |
+| 🟡 **SUSPICIOUS** | 15 | Moderate-to-high risk indicators requiring extreme caution. |
+| 🟢 **SAFE** | 17 | Successfully evaded detection heuristics. |
 
-**Final Detection Rate:** The system successfully caught and flagged **81 out of 100 (81%)** confirmed active phishing links based purely on zero-day heuristic intelligence, functioning entirely independent of standard blacklists.
+**Final Detection Rate:** The system successfully caught and flagged **83 out of 100 (83%)** confirmed active phishing links based purely on zero-day heuristic intelligence, functioning entirely independent of standard blacklists.
 
 ## 🚀 Setup & Installation
 
