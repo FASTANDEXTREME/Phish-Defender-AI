@@ -80,6 +80,9 @@ class WebsiteContentAgentOutput(TypedDict, total=False):
     payment_form_detected: bool
     scam_indicators_found: List[str]
     otp_detected: bool
+    final_url: str
+    final_domain: str
+    is_provider_blocklisted: bool
     # C5: Playwright availability
     playwright_available: bool
 
@@ -196,6 +199,28 @@ class DecisionAgent:
         pt_risk = float(phishtank.get("risk_score", 0.0) or 0.0)
         cre = cross_reference or {}
         cre_risk = float(cre.get("cross_ref_risk_score", 0.0) or 0.0)
+        
+        # -----------------------------------------------------------------
+        # Trust Anchor Breaking (Domain Context Nullification)
+        # -----------------------------------------------------------------
+        from urllib.parse import urlparse
+        import math
+        from collections import Counter
+        
+        def shannon_entropy(data: str) -> float:
+            if not data: return 0.0
+            freq = Counter(data)
+            return -sum((c/len(data)) * math.log2(c/len(data)) for c in freq.values())
+        
+        final_url = content.get("final_url", input_domain)
+        path = urlparse(final_url if "://" in final_url else f"http://{final_url}").path
+        path_entropy = shannon_entropy(path)
+        
+        is_trusted_anchor_broken = False
+        if intel_risk < 0.15 and path_entropy > 4.2 and len([p for p in path.split('/') if p]) >= 3:
+            logger.warning("Anchor Break: Trusted domain compromised. Nullifying intelligence safety score.")
+            intel_risk = 0.50 # Overwrite the domain intelligence risk
+            is_trusted_anchor_broken = True
 
         # -----------------------------------------------------------------
         # OVERRIDE: Google Safe Browsing is an authoritative trust layer
@@ -203,7 +228,7 @@ class DecisionAgent:
         if not safe_browsing.get("is_safe", True):
             logger.warning("Safe Browsing override: %s flagged as malicious", input_domain)
             explanation_items = self._build_explanation_items(
-                similarity, intelligence, content, safe_browsing, phishtank, cre, 1.0, "PHISHING"
+                similarity, intelligence, content, safe_browsing, phishtank, cre, 1.0, "PHISHING", is_trusted_anchor_broken
             )
             # Prepend the critical override message
             override_item = ExplanationItem(
@@ -380,7 +405,7 @@ class DecisionAgent:
         severity = self._compute_severity(score, classification, safe_browsing)
 
         explanation_items = self._build_explanation_items(
-            similarity, intelligence, content, safe_browsing, phishtank, cre, score, classification
+            similarity, intelligence, content, safe_browsing, phishtank, cre, score, classification, is_trusted_anchor_broken
         )
 
         return self._build_result(
@@ -510,6 +535,7 @@ class DecisionAgent:
         cross_reference: CrossReferenceOutput,
         final_score: float,
         classification: ClassificationLabel,
+        is_trusted_anchor_broken: bool = False,
     ) -> List[ExplanationItem]:
         items: List[ExplanationItem] = []
 
@@ -615,6 +641,13 @@ class DecisionAgent:
                 category="intelligence",
                 signal="Domain lacks a valid SSL certificate.",
                 impact="medium",
+            ))
+
+        if is_trusted_anchor_broken:
+            items.append(ExplanationItem(
+                category="intelligence",
+                signal="CRITICAL: Trusted domain exhibits deep, high-entropy randomized paths (possible compromised site). Nullified domain safety score.",
+                impact="high",
             ))
 
         # --- Content ---

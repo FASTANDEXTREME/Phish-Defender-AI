@@ -1,85 +1,52 @@
 # Phish-Defender AI 🛡️
 
-> **Now fully compatible with Headless Linux Terminal Deployment!** 🐧
+A highly concurrent, multi-agent cybersecurity intelligence system that orchestrates specialized AI agents to analyze, cross-reference, and classify zero-day phishing domains in real-time.
 
-Phish-Defender AI is a multi-agent cybersecurity intelligence system designed to detect phishing and malicious websites. It orchestrates five specialized AI agents to analyze domains, perform DNS/WHOIS lookups, scrape live website content via a modern headless browser, and cross-reference multiple global threat intelligence databases in real-time.
+## Key Features
 
----
+- **Concurrent 6-Agent Pipeline:** Evaluates Domain Similarity, Infrastructure Intelligence, Website Content, Google Safe Browsing, PhishTank, and Cross-Reference Engine signals in parallel.
+- **Deep Content Analysis with Playwright:** Uses headless Chromium with a 4-tier fallback retry mechanism to render obfuscated JavaScript, identify injected login/payment forms, and extract OTP requests over dynamic pages.
+- **Cross-Reference Engine (CRE):** A dedicated correlation layer combining brand intelligence, domain similarity, and content anomalies to detect sophisticated impersonations on hosted subdomains.
+- **Dynamic Threat Intelligence:** Native real-time lookups using both Google Safe Browsing v4 and the PhishTank API, incorporating transparent fail-open/fail-closed states.
+- **Advanced Heuristic Decision Models:** Features adaptive weight redistribution, deadly phishing signature combo multipliers, trust anchor breaking, and graceful degradation for legitimate apps.
+- **Production-Ready Web Dashboard:** A premium glassmorphic Vite/React SPA frontend integrated seamlessly into a Flask WSGI backend with robust memory-safe rate limiting.
 
-## 🌟 Project Overview
+## Tech Stack
 
-The system accepts a domain or URL, validates it against Server-Side Request Forgery (SSRF) attempts, and analyzes it concurrently. It calculates a weighted risk score and outputs a final classification, confidence level, and detailed explanation. 
+- **Backend:** Python 3.10+, Flask, Gunicorn
+- **Orchestration:** `concurrent.futures`, `threading.Event`, isolated daemon threads
+- **Frontend:** React, Vite, Tailwind CSS
+- **Browser/Scraping:** Playwright (Chromium), BeautifulSoup4, `lxml`
+- **Domain Intelligence:** `python-whois`, `dnspython`, `tldextract`, `rapidfuzz`
 
-The latest version features a **completely reworked modern UI** and integrated **PhishTank Threat Intelligence**, providing a robust defense against zero-day phishing attacks.
+## Architecture Overview
 
----
+The system relies on an isolated multi-agent pipeline executing concurrently:
+1. **Pipeline Watchdog:** Bounds execution to a strict 30s global deadline, triggering hard timeouts via thread Events to prevent application blocks while maintaining system stability.
+2. **Analysis Agents:** Five specialized agents independently evaluate Domain Similarity, Infrastructure Intelligence, HTML/JS Content, Safe Browsing, and PhishTank lookups.
+3. **Cross-Reference Engine (CRE):** Acts as the correlation intelligence layer, fusing conflicting or overlapping signals across different agents (e.g. content brands vs actual domain structures).
+4. **Decision Agent:** Aggregates findings, applies categorical combo multipliers, redistributes scoring weights based on signal availability, and produces the final classification (SAFE, SUSPICIOUS, or PHISHING) packed with human-readable causal explanations.
 
-## 🔥 Key Features (v2.5.0)
+## Project Structure
 
-- ✅ **New UI / Command Center**: Rebuilt from the ground up using **Vite, React, and Tailwind CSS** for a premium, high-performance experience.
-- ✅ **Cross-Reference Engine (CRE)**: Dedicated correlation module that cross-references brand impersonation signals across content, infrastructure, and domain heuristics.
-- ✅ **PhishTank Integration**: Real-time cross-referencing against the PhishTank global phishing database.
-- ✅ **Dynamic API Toggles**: Ability to enable/disable **Google Safe Browsing** and **PhishTank** intelligence layers on-the-fly.
-- ✅ **6-Agent Parallel Pipeline**: Concurrent execution of all intelligence agents, ending in a cross-reference synchronization step and per-agent error isolation.
-- ✅ **Headless JS Rendering**: Full JavaScript execution via Playwright Chromium (with a 4-tier fallback) to catch obfuscated phishing kits.
-- ✅ **Production-Ready**: Gunicorn WSGI server support, rate limiting, request timeouts, and health check endpoints.
-- ✅ **Headless Linux Deployment**: Fully compatible with terminal-only servers — no GUI required.
+- `app.py`: Main Flask WSGI server application serving the frontend and API `/analyze` routes with built-in sliding-window rate limiting.
+- `agents/`: Contains all modular intelligence and classification agents (`domain_similarity_agent.py`, `website_content_agent.py`, `decision_agent.py`, etc.).
+- `core/`: Core pipeline orchestration (`pipeline.py`), configuration constants (`config.py`), user input validation (`user_input_domain.py`), and the Cross-Reference Engine (`cross_reference_engine.py`).
+- `data/`: Caching directory used for storing the local PhishTank database components for O(1) rapid lookups.
+- `frontend/`: Source code for the premium React/Vite web dashboard UI/UX.
 
----
+## Configuration
 
-## 🏗️ System Architecture & Workflow
+Phish-Defender AI is entirely controlled via environment configuration within the `.env` file via `cp .env.example .env`.
 
-### 1. The Pipeline (`core/pipeline.py`)
-When a scan initializes, the pipeline starts a `ThreadPoolExecutor` to run all specialized intelligence agents fully in parallel. It isolates errors per agent—meaning if one agent fails (e.g., a network timeout), it falls back to a safe default rather than crashing the scan. It then aggregates their results using the **Cross-Reference Engine (CRE)** before passing them to the final Decision Engine. It also calculates granular latency metadata for the frontend.
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `GOOGLE_SAFE_BROWSING_API_KEY` | `""` | Google Safe Browsing API v4 key. |
+| `HEADLESS` | `true` | Set to `false` for automatic browser launch to the dashboard on startup. |
+| `PORT` | `8080` | Local or Server port binding. |
+| `RESOLVE_SERVER_IP` | `false` | Fetch public IP and location in background threads upon startup. |
 
-### 2. The Specialized Agents
-- **PhishTank Intelligence Agent (`phishtank_agent.py`)**
-  - Queries the PhishTank global database of confirmed phishing URLs.
-  - **Zero-Latency Lookups**: Operates on a local O(1) set-based cache for millisecond response times.
-  - **Automated Sync**: Performs non-blocking background refreshes of the threat dataset every hour.
-  - **No API Key Required**: Works out-of-the-box with public data downloads.
-- **Google Safe Browsing Agent (`safe_browsing_agent.py`)** 
-  - Queries Google's Safe Browsing API v4.
-  - **Authoritative Override**: If Google flags the URL as a threat, it triggers an immediate pipeline override, forcing a `1.0` (CRITICAL) risk score and a `PHISHING` classification.
-- **Domain Similarity Agent (`domain_similarity_agent.py`)** 
-  - Detects typosquatting, brand impersonation, and homograph attacks.
-  - Evaluates the **entire subdomain string**, catching impersonated brands deeply nested on free hosting platforms (e.g., `kucoin.webflow.io`).
-  - Normalizes Unicode homoglyphs (e.g., `g00gle`, `paypaI`) and cross-references them against a centralized list of 75+ high-value corporate and Web3 brands.
-  - Utilizes `rapidfuzz` for multi-algorithmic fuzzy matching (Levenshtein distance, token sorting, and strict-length partial matching). Includes non-linear risk generation for >85% similarity matches.
-- **Domain Intelligence Agent (`domain_intelligence_agent.py`)** 
-  - Evaluates infrastructure legitimacy via `python-whois`, `tldextract`, and `dnspython`.
-  - Intelligently parses registered domains, applying heavy penalties if WHOIS data is deliberately hidden on known free hosting platforms (e.g., Vercel, Wix, Github Pages).
-  - Checks domain age on a graduated 5-tier risk scale (from `<7 days` old to established).
-  - Checks for the presence of Mail Exchange (MX) records, Name Servers (NS), and DNSSEC configurations.
-  - Identifies contextual WHOIS privacy protections and short-expiry domains (registered for only 1 year and expiring within 30 days).
-- **Website Content Agent (`website_content_agent.py`)** 
-  - Utilizes **Playwright Headless Chromium** to render obfuscated, dynamically loaded, or JavaScript-heavy pages fully before analysis (with a robust 4-tier fallback: `networkidle` → `domcontentloaded` → `selectors` → `text`).
-  - Features **Brand Impersonation Detection** by scanning page content (titles, alt text, meta tags) to ensure they match the domain.
-  - Recognizes generic `email`, `tel`, and `code` inputs frequently abused for OTPs and credential harvesting, featuring a new 3-layer detection check for payment/credit card forms (including iframes like Stripe).
-  - Identifies **Tech Support Scams** using deep keyword matching and regex-based toll-free phone number correlation.
-  - Tracks cross-domain `<form>` submissions, iframe injections, and automated Meta/JS redirects.
-
-### 3. The Cross-Reference Engine (`core/cross_reference_engine.py`)
-- Acts as a dedicated stage between the parallel analysis agents and the decision agent.
-- Explicitly correlates signals across Content, Similarity, and Intelligence agents (e.g., matching a brand impersonation signal from the Content Agent against a free-hosting indicator from the Intelligence Agent).
-- Produces an independent `cross_ref_risk_score` (0.0 to 1.0) along with context on brand/content mismatches.
-
-### 4. The Decision Engine (`decision_agent.py`)
-- Aggregates the numerical risk scores (0.0 to 1.0) from all agents, including the new **Cross-Reference Engine**.
-- **Deadly Combo Multipliers:** Applies immediate, massive risk multipliers for known zero-day heuristics instantly bypassing simple algorithm masking to score as `PHISHING/SUSPICIOUS`.
-- **Dynamic Weight Redistribution:** If Google Safe Browsing returns "safe", the algorithm dynamically redistributes its mathematical weight to the custom Intelligence, Content, Similarity, and CRE agents. Uses a 4-way weight distribution explicitly factoring in the CRE signal when non-zero.
-- Applies a **50% Corroboration Boost** to the final score if multiple agents independently detect high risk.
-- Outputs the classification based on strict thresholds (`>=0.45`: PHISHING, `>=0.30`: SUSPICIOUS, `<0.30`: SAFE) alongside severity labels (LOW to CRITICAL).
-
-### 5. The Frontend Command Center
-- A glassmorphic, cyberpunk-style dashboard served directly by the backend as a pre-built Vite/React SPA.
-- Features live, real-world metrics (no hardcoded/fake stats), including session **Scans Completed**, **Live Pipeline Latency (MS)**, and **API Key Configuration Status**.
-- Displays the new **Cross-Reference Engine** metric card for brand impersonation context.
-- No Node.js or npm is required on the server — the frontend is pre-compiled and served as static files.
-
----
-
-## 📊 Performance & Accuracy
+## 📊 Output / Results
 
 To validate the model's independent heuristics, Phish-Defender AI was benchmarked against a live dataset consisting entirely of **confirmed phishing links** sourced directly from [PhishTank's Developer API](https://www.phishtank.com/developer_info.php). 
 
@@ -94,19 +61,6 @@ For this rigorous stress test, **Google Safe Browsing was completely disabled**,
 | 🟢 **SAFE** | 19 | Successfully evaded detection heuristics. |
 
 **Final Detection Rate:** The system successfully caught and flagged **81 out of 100 (81%)** confirmed active phishing links based purely on zero-day heuristic intelligence, functioning entirely independent of standard blacklists.
-
----
-
-## 💻 Tech Stack
-- **Backend**: Python 3.10+, Flask, Flask-CORS, Gunicorn (WSGI)
-- **Frontend**: **Vite, React, Tailwind CSS** (Pre-built SPA — no Node.js needed on server)
-- **Concurrency**: Python `concurrent.futures`
-- **Dynamic Rendering**: `playwright` (Headless Chromium)
-- **Scraping & Parsing**: `requests`, `beautifulsoup4`, `lxml`
-- **String Matching**: `rapidfuzz` (Levenshtein based fuzzy matching)
-- **Domain/DNS tools**: `python-whois`, `dnspython`, `tldextract`
-
----
 
 ## 🚀 Setup & Installation
 
@@ -402,104 +356,21 @@ docker run -d \
 
 > **Note:** `--shm-size=256m` is required because Playwright Chromium uses `/dev/shm` for shared memory. Docker defaults to 64MB which causes crashes.
 
----
+## Usage
 
-## 🔧 API Reference
+Interact with the engine natively via the full-scale web application interface. Alternatively, perform programmatic security scans by directly triggering `GET` calls to the `/analyze` route:
 
-### `GET /analyze`
-
-Analyze a domain for phishing.
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `domain` | string | required | Domain or URL to analyze |
-| `safebrowsing` | boolean | `true` | Enable/disable Google Safe Browsing |
-| `phishtank` | boolean | `true` | Enable/disable PhishTank lookup |
-
-**Example:**
 ```bash
 curl "http://localhost:8080/analyze?domain=suspicious-site.com&safebrowsing=true&phishtank=true"
 ```
 
-### `GET /server_info`
-Returns server metadata and API key status.
 
-### `GET /healthz`
-Health check endpoint for load balancers and monitoring. Returns `{"status": "ok"}`.
+## Known Issues / Limitations
 
-### `GET /`
-Serves the frontend SPA.
+- **JavaScript Rendering Latencies:** Highly obfuscated JS-heavy frameworks may occasionally trigger Playwright timeouts during analysis, though the platform intelligently handles this using a degraded non-JS DOM extraction fallback mechanism to prevent blocking.
+- **Process Worker Limitations:** Playwright's Headless Chromium necessitates strict hardware memory boundaries. Because it is not intrinsically fork-safe, the system mandates that Gunicorn executes continuously restricted under `--workers 1`.
 
----
+## Future Improvements
 
-## ⚙️ Environment Variables
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `GOOGLE_SAFE_BROWSING_API_KEY` | _(none)_ | Google Safe Browsing API v4 key |
-| `HEADLESS` | `true` | Set to `false` to auto-open browser on local dev |
-| `PORT` | `8080` | Server port |
-| `RESOLVE_SERVER_IP` | `false` | Set to `true` to fetch public IP on startup |
-
----
-
-## 🛡️ Security Considerations
-
-- **SSRF Protection**: The backend enforces strict validation, automatically blocking local/private IP ranges (`127.x.x.x`, `10.x.x.x`, `192.168.x.x`, `localhost`) before scanning.
-- **Rate Limiting**: Built-in rate limiter (10 requests/minute per IP) with automatic stale IP eviction.
-- **API Key Safety**: Never commit `.env` — use `.env.example` as a template. The `.gitignore` already excludes `.env`.
-- **Automated Processing**: The Website Content Agent utilizes a headless browser to render dynamically generated malicious content. It applies evasive bot-detection headers but performs no interactive behavior with the website.
-
----
-
-## 📁 Project Structure
-
-```
-Phish-Defender-AI/
-├── app.py                      # Flask entry point + routes
-├── requirements.txt            # Python dependencies (pinned)
-├── .env.example                # Environment variable template
-├── .gitignore
-├── agents/
-│   ├── decision_agent.py       # Final risk aggregation & classification
-│   ├── domain_similarity_agent.py  # Brand impersonation detection
-│   ├── domain_intelligence_agent.py # WHOIS/DNS/SSL analysis
-│   ├── website_content_agent.py    # HTML + Playwright content analysis
-│   ├── safe_browsing_agent.py      # Google Safe Browsing API
-│   └── phishtank_agent.py          # PhishTank database lookup
-├── core/
-│   ├── config.py               # Centralized configuration constants
-│   ├── cross_reference_engine.py # Brand signal correlation across agents
-│   ├── pipeline.py             # Concurrent agent orchestration
-│   └── user_input_domain.py    # Input validation & cleaning
-├── data/
-│   ├── dist/                   # Pre-built SPA (served in production)
-│   │   ├── index.html
-│   │   └── assets/
-│   ├── src/                    # React source (dev only)
-│   ├── package.json
-│   └── vite.config.js
-├── data/
-│   └── phishtank.json.gz       # PhishTank cache (auto-refreshed)
-├── CHANGELOG.md
-└── README.md
-```
-
----
-
-## 🔄 Updating the Frontend
-
-The frontend is a pre-built React SPA. The server does NOT need Node.js. However, if you make changes to `frontend/src/`:
-
-```bash
-cd frontend
-npm install
-npm run build    # Outputs to frontend/dist/
-cd ..
-```
-
-Then restart the server. The new build will be served automatically.
-
----
-
-*Disclaimer: Phish-Defender AI is intended for educational, defensive cybersecurity, and threat intelligence research purposes.*
+- Architect scale-out capacity through remote headless browser swarms running independently inside orchestrated container clusters.
+- Expand detection layers to ingest Vision-Language Models (VLMs) tailored for visual layout and deep-fake CSS brand impersonation analysis.

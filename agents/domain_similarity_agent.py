@@ -101,11 +101,14 @@ class DomainSimilarityAgent:
         # Detect phishing keywords in the domain
         phishing_keywords = self._detect_phishing_keywords(domain_part)
 
+        brand_to_score = brand_name if brand_detected else closest_brand
+        
         risk_score = self._compute_risk_score(
             brand_detected=brand_detected,
             similarity_score=similarity_score,
             is_exact_brand=is_exact_brand,
             phishing_keywords_count=len(phishing_keywords),
+            detected_brand_name=brand_to_score,
         )
 
         return DomainSimilarityResult(
@@ -182,6 +185,7 @@ class DomainSimilarityAgent:
         similarity_score: float,
         is_exact_brand: bool = False,
         phishing_keywords_count: int = 0,
+        detected_brand_name: Optional[str] = None,
     ) -> float:
         if is_exact_brand:
             return 0.0
@@ -212,6 +216,16 @@ class DomainSimilarityAgent:
         # Brand + phishing keyword combo is very suspicious
         if brand_detected and phishing_keywords_count > 0:
             risk += 0.10
+
+        if detected_brand_name:
+            from core.config import BRAND_TIERS
+            tier = BRAND_TIERS.get(detected_brand_name)
+            if tier == "finance_eu":
+                risk += 0.15
+            elif tier == "finance_global":
+                risk += 0.10
+            elif tier == "tech_social":
+                risk += 0.05
 
         return max(0.0, min(1.0, risk))
 

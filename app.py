@@ -213,4 +213,4 @@ if __name__ == '__main__':
 
     logger.info("Starting Phish-Defender AI on port %d (headless=%s)", PORT, HEADLESS)
     logger.info("NOTE: For production, use: gunicorn -w 1 --threads 4 -b 0.0.0.0:%d --timeout 120 app:app", PORT)
-    app.run(debug=False, host="0.0.0.0" if HEADLESS else "127.0.0.1", port=PORT, use_reloader=False)
+    app.run(debug=False, host="0.0.0.0" if HEADLESS else "127.0.0.1", port=PORT, use_reloader=False, threaded=True)

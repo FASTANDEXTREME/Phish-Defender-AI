@@ -12,6 +12,8 @@ Improvements over MVP:
 
 from __future__ import annotations
 
+import concurrent.futures
+import time
 import logging
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -66,20 +68,20 @@ class DomainIntelligenceAgent:
 
     def __init__(
         self,
-        whois_timeout: float = 5.0,
-        dns_timeout: float = 3.0,
+        whois_timeout: float = 4.0,
+        dns_timeout: float = 2.0,
     ) -> None:
         self._whois_timeout = whois_timeout
         self._dns_timeout = dns_timeout
 
         # Reuse one resolver instance per agent (performance)
-        # Use explicit fallback nameservers for consistent behavior across environments
-        self._resolver = dns.resolver.Resolver()
-        self._resolver.lifetime = dns_timeout
-        self._resolver.timeout = dns_timeout
-        # Fallback: if system DNS is unreliable, use well-known public resolvers
-        if not self._resolver.nameservers:
-            self._resolver.nameservers = ["1.1.1.1", "8.8.8.8"]
+        # HARDENED: Always use exactly 2 fast public resolvers to prevent
+        # N×timeout multiplication. System DNS may have 4+ nameservers,
+        # each of which gets _timeout seconds, causing 4×2s = 8s per query.
+        self._resolver = dns.resolver.Resolver(configure=False)
+        self._resolver.nameservers = ["1.1.1.1", "8.8.8.8"]
+        self._resolver.lifetime = dns_timeout    # Total query lifetime
+        self._resolver.timeout = dns_timeout     # Per-nameserver timeout
 
     def run(self, domain: str) -> DomainIntelligenceResult:
         safe_domain = domain.strip().lower()
@@ -148,13 +150,52 @@ class DomainIntelligenceAgent:
     # --------------------
 
     def _safe_fetch_whois(self, domain: str) -> Dict[str, Any]:
+        """
+        Fetch WHOIS data using an ISOLATED SUBPROCESS.
+        
+        CRITICAL FIX: The `python-whois` library on Windows has severe bugs where it
+        can completely lock the Python GIL (likely during malformed regex parsing or 
+        hanging socket C-calls) for >120 seconds. 
+        Because it locks the GIL, it freezes the entire Flask thread AND watchdog timers.
+        By isolating the WHOIS lookup in a separate OS process via subprocess.run, 
+        we guarantee the OS will enforce the 4.0s timeout and our main process remains 
+        100% unblocked.
+        """
+        import subprocess
+        import json
         try:
-            data = whois.whois(domain)
-            if isinstance(data, dict):
+            # We run python-whois in a temporary separate process
+            # The stdout contains the parsed JSON dictionary
+            script = f"import whois, json; print(json.dumps(dict(whois.whois('{domain}')), default=str))"
+            proc = subprocess.run(
+                ["python", "-c", script],
+                capture_output=True,
+                text=True,
+                timeout=self._whois_timeout,
+            )
+            if proc.returncode == 0 and proc.stdout:
+                data = json.loads(proc.stdout)
+                
+                # Reconstruct datetime objects since json.dumps(default=str) stringifies them
+                import dateutil.parser
+                for key in ["creation_date", "expiration_date", "updated_date"]:
+                    if key in data and data[key]:
+                        try:
+                            if isinstance(data[key], list):
+                                data[key] = [dateutil.parser.parse(d) if isinstance(d, str) else d for d in data[key]]
+                            elif isinstance(data[key], str):
+                                data[key] = dateutil.parser.parse(data[key])
+                        except Exception:
+                            pass 
                 return data
-            return dict(data)  # type: ignore[arg-type]
-        except Exception:
-            logger.debug("WHOIS lookup failed for %s", domain)
+            else:
+                logger.debug("Isolated WHOIS failed for %s. Error: %s", domain, proc.stderr[:100])
+                return {}
+        except subprocess.TimeoutExpired:
+            logger.warning("Isolated WHOIS lookup timed out for %s after %.1fs", domain, self._whois_timeout)
+            return {}
+        except Exception as exc:
+            logger.debug("Isolated WHOIS lookup exception for %s: %s", domain, exc)
             return {}
 
     def _compute_domain_age_days(self, whois_data: Dict[str, Any]) -> Optional[int]:
@@ -251,15 +292,47 @@ class DomainIntelligenceAgent:
             return False
 
     def _check_ssl_certificate(self, domain: str) -> bool:
-        """Check if the domain has a valid SSL certificate."""
+        """Check SSL certificate with a STRICT wall-clock deadline.
+
+        Uses a deadline-based approach: tracks remaining time budget at each
+        step (TCP connect, SSL handshake) so adversarial servers that perform
+        slow-drip TLS handshakes can't exceed the total budget.
+        """
         import ssl
         import socket
+
+        HARD_TIMEOUT = self._dns_timeout  # Total time budget for entire SSL check
+        deadline = time.monotonic() + HARD_TIMEOUT
+
         try:
             context = ssl.create_default_context()
-            with socket.create_connection((domain, 443), timeout=self._dns_timeout) as sock:
+
+            # TCP connect — use at most half the budget
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                return False
+            sock = socket.create_connection(
+                (domain, 443), timeout=min(1.5, remaining)
+            )
+            try:
+                # Set socket timeout BEFORE wrapping with SSL.
+                # Recalculate remaining budget so adversarial slow-drip
+                # TLS handshakes can't exceed deadline.
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    return False
+                sock.settimeout(remaining)
+
                 with context.wrap_socket(sock, server_hostname=domain) as ssock:
                     cert = ssock.getpeercert()
                     return bool(cert)
+            except (ssl.SSLError, socket.timeout, ConnectionError, OSError):
+                return False
+            finally:
+                try:
+                    sock.close()
+                except Exception:
+                    pass
         except Exception as e:
             logger.debug("SSL check failed for %s: %s", domain, e)
             return False

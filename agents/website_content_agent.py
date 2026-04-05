@@ -32,7 +32,7 @@ from core.config import (
     SUSPICIOUS_CONTENT_KEYWORDS,
     PAYMENT_KEYWORDS,
     SCAM_KEYWORDS,
-    OTP_KEYWORDS,
+    INTENT_OTP,
     SUSPICIOUS_PATHS,
 )
 
@@ -148,64 +148,83 @@ class _BrowserPool:
                 viewport={"width": 1920, "height": 1080},
                 locale="en-US",
             )
+            
+            # FAST RENDER: Block unnecessary resources to speed up page load
+            def route_intercept(route):
+                if route.request.resource_type in ["image", "media", "font", "other"]:
+                    route.abort()
+                else:
+                    route.continue_()
+            
+            context.route("**/*", route_intercept)
+            
             page = context.new_page()
-            # Set a hard ceiling on ALL page operations to prevent hung renderers
-            page.set_default_timeout(timeout_ms + 5000)
+            # Set a hard ceiling on ALL page operations (both default and navigation)
+            page.set_default_timeout(timeout_ms)
+            page.set_default_navigation_timeout(timeout_ms)
+            
+            # Track whether navigation succeeded — if it fails (timeout, stall,
+            # adversarial response), we must NOT call page.evaluate() on the
+            # undefined page state, as it can hang indefinitely.
+            goto_succeeded = False
             try:
-                page.goto(url, timeout=timeout_ms, wait_until="networkidle")
-            except Exception:
-                # Second attempt: Stop waiting for network silence, wait for DOM content
+                # Use domcontentloaded instead of networkidle for much faster resolution
+                page.goto(url, timeout=timeout_ms, wait_until="domcontentloaded")
+                goto_succeeded = True
+                
+                # Very brief wait for high-risk elements
                 try:
-                    page.goto(url, timeout=timeout_ms, wait_until="domcontentloaded")
-                    try:
-                        # Aggressively wait for high-risk phishing elements and generic OTP text fields
-                        page.wait_for_selector('input[type="password"], input[name*="pass"], input[name*="login"], input[type="text"], input[type="tel"], iframe', timeout=2000)
-                    except Exception:
-                        pass
-                    # DOM Stability Mutation Observer (waits up to 3 seconds for Base64 injection/SPA hydration to stop)
-                    try:
-                        page.evaluate('''() => {
-                            return new Promise(resolve => {
-                                let lastLength = document.body ? document.body.innerHTML.length : 0;
-                                let stableCount = 0;
-                                let iter = 0;
-                                const timer = setInterval(() => {
-                                    let curLength = document.body ? document.body.innerHTML.length : 0;
-                                    if (curLength === lastLength) stableCount++;
-                                    else stableCount = 0;
-                                    lastLength = curLength;
-                                    iter++;
-                                    if (stableCount >= 2 || iter >= 6) {
-                                        clearInterval(timer);
-                                        resolve();
-                                    }
-                                }, 500);
-                            });
-                        }''')
-                    except Exception:
-                        page.wait_for_timeout(1000)
+                    page.wait_for_selector('input[type="password"], input[name*="pass"], input[type="text"]', timeout=1000)
                 except Exception:
                     pass
-            content = page.evaluate("""
-                () => {
-                    function pierce(root) {
-                        root.querySelectorAll('*').forEach(el => {
-                            if (el.shadowRoot) {
-                                pierce(el.shadowRoot);
-                                el.innerHTML += el.shadowRoot.innerHTML;
-                            }
+                
+                # Quick DOM Stability Check
+                try:
+                    page.evaluate('''() => {
+                        return new Promise(resolve => {
+                            setTimeout(resolve, 800);
                         });
+                    }''')
+                except Exception:
+                    pass
+                    
+            except Exception as e:
+                logger.debug("Playwright goto/wait exception for %s: %s", url, e)
+
+            # SAFEGUARD: Only extract DOM if goto succeeded. If the page never
+            # loaded (adversarial stall, timeout, connection refused), calling
+            # evaluate() on the empty/broken page can hang or return garbage.
+            if not goto_succeeded:
+                logger.debug("Skipping DOM extraction — page.goto() failed for %s", url)
+                return None, None
+
+            # Extract DOM content with its own safety net
+            try:
+                content = page.evaluate("""
+                    () => {
+                        function pierce(root) {
+                            try {
+                                root.querySelectorAll('*').forEach(el => {
+                                    if (el.shadowRoot) {
+                                        pierce(el.shadowRoot);
+                                        el.innerHTML += el.shadowRoot.innerHTML;
+                                    }
+                                });
+                            } catch (e) {}
+                        }
+                        pierce(document);
+                        return document.documentElement.outerHTML;
                     }
-                    pierce(document);
-                    return document.documentElement.outerHTML;
-                }
-            """)
+                """)
+            except Exception as exc:
+                logger.debug("DOM extraction evaluate() failed for %s: %s", url, exc)
+                return None, None
+
             final_url = page.url
             return content, final_url
         except Exception as exc:
             logger.debug("Browser pool fetch failed for %s: %s", url, exc)
-            # If the browser process crashed, mark as unavailable
-            if "Browser has been closed" in str(exc) or "Target closed" in str(exc):
+            if "Browser has been closed" in str(exc) or "Target closed" in str(exc) or "Connection closed" in str(exc):
                 with self._lock:
                     self._browser = None
                     self._checked = False
@@ -237,6 +256,15 @@ class _BrowserPool:
 
 # Module-level singleton — shared across all WebsiteContentAgent instances
 _browser_pool = _BrowserPool()
+
+def _warmup_browser():
+    """Eagerly launch the browser in the background so the first request is fast."""
+    try:
+        _browser_pool._ensure_browser()
+    except Exception:
+        pass
+
+threading.Thread(target=_warmup_browser, daemon=True, name="BrowserWarmupThread").start()
 
 
 @dataclass(frozen=True)
@@ -376,8 +404,8 @@ class WebsiteContentAgent:
             has_suspicious_txt = False
             for inp in form.find_all("input", {"type": ["text", "email", "tel", ""]}) + form.find_all("input", class_=True):
                 combined = f"{inp.get('name','')} {inp.get('id','')} {inp.get('placeholder','')} {inp.get('class','')} ".lower()
-                # Fuzzy keyword matching for obfuscations like "pass**rd"
-                if re.search(r"p[a-z@*.,]+s[a-z*.,]+[w*.,]*r[a-z*.,]+d", combined):
+                # Fuzzy keyword matching for obfuscations like "pass**rd", bound to avoid ReDoS
+                if re.search(r"p[a-z@*.,]{0,5}s[a-z*.,]{0,5}[w*.,]{0,5}r[a-z*.,]{0,5}d", combined):
                     has_pw = True
                 if any(kw in combined for kw in ["email", "user", "otp", "code", "card", "anmeld"]):
                     has_suspicious_txt = True
@@ -402,8 +430,20 @@ class WebsiteContentAgent:
         hidden_inputs = soup.find_all("input", {"type": "hidden"})
         hidden_inputs_count = len(hidden_inputs)
 
+        # --- Deep DOM & Accessibility Text Extraction ---
+        hidden_text_signals = []
+        for svg in soup.find_all("svg"):
+            svg_title = svg.find("title")
+            if svg_title: hidden_text_signals.append(svg_title.text)
+        for tag in soup.find_all(attrs={"aria-label": True}):
+            hidden_text_signals.append(tag["aria-label"])
+        for meta_tag in soup.find_all("meta", property="og:site_name"):
+            hidden_text_signals.append(meta_tag.get("content", ""))
+
         # --- Full visible text for multiple analyses ---
         text = soup.get_text(separator=" ").lower()
+        if hidden_text_signals:
+            text += " " + " ".join(hidden_text_signals).lower()
 
         # --- Suspicious keywords ---
         suspicious_found: List[str] = [
@@ -440,19 +480,49 @@ class WebsiteContentAgent:
             scam_indicators_found.append("toll-free phone number")
 
         # =============================================================
-        # C6: OTP / VERIFICATION CODE DETECTION
+        # C6: OTP / VERIFICATION CODE DETECTION (Multilingual)
         # =============================================================
-        otp_detected = any(kw in text for kw in OTP_KEYWORDS)
+        try:
+            from langdetect import detect
+            page_lang = detect(text)
+        except Exception:
+            page_lang = "en"
+        
+        lang_otp_keywords = INTENT_OTP.get(page_lang, INTENT_OTP["en"]).copy()
+        
+        # Always check English keywords as fallback in case language detection fails or site is mixed
+        if page_lang != "en":
+            lang_otp_keywords.extend(INTENT_OTP["en"])
+            
+        # DEEPER INSIGHT: langdetect frequently fails or hallucinates on "Lonely Form" pages 
+        # that have fewer than 20-50 words. To prevent evasion on minimalist checkpoints,
+        # we check the unified vocabulary across all tracked languages.
+        if len(text.split()) < 75:
+            lang_otp_keywords = [kw for kws in INTENT_OTP.values() for kw in kws]
+            
+        otp_detected = any(kw in text for kw in set(lang_otp_keywords))
 
-        # --- External scripts ---
+        # --- External scripts & JS Obfuscation ---
         scripts = soup.find_all("script")
         external_scripts_count = 0
+        js_risk = 0.0
         for script in scripts:
-            src = script.get("src")
+            if script.string:
+                script_text = script.string.lower()
+                if "eval(function(p,a,c,k,e,d)" in script_text:
+                    js_risk += 0.30
+                if "atob(" in script_text and script_text.count("\\x") > 10:
+                    js_risk += 0.20
+
+            src = script.get("src", "").lower()
             if not src:
                 continue
             if src.startswith("http://") or src.startswith("https://") or src.startswith("//"):
                 external_scripts_count += 1
+            if any(cdn in src for cdn in ["pastebin.com", "raw.githubusercontent.com", "worker.dev"]):
+                js_risk += 0.25
+        
+        js_risk = min(0.40, js_risk)
 
         # --- Suspicious iframes ---
         iframes = soup.find_all("iframe")
@@ -502,6 +572,13 @@ class WebsiteContentAgent:
         if path and len(path) > 10 and domain_entropy(path) > 4.0:
             path_risk += 0.20
 
+        word_count = len(text.split())
+        total_links = len(soup.find_all("a"))
+        has_button = bool(soup.find("button") or soup.find("input", {"type": "submit"}))
+        has_lonely_form = False
+        if len(text_inputs) in [1, 2] and has_button and total_links < 3 and word_count < 100:
+            has_lonely_form = True
+
         # Tightened: brand impersonation, payment forms, and scam indicators
         # now also prevent legitimate_app_behavior classification.
         is_legitimate_app = (
@@ -541,6 +618,8 @@ class WebsiteContentAgent:
             otp_detected=otp_detected,
             path_risk=path_risk,
             is_provider_blocklisted=is_provider_blocklisted,
+            has_lonely_form=has_lonely_form,
+            js_risk=js_risk,
         )
 
         return WebsiteContentResult(
@@ -771,9 +850,16 @@ class WebsiteContentAgent:
         otp_detected: bool = False,
         path_risk: float = 0.0,
         is_provider_blocklisted: bool = False,
+        has_lonely_form: bool = False,
+        js_risk: float = 0.0,
     ) -> float:
         risk = 0.0
         risk += path_risk
+        risk += js_risk
+        
+        # Structural Minimalist Form Detection (Contextual Gateway)
+        if has_lonely_form:
+            risk += 0.40
 
         if is_legitimate_app:
             # Baseline risk reduction handled securely in DecisionAgent now

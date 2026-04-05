@@ -76,7 +76,7 @@ def run_batch_test(file_path: str, max_live_links: int = 100):
     
     classification_counts = Counter()
     severity_counts = Counter()
-    sb_detected_count = 0 
+    degraded_count = 0 
     
     results = []
     live_tested = 0
@@ -113,13 +113,21 @@ def run_batch_test(file_path: str, max_live_links: int = 100):
             classification_counts[classification] += 1
             severity_counts[severity] += 1
             
-            sb_safe = output.get("raw_safe_browsing", {}).get("is_safe", True)
-            if not sb_safe:
-                sb_detected_count += 1
+            # Pipeline metadata extraction (timings, degradation)
+            meta = output.get("pipeline_metadata", {})
+            total_ms = meta.get("total_ms", 0.0)
+            is_degraded = meta.get("results_degraded", False)
+            degraded_agents = meta.get("degraded_agents", [])
+            
+            if is_degraded:
+                degraded_count += 1
             
             print(f"  ====== [SUCCESS # {live_tested}/{max_live_links} LIVE DOMAIN] ======")
+            print(f"  Time           : {total_ms:.1f}ms")
             print(f"  Classification : {classification}")
             print(f"  Risk Level     : {severity} (Score: {score})")
+            if is_degraded:
+                print(f"  Degraded       : YES (Failed agents: {', '.join(degraded_agents)})")
             print("  Reasons/Explanations:")
             for exp in explanations:
                 exp_clean = str(exp).replace('\u2192', '->')
@@ -130,17 +138,20 @@ def run_batch_test(file_path: str, max_live_links: int = 100):
                 "classification": classification,
                 "severity": severity,
                 "score": score,
-                "sb_safe": sb_safe,
+                "is_degraded": is_degraded,
+                "degraded_agents": degraded_agents,
+                "total_ms": total_ms,
                 "explanations": explanations
             })
             
         except Exception as e:
             print(f"  Error analyzing {link}: {e}")
 
-    print("\n" + "="*60)
+    print("="*60)
     print("BATCH TEST SUMMARY (LIVE LINKS ONLY - EXTERNAL APIs OFF)")
     print("="*60)
-    print(f"Total LIVE links successfully tested: {live_tested}")
+    print(f"Total LIVE links successfully tested : {live_tested}")
+    print(f"Tests with degraded insights         : {degraded_count} ({(degraded_count/max(1,live_tested))*100:.1f}%)")
     
     print("\n--- By Classification ---")
     print(f"SAFE:       {classification_counts.get('SAFE', 0)}")

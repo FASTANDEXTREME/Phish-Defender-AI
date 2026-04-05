@@ -12,6 +12,8 @@ from typing import Dict, List
 # Known brand targets (name → canonical domain)
 # ---------------------------------------------------------------------------
 KNOWN_BRANDS: Dict[str, str] = {
+    "societe generale": "societegenerale.com",
+    "bnp paribas": "mabanque.bnpparibas",
     # Big Tech
     "google": "google.com",
     "facebook": "facebook.com",
@@ -121,6 +123,27 @@ KNOWN_BRANDS: Dict[str, str] = {
     "steam": "steampowered.com",
     "epicgames": "epicgames.com",
     "roblox": "roblox.com",
+}
+
+# ---------------------------------------------------------------------------
+# Granular Brand Intelligence Tiers (Brand Tier Mapping)
+# ---------------------------------------------------------------------------
+BRAND_TIERS: Dict[str, str] = {
+    "paypal": "finance_global",
+    "stripe": "finance_global",
+    "chase": "finance_global",
+    "wellsfargo": "finance_global",
+    "bankofamerica": "finance_global",
+    "citibank": "finance_global",
+    "societe generale": "finance_eu",
+    "bnp paribas": "finance_eu",
+    "barclays": "finance_eu",
+    "hsbc": "finance_global",
+    "facebook": "tech_social",
+    "instagram": "tech_social",
+    "apple": "tech_social",
+    "microsoft": "tech_social",
+    "google": "tech_social",
 }
 
 # ---------------------------------------------------------------------------
@@ -266,14 +289,19 @@ SCAM_KEYWORDS: List[str] = [
 ]
 
 # ---------------------------------------------------------------------------
-# OTP / Verification code keywords (C6)
+# OTP / Verification code keywords (C6) - Multilingual
 # ---------------------------------------------------------------------------
-OTP_KEYWORDS: List[str] = [
-    "verification code", "one-time password", "one-time code",
-    "otp", "6-digit code", "4-digit code", "authentication code",
-    "security code", "enter the code", "enter code",
-    "code sent to", "we sent a code",
-]
+INTENT_OTP: Dict[str, List[str]] = {
+    "en": [
+        "verification code", "one-time password", "one-time code",
+        "otp", "6-digit code", "4-digit code", "authentication code",
+        "security code", "enter the code", "enter code",
+        "code sent to", "we sent a code"
+    ],
+    "de": ["anmeld", "code", "bestätigung", "kennwort", "sicherheitscode", "anmeldecode"],
+    "fr": ["code de vérification", "mot de passe", "code client"],
+    "es": ["código", "contraseña", "verificación"]
+}
 
 # ---------------------------------------------------------------------------
 # Scoring weights for the Decision Agent
@@ -327,6 +355,7 @@ CORROBORATION_BOOST: float = 1.50  # 50% boost for agreement
 __all__ = [
     "KNOWN_BRANDS",
     "KNOWN_HOSTING_PLATFORMS",
+    "BRAND_TIERS",
     "UNICODE_HOMOGLYPHS",
     "HOMOGLYPH_TRANSLATE",
     "PHISHING_DOMAIN_KEYWORDS",
@@ -334,7 +363,7 @@ __all__ = [
     "SUSPICIOUS_CONTENT_KEYWORDS",
     "PAYMENT_KEYWORDS",
     "SCAM_KEYWORDS",
-    "OTP_KEYWORDS",
+    "INTENT_OTP",
     "SCORING_WEIGHTS_WITH_SB",
     "SCORING_WEIGHTS_WITHOUT_SB",
     "SCORING_WEIGHTS_WITHOUT_SB_WITH_CRE",

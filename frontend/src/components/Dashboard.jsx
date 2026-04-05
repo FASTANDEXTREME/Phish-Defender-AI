@@ -4,6 +4,7 @@ import { Shield, Fingerprint, Globe, ServerCrash, Database, Link2 } from 'lucide
 import RiskGauge from './RiskGauge';
 import MetricCard from './MetricCard';
 import ExplanationList from './ExplanationList';
+import DegradedResultsBanner from './DegradedResultsBanner';
 
 const Dashboard = ({ result }) => {
   if (!result) return null;
@@ -22,6 +23,9 @@ const Dashboard = ({ result }) => {
     raw_cross_reference
   } = result;
 
+  // Build a set of degraded agent names for per-card indicators
+  const degradedSet = new Set(result.pipeline_metadata?.degraded_agents || []);
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 30 }}
@@ -30,7 +34,7 @@ const Dashboard = ({ result }) => {
       className="max-w-6xl mx-auto px-4 md:px-6 pb-20"
     >
       {/* Header Info */}
-      <div className="mb-12 text-center md:text-left flex flex-col md:flex-row md:items-end justify-between border-b border-white/[0.05] pb-6">
+      <div className="mb-8 text-center md:text-left flex flex-col md:flex-row md:items-end justify-between border-b border-white/[0.05] pb-6">
         <div>
           <h2 className="text-gray-400 text-sm tracking-widest uppercase font-bold mb-2">Analysis Results For</h2>
           <div className="text-3xl md:text-4xl font-extrabold text-white truncate max-w-full">
@@ -43,6 +47,9 @@ const Dashboard = ({ result }) => {
         </div>
         )}
       </div>
+
+      {/* Degraded Results Banner — shown only when agents failed/timed out */}
+      <DegradedResultsBanner pipelineMetadata={result.pipeline_metadata} />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
@@ -61,6 +68,7 @@ const Dashboard = ({ result }) => {
                 title="Google Safe Browsing" 
                 icon={Shield} 
                 statusColor={raw_safe_browsing?.is_disabled ? "text-gray-500" : (raw_safe_browsing?.is_safe ? "text-emerald-400" : "text-primary-500")}
+                degraded={degradedSet.has('safe_browsing')}
             >
                 {raw_safe_browsing?.is_disabled ? (
                     <span className="text-gray-500 font-medium">Disabled</span>
@@ -75,6 +83,7 @@ const Dashboard = ({ result }) => {
                 title="PhishTank API" 
                 icon={Database} 
                 statusColor={raw_phishtank?.is_disabled ? "text-gray-500" : (raw_phishtank?.is_phishing ? "text-primary-500" : "text-emerald-400")}
+                degraded={degradedSet.has('phishtank')}
             >
                 {raw_phishtank?.is_disabled ? (
                     <span className="text-gray-500 font-medium">Disabled</span>
@@ -91,6 +100,7 @@ const Dashboard = ({ result }) => {
                 value={`${Math.round((raw_similarity?.similarity_score || 0) * 100)}%`}
                 statusColor="text-blue-400"
                 detailRow
+                degraded={degradedSet.has('similarity')}
             >
                 <div className="flex justify-between border-b border-white/[0.05] pb-2">
                     <span>Brand Detected:</span>
@@ -107,6 +117,7 @@ const Dashboard = ({ result }) => {
                 icon={Globe} 
                 statusColor="text-indigo-400"
                 detailRow
+                degraded={degradedSet.has('intelligence')}
             >
                 <div className="flex justify-between border-b border-white/[0.05] pb-2">
                     <span>Age:</span>
@@ -125,6 +136,7 @@ const Dashboard = ({ result }) => {
                 icon={ServerCrash} 
                 statusColor="text-purple-400"
                 detailRow
+                degraded={degradedSet.has('content')}
             >
                 <div className="flex justify-between border-b border-white/[0.05] pb-2">
                     <span>Login Form:</span>
@@ -146,6 +158,7 @@ const Dashboard = ({ result }) => {
                 icon={Link2} 
                 statusColor={raw_cross_reference?.cross_ref_risk_score >= 0.65 ? "text-primary-500" : raw_cross_reference?.cross_ref_risk_score > 0 ? "text-orange-500" : "text-emerald-400"}
                 detailRow
+                degraded={degradedSet.has('cross_reference')}
             >
                 <div className="flex justify-between border-b border-white/[0.05] pb-2">
                     <span>Brand Impersonation:</span>

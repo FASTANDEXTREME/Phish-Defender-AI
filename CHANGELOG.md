@@ -2,6 +2,22 @@
 
 This changelog documents all structural, architectural, algorithmic, and UI improvements made to transform the Intelligent Phishing Domain Detection System MVP into a robust, production-ready security tool.
 
+## [2.6.0] - 5th April 2026
+
+### 🚀 Performance & Stability (Pipeline Hardening)
+- **Absolute Thread Timeouts (`core/pipeline.py`)**: 
+  - Eliminated complex `concurrent.futures` bottlenecks in favor of a highly reliable timeout strategy using `threading.Event` inside daemon threads. This guarantees isolated per-agent timeouts and prevents thread leakage when blocked by adversarial sites.
+- **Global Pipeline Deadline**: 
+  - Imposed a strict 30-second global execution deadline protected by a secondary asynchronous watchdog.
+- **Heavy Rendering Early Exit**: 
+  - Implemented an early exit optimization. If the fast intelligence layer (Google Safe Browsing or PhishTank) definitively confirms a malicious threat, the computationally expensive Playwright JS rendering phase is gracefully bypassed to heavily decrease overall response time.
+
+### 📚 Documentation
+- **Complete README Overhaul**: 
+  - Rewrote the documentation with a structured outline detailing the architecture, technology stack, project structure, and known limitations, while thoroughly preserving all production setup and deployment commands.
+
+---
+
 ## [2.5.0] - 4th April 2026
 
 ### 🚀 Major Upgrades & Audit Remediations

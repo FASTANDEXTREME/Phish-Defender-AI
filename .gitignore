@@ -26,8 +26,10 @@ developmenttext/
 # Test artifacts — not needed in production
 batch_test_results.log
 verified_online.json
-test.py
+takess.py
 backup.html
+
+
 
 # Frontend build dependencies (rebuild with npm install)
 frontend/node_modules/
