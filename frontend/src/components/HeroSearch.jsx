@@ -5,13 +5,21 @@ import { motion } from 'framer-motion';
 const HeroSearch = ({ onSearch, isLoading }) => {
   const [domain, setDomain] = useState('');
   const [safeBrowsingEnabled, setSafeBrowsingEnabled] = useState(() => {
-    const saved = localStorage.getItem('safeBrowsingEnabled');
-    return saved !== null ? JSON.parse(saved) : true;
+    try {
+      const saved = localStorage.getItem('safeBrowsingEnabled');
+      return saved !== null ? JSON.parse(saved) : true;
+    } catch (e) {
+      return true;
+    }
   });
 
   const [phishtankEnabled, setPhishtankEnabled] = useState(() => {
-    const saved = localStorage.getItem('phishtankEnabled');
-    return saved !== null ? JSON.parse(saved) : true;
+    try {
+      const saved = localStorage.getItem('phishtankEnabled');
+      return saved !== null ? JSON.parse(saved) : true;
+    } catch (e) {
+      return true;
+    }
   });
 
   useEffect(() => {

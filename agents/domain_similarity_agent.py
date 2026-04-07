@@ -89,8 +89,13 @@ class DomainSimilarityAgent:
 
         brand_name, brand_detected = self._detect_brand_containment(full_normalized)
 
-        # Check if the domain itself is exactly the brand name (e.g. "amazon" in "amazon.in")
-        is_exact_brand = ext.domain in self._brands
+        # Fix alt-TLD impersonation: Only classify as an "exact brand" (score 0) if the full 
+        # registrable domain matches the canonical brand domain exactly.
+        is_exact_brand = False
+        if ext.domain in self._brands:
+            canonical_domain = self._brands[ext.domain]
+            if f"{ext.domain}.{ext.suffix}" == canonical_domain:
+                is_exact_brand = True
 
         if is_exact_brand:
             closest_brand = ext.domain

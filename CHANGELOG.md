@@ -2,6 +2,37 @@
 
 This changelog documents all structural, architectural, algorithmic, and UI improvements made to transform the Intelligent Phishing Domain Detection System MVP into a robust, production-ready security tool.
 
+## [2.6.1] - 7th April 2026
+
+### 🛡️ Security Hardening
+- **RCE Elimination (`agents/domain_intelligence_agent.py`)**: 
+  - Eradicated critical remote code execution vulnerability by replacing dangerous string interpolation with proper, sandboxed `sys.executable` argument arrays.
+- **SSRF Blocklist Expansion (`app.py`)**: 
+  - Greatly expanded the URL validation regex to strictly block parsing of malicious loopbacks (`[::1]`), AWS metadata injection endpoints (`169.254.169.254`), and Docker/Azure container subnets (`172.x`).
+- **Data Protection**:
+  - **Metadata:** Eliminated the `/server_info` API endpoint to stop exposing internal Docker routing and SafeBrowsing API key inclusion status.
+  - **Exception Scrubbing:** Restructured Safe Browsing error flows to ensure API keys are never printed alongside exceptions in production logs.
+
+### 🧪 Automated Testing & CI/CD
+- **Testing Framework (`tests/`)**:
+  - Implemented the first phase of an automated `pytest`-driven testing harness, introducing exact validation coverage for SSRF blocks and brand impersonation false-negative traps.
+- **CI/CD Quality Gates (`.github/workflows/main_phish-defender-ai.yml`)**:
+  - Gated the main deployment pipeline; automated checks now spin up a virtual environment and run the Pytest suite. Deployment is aborted immediately if tests fail.
+
+### 🐛 Algorithmic & Logic Bug Fixes
+- **Exact Brand Subdomains (`agents/domain_similarity_agent.py`)**:
+  - Fixed a logic error where spoofing an exact brand string on an alternate TLD (e.g., `paypal.net`) erroneously triggered the safe domain bypass hook.
+- **Brand Substring Evasion (`agents/website_content_agent.py`)**:
+  - Fixed a false-negative bypass where an adversarial domain (e.g., `openai-support.com`) could slip the impersonation check simply because it contained the text "openai" via substring matching; resolution relies on `tldextract` registrable domain verification.
+- **Frontend URL Path Preservation (`frontend/src/App.jsx`)**:
+  - Stopped frontend input fields from aggressively canonicalizing and pruning URL queries and subdirectory payloads, restoring full context for path-based backend heuristics.
+- **Threat Intel Degradation State**:
+  - Rebuilt intelligence agents and frontend dashboards to correctly expose `Disabled` and `Degraded` states rather than failing open and rendering an erroneous "Safe" classification when Safe Browsing API or Phishtank servers crash.
+  
+### 🧹 Housekeeping
+- Dropped hardcoded DNS resolvers (1.1.1.1) to allow fallback to native system resolvers for enterprise networks.
+- Cleaned the repository of dead documentation (`frontend/README.md`) and unsafe live-reconnaissance artifacts (`takess.py`).
+
 ## [2.6.0] - 5th April 2026
 
 ### 🚀 Performance & Stability (Pipeline Hardening)

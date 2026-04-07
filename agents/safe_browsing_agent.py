@@ -35,6 +35,7 @@ class SafeBrowsingResult:
     is_safe: bool
     threat_matches: List[Dict[str, Any]]
     risk_score: float
+    is_disabled: bool = False
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -42,6 +43,7 @@ class SafeBrowsingResult:
             "is_safe": self.is_safe,
             "threat_matches": self.threat_matches,
             "risk_score": self.risk_score,
+            "is_disabled": self.is_disabled,
         }
 
 
@@ -155,7 +157,7 @@ class SafeBrowsingAgent:
             )
 
         except Exception as exc:
-            logger.error("Safe Browsing API error for %s: %s", url, exc)
+            logger.error("Safe Browsing API error for %s: %s", url, type(exc).__name__)
             self._record_failure()
             return self._default_result(url)
 
@@ -234,6 +236,7 @@ class SafeBrowsingAgent:
                 is_safe=True,
                 threat_matches=[],
                 risk_score=0.0,
+                is_disabled=True,
             )
         else:
             return SafeBrowsingResult(
@@ -241,6 +244,7 @@ class SafeBrowsingAgent:
                 is_safe=False,
                 threat_matches=[],
                 risk_score=0.3,
+                is_disabled=True,
             )
 
 

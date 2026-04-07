@@ -16,7 +16,8 @@ from core.pipeline import run_pipeline
 _base_dir = os.path.dirname(os.path.abspath(__file__))
 _dist_folder = os.path.join(_base_dir, 'frontend', 'dist')
 app = Flask(__name__, static_folder=_dist_folder, static_url_path='')
-CORS(app)
+# Restrict CORS to self instead of completely open
+CORS(app, resources={r"/analyze": {"origins": ["http://localhost:5173", "http://127.0.0.1:5173"]}})
 
 # Configure logging
 logging.basicConfig(
@@ -127,11 +128,13 @@ if os.environ.get("RESOLVE_SERVER_IP", "false").lower() == "true":
 # Input validation helpers
 # ---------------------------------------------------------------------------
 _BLOCKED_PATTERNS = re.compile(
-    r"^(localhost|127\.\d+\.\d+\.\d+|10\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|0\.0\.0\.0|\[::1\])",
+    r"^(localhost|127\.\d+\.\d+\.\d+|10\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|172\.(1[6-9]|2[0-9]|3[0-1])\.\d+\.\d+|169\.254\.\d+\.\d+|0\.0\.0\.0|\[?::1\]?|\[?[fF][cdCD][0-9a-fA-F]{2}:.*)",
     re.IGNORECASE,
 )
 MAX_DOMAIN_LENGTH = 253
 
+
+from urllib.parse import urlparse
 
 def _validate_domain(raw: str) -> str:
     """Return cleaned domain or raise ValueError."""
@@ -140,7 +143,15 @@ def _validate_domain(raw: str) -> str:
         raise ValueError("Missing domain parameter")
     if len(domain) > MAX_DOMAIN_LENGTH:
         raise ValueError(f"Domain exceeds maximum length ({MAX_DOMAIN_LENGTH} chars)")
-    if _BLOCKED_PATTERNS.match(domain):
+    
+    # Extract hostname to prevent SSRF bypass via full URLs
+    to_parse = domain
+    if "://" not in to_parse and "/" in to_parse:
+        to_parse = "http://" + to_parse
+    parsed = urlparse(to_parse if "://" in to_parse else f"http://{to_parse}")
+    host = parsed.hostname or domain
+    
+    if _BLOCKED_PATTERNS.match(host):
         raise ValueError("Local/private domains are not allowed")
     return domain
 
@@ -158,12 +169,6 @@ def serve_frontend():
 def health_check():
     """Health check endpoint for load balancers, monitoring, and container orchestration."""
     return jsonify({"status": "ok", "timestamp": time.time()}), 200
-
-
-@app.route('/server_info', methods=['GET'])
-def get_server_info():
-    api_key = os.environ.get("GOOGLE_SAFE_BROWSING_API_KEY", os.environ.get("API_KEY", ""))
-    return jsonify({**server_info, "api_key_active": bool(api_key)})
 
 
 @app.route('/analyze', methods=['GET'])

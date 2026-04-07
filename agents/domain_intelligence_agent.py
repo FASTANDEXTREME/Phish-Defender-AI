@@ -12,8 +12,8 @@ Improvements over MVP:
 
 from __future__ import annotations
 
-import concurrent.futures
 import time
+import sys
 import logging
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -75,11 +75,8 @@ class DomainIntelligenceAgent:
         self._dns_timeout = dns_timeout
 
         # Reuse one resolver instance per agent (performance)
-        # HARDENED: Always use exactly 2 fast public resolvers to prevent
-        # N×timeout multiplication. System DNS may have 4+ nameservers,
-        # each of which gets _timeout seconds, causing 4×2s = 8s per query.
-        self._resolver = dns.resolver.Resolver(configure=False)
-        self._resolver.nameservers = ["1.1.1.1", "8.8.8.8"]
+        # Use system DNS resolvers to avoid breaking enterprise VPNs/split-horizon
+        self._resolver = dns.resolver.Resolver()
         self._resolver.lifetime = dns_timeout    # Total query lifetime
         self._resolver.timeout = dns_timeout     # Per-nameserver timeout
 
@@ -166,9 +163,9 @@ class DomainIntelligenceAgent:
         try:
             # We run python-whois in a temporary separate process
             # The stdout contains the parsed JSON dictionary
-            script = f"import whois, json; print(json.dumps(dict(whois.whois('{domain}')), default=str))"
+            script = "import whois, json, sys; print(json.dumps(dict(whois.whois(sys.argv[1])), default=str))"
             proc = subprocess.run(
-                ["python", "-c", script],
+                [sys.executable, "-c", script, domain],
                 capture_output=True,
                 text=True,
                 timeout=self._whois_timeout,

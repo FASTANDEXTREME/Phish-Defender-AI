@@ -80,7 +80,7 @@ const ScanningAnimation = ({ isVisible }) => {
 
               return (
                 <div key={step.id} className="flex items-center justify-between p-3 rounded-lg bg-dark-800/40 border border-white/[0.02]">
-                  <div className={`flex items-center space-x-4 transition-colors duration-500 opacity-${isPending ? '50' : '100'}`}>
+                  <div className={`flex items-center space-x-4 transition-colors duration-500 ${isPending ? 'opacity-50' : 'opacity-100'}`}>
                     <Icon className={`w-5 h-5 transition-colors duration-500 ${iconColor}`} />
                     <span className={`font-medium transition-colors duration-500 ${textColor}`}>
                       {step.label}

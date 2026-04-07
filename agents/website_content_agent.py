@@ -374,7 +374,7 @@ class WebsiteContentAgent:
 
         page_domain = self._extract_domain(final_url or input_domain)
 
-        soup = BeautifulSoup(html, "lxml")
+        soup = BeautifulSoup(html, "html.parser")
 
         # --- Forms & Inputs ---
         forms = soup.find_all("form")
@@ -761,10 +761,13 @@ class WebsiteContentAgent:
             if len(brand) <= 2:
                 continue
 
-            # Check if this brand's canonical domain is part of the page's domain.
+            # Check if this brand's canonical domain is the actual page's registrable domain.
             # If it is, this is the real site — not impersonation.
+            # Fix: use tldextract instead of substring match to catch openai-support.com
+            import tldextract
+            ext = tldextract.extract(page_domain)
             canon_root = canonical_domain.split(".")[0]  # e.g. "facebook" from "facebook.com"
-            if canon_root in page_domain:
+            if canon_root == ext.domain:
                 continue
 
             # For short brands (3 chars), require word boundary matches

@@ -17,8 +17,9 @@ function App() {
     setResult(null);
 
     try {
-      // Clean up input in frontend just in case
-      let cleanDomain = domain.replace(/^https?:\/\//, '').split('/')[0];
+      // Send the user input cleanly without truncating paths or query strings
+      // The backend pipeline (`_validate_domain` and `UserInputDomainModule`) will handle canonicalization
+      let cleanDomain = domain.trim();
       
       const res = await axios.get('/analyze', {
         params: { 
