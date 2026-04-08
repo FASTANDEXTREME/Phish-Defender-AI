@@ -108,8 +108,9 @@ sudo apt update && sudo apt upgrade -y
 
 # Install Python, pip, git, and essential build tools
 sudo apt install -y python3 python3-pip python3-venv git curl wget
-#Install NPM
-sudo apt-get update && sudo apt-get install nodejs npm
+# Install Node.js v20 (Required for Vite frontend compilation)
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
 
 # Install whois binary (needed by the Domain Intelligence Agent)
 sudo apt install -y whois
