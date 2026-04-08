@@ -108,6 +108,8 @@ sudo apt update && sudo apt upgrade -y
 
 # Install Python, pip, git, and essential build tools
 sudo apt install -y python3 python3-pip python3-venv git curl wget
+#Install NPM
+sudo apt-get update && sudo apt-get install nodejs npm
 
 # Install whois binary (needed by the Domain Intelligence Agent)
 sudo apt install -y whois
@@ -128,7 +130,7 @@ sudo chown -R $(whoami):$(whoami) /opt/Phish-Defender-AI
 
 ```bash
 python3 -m venv .venv
-source .venv/bin/activate
+. .venv/bin/activate
 
 pip install --upgrade pip
 pip install -r requirements.txt
