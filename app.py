@@ -121,8 +121,35 @@ def _resolve_server_identity() -> None:
         logger.warning("Failed to fetch server IP: %s", exc)
 
 
-if os.environ.get("RESOLVE_SERVER_IP", "false").lower() == "true":
-    threading.Thread(target=_resolve_server_identity, daemon=True).start()
+def init_app():
+    from dotenv import load_dotenv
+    load_dotenv()
+    
+    if os.environ.get("RESOLVE_SERVER_IP", "false").lower() == "true":
+        threading.Thread(target=_resolve_server_identity, daemon=True).start()
+        
+    def _warmup():
+        try:
+            from agents.website_content_agent import _browser_pool
+            _browser_pool._ensure_browser()
+        except Exception as e:
+            logger.debug("Warmup failed: %s", e)
+            pass
+    threading.Thread(target=_warmup, daemon=True, name="BrowserWarmupThread").start()
+
+    # Automatic Frontend Build
+    import subprocess
+    frontend_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'frontend')
+    dist_index = os.path.join(frontend_dir, 'dist', 'index.html')
+    if not os.path.exists(dist_index):
+        logger.info("Frontend build not found. Running npm install and build automatically...")
+        try:
+            use_shell = os.name == 'nt'
+            subprocess.run(["npm", "install"], cwd=frontend_dir, check=True, shell=use_shell)
+            subprocess.run(["npm", "run", "build"], cwd=frontend_dir, check=True, shell=use_shell)
+            logger.info("Frontend compiled successfully.")
+        except Exception as e:
+            logger.error("Failed to compile frontend automatically: %s", e)
 
 # ---------------------------------------------------------------------------
 # Input validation helpers
@@ -135,6 +162,8 @@ MAX_DOMAIN_LENGTH = 253
 
 
 from urllib.parse import urlparse
+import socket
+import ipaddress
 
 def _validate_domain(raw: str) -> str:
     """Return cleaned domain or raise ValueError."""
@@ -153,6 +182,19 @@ def _validate_domain(raw: str) -> str:
     
     if _BLOCKED_PATTERNS.match(host):
         raise ValueError("Local/private domains are not allowed")
+
+    try:
+        addr_info = socket.getaddrinfo(host, None)
+        for result in addr_info:
+            ip_str = result[4][0]
+            ip_obj = ipaddress.ip_address(ip_str)
+            if ip_obj.is_private or ip_obj.is_loopback or ip_obj.is_link_local or ip_obj.is_reserved or ip_obj.is_multicast:
+                raise ValueError("Local/private IPs are not allowed")
+    except Exception as e:
+        if isinstance(e, ValueError) and str(e) == "Local/private IPs are not allowed":
+            raise
+        pass
+
     return domain
 
 
@@ -174,7 +216,7 @@ def health_check():
 @app.route('/analyze', methods=['GET'])
 def analyze():
     # --- Rate limiting ---
-    client_ip = request.remote_addr or "unknown"
+    client_ip = request.headers.get("X-Forwarded-For", request.remote_addr or "unknown").split(",")[0].strip()
     if not _rate_limiter.is_allowed(client_ip):
         logger.warning("Rate limit exceeded for %s", client_ip)
         return jsonify({"error": "Rate limit exceeded. Please wait before making another request."}), 429
@@ -199,6 +241,9 @@ def analyze():
         logger.exception("Unexpected error analyzing %s", domain)
         return jsonify({"error": "An internal error occurred during analysis"}), 500
 
+
+# Call init_app on module load for WSGI servers like Gunicorn
+init_app()
 
 # ---------------------------------------------------------------------------
 # Entry point — for local development only.

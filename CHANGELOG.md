@@ -12,12 +12,18 @@ This changelog documents all structural, architectural, algorithmic, and UI impr
 - **Data Protection**:
   - **Metadata:** Eliminated the `/server_info` API endpoint to stop exposing internal Docker routing and SafeBrowsing API key inclusion status.
   - **Exception Scrubbing:** Restructured Safe Browsing error flows to ensure API keys are never printed alongside exceptions in production logs.
+- **Execution Path Security (`app.py`)**: 
+  - Centralized global component warmup (Playwright instances, `.env` imports, and server resolution) strictly into `init_app()`, mitigating floating import-time execution risks.
+- **Advanced SSRF Protection (`website_content_agent.py`)**: 
+  - Rewrote internal fetching to manually intercept raw HTTP redirects recursively up to 3 hops, deeply validating bounds via `socket.getaddrinfo` to block dynamic cloud metadata bouncing.
 
 ### 🧪 Automated Testing & CI/CD
 - **Testing Framework (`tests/`)**:
   - Implemented the first phase of an automated `pytest`-driven testing harness, introducing exact validation coverage for SSRF blocks and brand impersonation false-negative traps.
 - **CI/CD Quality Gates (`.github/workflows/main_phish-defender-ai.yml`)**:
   - Gated the main deployment pipeline; automated checks now spin up a virtual environment and run the Pytest suite. Deployment is aborted immediately if tests fail.
+- **Frontend Quality Gates (`frontend/`, CI)**:
+  - Validated ESLint states preventing React concurrent render mutations and wrapped Vite processes correctly through `loadEnv`. Deployed `npm ci` and `npm run lint` checks gracefully into the core GitHub Actions pipeline.
 
 ### 🐛 Algorithmic & Logic Bug Fixes
 - **Exact Brand Subdomains (`agents/domain_similarity_agent.py`)**:
@@ -28,10 +34,15 @@ This changelog documents all structural, architectural, algorithmic, and UI impr
   - Stopped frontend input fields from aggressively canonicalizing and pruning URL queries and subdirectory payloads, restoring full context for path-based backend heuristics.
 - **Threat Intel Degradation State**:
   - Rebuilt intelligence agents and frontend dashboards to correctly expose `Disabled` and `Degraded` states rather than failing open and rendering an erroneous "Safe" classification when Safe Browsing API or Phishtank servers crash.
+- **PhishTank Routing Resilience (`agents/phishtank_agent.py`)**:
+  - Shifted update target explicitly onto safe `HTTPS` connections to protect cache syncing against MITM degradation.
   
 ### 🧹 Housekeeping
 - Dropped hardcoded DNS resolvers (1.1.1.1) to allow fallback to native system resolvers for enterprise networks.
 - Cleaned the repository of dead documentation (`frontend/README.md`) and unsafe live-reconnaissance artifacts (`takess.py`).
+- Overhauled `.gitignore` explicitly blocking tracking of compiled `/dist/` files and `/data/` caches natively via `git rm --cached`.
+- Detailed scrubbing of the `README.md` clearing obsolete deployment assets (e.g., `concurrent.futures`, `Dockerfile`, `lxml` bindings).
+- Synchronized missing pipeline dependencies securely bounding `python-dateutil>=2.8.2` onto `requirements.txt`.
 
 ## [2.6.0] - 5th April 2026
 

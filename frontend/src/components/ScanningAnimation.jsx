@@ -25,7 +25,9 @@ const ScanningAnimation = ({ isVisible }) => {
       }, step.delay);
     });
 
-    return () => timeouts.forEach(clearTimeout);
+    return () => {
+      timeouts.forEach(t => clearTimeout(t));
+    };
   }, [isVisible]);
 
   if (!isVisible) return null;

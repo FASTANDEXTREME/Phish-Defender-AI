@@ -29,8 +29,10 @@ verified_online.json
 takess.py
 backup.html
 report.md
-
+Report2.md
 
 
 # Frontend build dependencies (rebuild with npm install)
 frontend/node_modules/
+frontend/dist/
+data/

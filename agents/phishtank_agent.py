@@ -22,7 +22,7 @@ import requests
 
 logger = logging.getLogger(__name__)
 
-PHISHTANK_URL = "http://data.phishtank.com/data/online-valid.json.gz"
+PHISHTANK_URL = "https://data.phishtank.com/data/online-valid.json.gz"
 UPDATE_INTERVAL = 3600  # 1 hour
 
 # Absolute path anchored to project root — works regardless of CWD
@@ -77,8 +77,8 @@ class PhishTankAgent:
         parsed = urlparse(url)
         
         # PhishTank dataset has a mix of http and https. 
-        # The safest approach is to store and match only the raw netloc + path.
-        return f"{parsed.netloc}{parsed.path}".rstrip("/")
+        # Ensure we keep the exact path and parameters as phishing often targets deep query links.
+        return f"{parsed.netloc}{parsed.path}?{parsed.query}".rstrip("?")
 
     def _load_from_disk(self):
         """Load the set from the local gzip file into memory."""

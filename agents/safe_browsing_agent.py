@@ -24,7 +24,6 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from dotenv import load_dotenv
 
-load_dotenv()  # Load .env once at import time
 
 logger = logging.getLogger(__name__)
 
@@ -74,23 +73,29 @@ class SafeBrowsingAgent:
         timeout: float = 5.0,
         fail_open: bool = True,
     ):
-        self._api_key = api_key or os.environ.get(
-            "GOOGLE_SAFE_BROWSING_API_KEY",
-            os.environ.get("API_KEY", ""),
-        )
+        self._api_key_override = api_key
         self._timeout = timeout
         self._fail_open = fail_open
 
         # Thread-safe session pool via threading.local
         self._thread_local = threading.local()
+        self._logged_missing_key = False
 
-        if not self._api_key:
-            logger.warning("No Safe Browsing API key configured — agent will return safe by default")
+    @property
+    def _api_key(self) -> str:
+        return self._api_key_override or os.environ.get(
+            "GOOGLE_SAFE_BROWSING_API_KEY",
+            os.environ.get("API_KEY", ""),
+        )
 
     def run(self, url: str) -> SafeBrowsingResult:
         check_url = url if url.startswith("http") else f"http://{url}"
 
-        if not self._api_key:
+        api_key = self._api_key
+        if not api_key:
+            if not self._logged_missing_key:
+                logger.warning("No Safe Browsing API key configured — agent will return safe by default")
+                self._logged_missing_key = True
             return self._default_result(url)
 
         # Circuit breaker: skip if API has been consistently failing
@@ -117,7 +122,7 @@ class SafeBrowsingAgent:
         }
 
         try:
-            endpoint = self.ENDPOINT_URL.format(self._api_key)
+            endpoint = self.ENDPOINT_URL.format(api_key)
             session = self._get_session()
 
             # Total operation timeout — hard cap on entire SB operation

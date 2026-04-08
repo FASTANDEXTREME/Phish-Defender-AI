@@ -149,9 +149,29 @@ class _BrowserPool:
                 locale="en-US",
             )
             
-            # FAST RENDER: Block unnecessary resources to speed up page load
+            # FAST RENDER & SSRF SHIELD: Block unnecessary resources and private IPs
             def route_intercept(route):
-                if route.request.resource_type in ["image", "media", "font", "other"]:
+                import socket
+                import ipaddress
+                from urllib.parse import urlparse
+                r_type = route.request.resource_type
+                r_url = route.request.url
+                
+                # Check SSRF
+                try:
+                    host = urlparse(r_url).hostname
+                    if host:
+                        addr_info = socket.getaddrinfo(host, None)
+                        for result in addr_info:
+                            ip_str = result[4][0]
+                            ip_obj = ipaddress.ip_address(ip_str)
+                            if ip_obj.is_private or ip_obj.is_loopback or ip_obj.is_link_local or ip_obj.is_reserved or ip_obj.is_multicast:
+                                route.abort("blockedbyclient")
+                                return
+                except Exception:
+                    pass
+
+                if r_type in ["image", "media", "font", "other"]:
                     route.abort()
                 else:
                     route.continue_()
@@ -257,14 +277,6 @@ class _BrowserPool:
 # Module-level singleton — shared across all WebsiteContentAgent instances
 _browser_pool = _BrowserPool()
 
-def _warmup_browser():
-    """Eagerly launch the browser in the background so the first request is fast."""
-    try:
-        _browser_pool._ensure_browser()
-    except Exception:
-        pass
-
-threading.Thread(target=_warmup_browser, daemon=True, name="BrowserWarmupThread").start()
 
 
 @dataclass(frozen=True)
@@ -677,23 +689,63 @@ class WebsiteContentAgent:
             # 2. Fallback to raw HTTP (thread-safe per-thread session)
             try:
                 session = _get_thread_session()
-                resp = session.get(
-                    url,
-                    timeout=self._timeout,
-                    verify=False,
-                    stream=True,
-                )
-                if 200 <= resp.status_code < 400:
-                    # Read incrementally up to MAX_RESPONSE_SIZE
-                    chunks: list[bytes] = []
-                    downloaded = 0
-                    for chunk in resp.iter_content(chunk_size=65_536):
-                        chunks.append(chunk)
-                        downloaded += len(chunk)
-                        if downloaded >= MAX_RESPONSE_SIZE:
-                            break
-                    content = b"".join(chunks)[:MAX_RESPONSE_SIZE]
-                    return content.decode("utf-8", errors="replace"), resp.url
+                # Manual redirect loop handling for SSRF tracing
+                current_url = url
+                content = None
+                final_url = None
+                
+                for _ in range(3): # Max 3 redirects
+                    import socket
+                    import ipaddress
+                    from urllib.parse import urlparse, urljoin
+                    
+                    parsed = urlparse(current_url)
+                    host = parsed.hostname
+                    if host:
+                        try:
+                            addr_info = socket.getaddrinfo(host, None)
+                            is_private = False
+                            for result in addr_info:
+                                ip_str = result[4][0]
+                                ip_obj = ipaddress.ip_address(ip_str)
+                                if ip_obj.is_private or ip_obj.is_loopback or ip_obj.is_link_local or ip_obj.is_reserved or ip_obj.is_multicast:
+                                    is_private = True
+                                    break
+                            if is_private:
+                                break # SSRF blocked
+                        except Exception:
+                            pass # Let request attempt fail natively
+                    
+                    resp = session.get(
+                        current_url,
+                        timeout=self._timeout,
+                        verify=False,
+                        stream=True,
+                        allow_redirects=False,
+                    )
+                    
+                    # Redirect Handling
+                    if 300 <= resp.status_code < 400 and 'Location' in resp.headers:
+                        current_url = urljoin(current_url, resp.headers['Location'])
+                        continue
+                        
+                    # Target content Reached
+                    if 200 <= resp.status_code < 400:
+                        chunks: list[bytes] = []
+                        downloaded = 0
+                        for chunk in resp.iter_content(chunk_size=65_536):
+                            chunks.append(chunk)
+                            downloaded += len(chunk)
+                            if downloaded >= MAX_RESPONSE_SIZE:
+                                break
+                        content_bytes = b"".join(chunks)[:MAX_RESPONSE_SIZE]
+                        content = content_bytes.decode("utf-8", errors="replace")
+                        final_url = current_url
+                    
+                    break # Stop redirect processing if not a 3xx
+
+                if content is not None:
+                    return content, final_url
             except Exception:
                 continue
         return None, None

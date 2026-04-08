@@ -14,9 +14,9 @@ A highly concurrent, multi-agent cybersecurity intelligence system that orchestr
 ## Tech Stack
 
 - **Backend:** Python 3.10+, Flask, Gunicorn
-- **Orchestration:** `concurrent.futures`, `threading.Event`, isolated daemon threads
+- **Orchestration:** `threading.Event`, isolated daemon threads
 - **Frontend:** React, Vite, Tailwind CSS
-- **Browser/Scraping:** Playwright (Chromium), BeautifulSoup4, `lxml`
+- **Browser/Scraping:** Playwright (Chromium), BeautifulSoup4
 - **Domain Intelligence:** `python-whois`, `dnspython`, `tldextract`, `rapidfuzz`
 
 ## Architecture Overview
@@ -37,7 +37,7 @@ The system relies on an isolated multi-agent pipeline executing concurrently:
 
 ## Configuration
 
-Phish-Defender AI is entirely controlled via environment configuration within the `.env` file via `cp .env.example .env`.
+Phish-Defender AI is entirely controlled via environment configuration within the `.env` file.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -81,7 +81,6 @@ pip install -r requirements.txt
 playwright install chromium
 
 # 4. Configure environment
-cp .env.example .env
 # Edit .env and add your Google Safe Browsing API key (optional)
 
 # 5. Launch (opens browser automatically)
@@ -338,23 +337,6 @@ sudo certbot --nginx -d yourdomain.com
 
 ---
 
-## 🐳 Docker Deployment (Alternative)
-
-```bash
-# Build
-docker build -t phishdefender .
-
-# Run (note: --shm-size is critical for Playwright Chromium)
-docker run -d \
-  --name phishdefender \
-  --shm-size=256m \
-  -p 8080:8080 \
-  -e HEADLESS=true \
-  -e GOOGLE_SAFE_BROWSING_API_KEY=your_key_here \
-  phishdefender
-```
-
-> **Note:** `--shm-size=256m` is required because Playwright Chromium uses `/dev/shm` for shared memory. Docker defaults to 64MB which causes crashes.
 
 ## Usage
 

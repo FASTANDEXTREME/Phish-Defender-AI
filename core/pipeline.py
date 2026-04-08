@@ -227,9 +227,11 @@ def _run_pipeline_inner(
         if task is None:
             return default, 0.0, None
         result, elapsed, err = task.get_result(default)
-        if err:
-            agent_errors[name] = err
-            degraded_agents.append(name)
+        if err or result.get("is_disabled") or result.get("is_error"):
+            if err:
+                agent_errors[name] = err
+            if name not in degraded_agents:
+                degraded_agents.append(name)
         return result, elapsed, err
 
     sim_result, sim_time, sim_err = _collect("similarity", task_sim, _DEFAULT_SIMILARITY)
