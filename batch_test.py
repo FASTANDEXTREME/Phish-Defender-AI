@@ -26,6 +26,9 @@ class TeeLogger:
 sys.stdout = TeeLogger("batch_test_results.log")
 sys.stderr = sys.stdout
 
+from dotenv import load_dotenv
+load_dotenv()
+
 from core.pipeline import run_pipeline
 import core.pipeline
 

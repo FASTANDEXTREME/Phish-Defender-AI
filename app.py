@@ -139,17 +139,22 @@ def init_app():
 
     # Automatic Frontend Build
     import subprocess
+    import shutil
     frontend_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'frontend')
     dist_index = os.path.join(frontend_dir, 'dist', 'index.html')
     if not os.path.exists(dist_index):
         logger.info("Frontend build not found. Running npm install and build automatically...")
-        try:
-            use_shell = os.name == 'nt'
-            subprocess.run(["npm", "install"], cwd=frontend_dir, check=True, shell=use_shell)
-            subprocess.run(["npm", "run", "build"], cwd=frontend_dir, check=True, shell=use_shell)
-            logger.info("Frontend compiled successfully.")
-        except Exception as e:
-            logger.error("Failed to compile frontend automatically: %s", e)
+        npm_path = shutil.which("npm")
+        if not npm_path:
+            logger.error("Node.js (npm) is not found in your system PATH. Please install Node.js (e.g. 'sudo apt install nodejs npm') to auto-build the frontend, or build it locally and transfer the 'frontend/dist' folder directly to the server.")
+        else:
+            try:
+                use_shell = os.name == 'nt'
+                subprocess.run([npm_path, "install"], cwd=frontend_dir, check=True, shell=use_shell)
+                subprocess.run([npm_path, "run", "build"], cwd=frontend_dir, check=True, shell=use_shell)
+                logger.info("Frontend compiled successfully.")
+            except Exception as e:
+                logger.error("Failed to compile frontend automatically: %s", e)
 
 # ---------------------------------------------------------------------------
 # Input validation helpers
