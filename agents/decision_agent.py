@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 # Type aliases for agent outputs
 # ---------------------------------------------------------------------------
-ClassificationLabel = Literal["PHISHING", "SUSPICIOUS", "SAFE"]
+ClassificationLabel = Literal["PHISHING", "SUSPICIOUS", "SAFE", "UNKNOWN"]
 ConfidenceLabel = Literal["HIGH", "MEDIUM", "LOW"]
 SeverityLabel = Literal["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"]
 
@@ -188,6 +188,7 @@ class DecisionAgent:
         safe_browsing: SafeBrowsingAgentOutput,
         phishtank: PhishTankAgentOutput,
         cross_reference: CrossReferenceOutput | None = None,
+        network_state: str | None = None,
     ) -> DecisionAgentResult:
 
         input_domain = self._resolve_input_domain(similarity, intelligence, content, safe_browsing, phishtank)
@@ -311,6 +312,11 @@ class DecisionAgent:
         strong_sim = float(similarity.get("similarity_score", 0.0) or 0.0) > 0.60
         ssl_valid = intelligence.get("ssl_valid", False)
         legitimate_app = content.get("legitimate_app_behavior", False)
+        domain_age = intelligence.get("domain_age_days")
+        
+        # FP-Fix: Check if domain similarity agent already identified this as a known alias
+        # If sim_risk is 0.0 and brand_detected, this is a known sub-brand — skip most combos
+        is_known_alias = (sim_risk == 0.0 and similarity.get("brand_detected") is not None)
         
         # Combo 1: New Domain + Login Form
         if is_new and has_login:
@@ -331,9 +337,27 @@ class DecisionAgent:
         final_domain = content.get("final_domain", "")
         # If the page actually served ends up on a vastly different domain and has a login form
         # (Exclude subdomains, e.g., 'auth.google.com' vs 'google.com')
+        # FP-Fix: Also exclude redirects to known brand family domains
         if final_domain and final_domain != input_domain:
             if final_domain.split('.')[-2:] != input_domain.split('.')[-2:]:
-                if has_login:
+                # Check if redirect is to a known family domain (e.g. amazonaws.com → aws.amazon.com)
+                from core.config import BRAND_DOMAIN_ALIASES
+                import tldextract as _tld
+                _in_ext = _tld.extract(input_domain)
+                _fin_ext = _tld.extract(final_domain)
+                _in_root = f"{_in_ext.domain}.{_in_ext.suffix}" if _in_ext.suffix else _in_ext.domain
+                _fin_root = f"{_fin_ext.domain}.{_fin_ext.suffix}" if _fin_ext.suffix else _fin_ext.domain
+                is_family_redirect = False
+                for _canon, _aliases in BRAND_DOMAIN_ALIASES.items():
+                    _all = [_canon] + _aliases
+                    _all_roots = set()
+                    for _d in _all:
+                        _de = _tld.extract(_d)
+                        _all_roots.add(f"{_de.domain}.{_de.suffix}" if _de.suffix else _de.domain)
+                    if _in_root in _all_roots and _fin_root in _all_roots:
+                        is_family_redirect = True
+                        break
+                if has_login and not is_family_redirect:
                     logger.info("Combo detected: Open Redirect with Login Form -> final_domain=%s", final_domain)
                     score += 0.35
 
@@ -343,7 +367,8 @@ class DecisionAgent:
             score = 1.0
 
         # Combo 4: Pure impersonation (Sim risk very high)
-        if sim_risk >= 0.75:
+        # FP-Fix: Only apply if NOT a known alias (prevents discord.gg, github.io etc.)
+        if sim_risk >= 0.75 and not is_known_alias:
             logger.info("Combo detected: Very high similarity risk -> %s", input_domain)
             score += 0.20
 
@@ -364,16 +389,16 @@ class DecisionAgent:
         # -----------------------------------------------------------------
         if phishtank.get("is_phishing", False):
             logger.warning("PhishTank override: %s flagged", input_domain)
-            score = max(0.44, score)  # High risk but not exclusively >0.45 solely from PhishTank
+            score = max(0.54, score)  # FP-Fix: Raised floor to match new PHISHING_THRESHOLD
             
             # Note: We append the item manually to the explanation items array later, 
             # or rely on `_build_explanation_items` below so we don't duplicate.
 
         # -----------------------------------------------------------------
         # Graceful Degradation (Positive Signals)
-        # I1: Tightened — only apply if NO agent flags significant risk.
-        # The old -0.30 would zero out scores from intel/sim agents,
-        # causing phishing sites with no detected forms to pass as SAFE.
+        # FP-Fix: Strengthened legitimate app reduction. If the page looks like a
+        # legitimate application (no forms, no keywords, good title) with valid SSL
+        # and no agents flagging high risk, apply a stronger score reduction.
         # -----------------------------------------------------------------
         any_agent_high_risk = any(r >= 0.40 for r in [sim_risk, intel_risk, content_risk, cre_risk])
         has_critical_signals = bool(brand_impersonation) or has_payment or len(scam_indicators) >= 2 or cre_risk >= 0.50
@@ -383,11 +408,26 @@ class DecisionAgent:
         if is_hosted or content.get("is_provider_blocklisted"):
             legitimate_app = False
 
+        # FP-Fix: Established domain trust signal — domains >2yr with SSL get positive treatment
+        is_established_domain = (
+            domain_age is not None
+            and domain_age > 730
+            and ssl_valid
+            and not is_new
+            and not is_hosted
+        )
+
         if legitimate_app and ssl_valid and not any_agent_high_risk and not has_critical_signals:
             logger.info("Graceful degradation: legitimate behavior and valid SSL -> %s", input_domain)
-            score = max(0.0, score - 0.10)  # I1: reduced from -0.30 → -0.10
+            score = max(0.0, score - 0.15)  # FP-Fix: increased from -0.10 → -0.15
         elif legitimate_app and not any_agent_high_risk and not has_critical_signals:
-            score = max(0.0, score - 0.05)  # I1: reduced from -0.15 → -0.05
+            score = max(0.0, score - 0.08)  # FP-Fix: increased from -0.05 → -0.08
+
+        # FP-Fix: Established domain bonus — old well-known domains get a trust discount
+        if is_established_domain and not has_critical_signals and score > 0:
+            old_score = score
+            score = max(0.0, score - 0.10)
+            logger.info("Established domain trust: %.2f → %.2f for %s (age: %s days)", old_score, score, input_domain, domain_age)
 
         # Signal amplification — when multiple agents agree on high risk
         # Lowered threshold from 0.5 to 0.4 so combinations of mid-risk signals still trigger the boost
@@ -400,7 +440,10 @@ class DecisionAgent:
 
         score = max(0.0, min(1.0, score))
 
-        classification = self._classify(score)
+        if network_state == "BLOCKED":
+            score = min(score, 0.60)
+
+        classification = self._classify(score, is_new, is_hosted, network_state)
         confidence = self._compute_confidence(score, classification)
         severity = self._compute_severity(score, classification, safe_browsing)
 
@@ -440,8 +483,19 @@ class DecisionAgent:
                 return domain
         return ""
 
-    def _classify(self, score: float) -> ClassificationLabel:
-        if score >= PHISHING_THRESHOLD:
+    def _classify(self, score: float, is_new: bool, is_hosted: bool, network_state: str | None) -> ClassificationLabel:
+        if network_state in ("BLOCKED", "UNREACHABLE", "ERROR"):
+            return "UNKNOWN"
+            
+        # FP-Fix: Use consistent thresholds based on domain type.
+        # The old code used 0.35 for new/hosted which was far too aggressive.
+        phishing_threshold = PHISHING_THRESHOLD  # 0.55 (base)
+        if is_new or is_hosted:
+            phishing_threshold = 0.45  # FP-Fix: Was 0.35 — still lower than base for untrusted domains
+        elif not is_new and not is_hosted:
+            phishing_threshold = PHISHING_THRESHOLD  # 0.55 for established domains
+
+        if score >= phishing_threshold:
             return "PHISHING"
         if score >= SUSPICIOUS_THRESHOLD:
             return "SUSPICIOUS"
@@ -449,6 +503,8 @@ class DecisionAgent:
 
     def _compute_confidence(self, score: float, label: ClassificationLabel) -> ConfidenceLabel:
         """Score-based confidence instead of label-based."""
+        if label == "UNKNOWN":
+            return "LOW"
         if label == "SAFE":
             return "HIGH" if score < 0.1 else "MEDIUM"
         if label == "PHISHING":
@@ -468,6 +524,8 @@ class DecisionAgent:
             return "MEDIUM"
         if label == "SUSPICIOUS":
             return "LOW"
+        if label == "UNKNOWN":
+            return "INFO"
         return "INFO"
 
     def _build_result(
@@ -609,11 +667,13 @@ class DecisionAgent:
             ))
 
         if not intelligence.get("has_mx_record", True):
-            items.append(ExplanationItem(
-                category="intelligence",
-                signal="Domain has no MX (mail) records — unusual for legitimate domains.",
-                impact="medium",
-            ))
+            domain_name = self._resolve_input_domain(similarity, intelligence, content, safe_browsing, phishtank)
+            if len([p for p in domain_name.split('.') if p]) <= 2:
+                items.append(ExplanationItem(
+                    category="intelligence",
+                    signal="Domain has no MX (mail) records — unusual for legitimate domains.",
+                    impact="medium",
+                ))
 
         ns_count = intelligence.get("nameserver_count")
         if isinstance(ns_count, int) and ns_count < 2:

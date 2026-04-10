@@ -136,7 +136,36 @@ def _remaining(deadline: float) -> float:
     return max(0.0, deadline - time.monotonic())
 
 
-def run_pipeline(domain: str, safebrowsing_enabled: bool = True, phishtank_enabled: bool = True) -> Dict[str, Any]:
+def _evaluate_network_state(url: str, timeout: float = 3.5) -> str:
+    import requests
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "sec-ch-ua": '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"Windows"',
+        "Sec-Fetch-Dest": "document",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-Site": "none",
+        "Sec-Fetch-User": "?1",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Upgrade-Insecure-Requests": "1",
+        "Connection": "keep-alive",
+        "Cache-Control": "max-age=0"
+    }
+    try:
+        r = requests.get(url, headers=headers, timeout=timeout, allow_redirects=True, verify=False)
+        if r.status_code in (401, 403, 405):
+            return "BLOCKED"
+        if r.status_code >= 500:
+            return "ERROR"
+        return "LIVE"
+    except Exception:
+        return "UNREACHABLE"
+
+
+def run_pipeline(domain: str, safebrowsing_enabled: bool = True, phishtank_enabled: bool = True, network_state: Optional[str] = None) -> Dict[str, Any]:
     """
     End-to-end pipeline with global deadline enforcement.
 
@@ -165,7 +194,7 @@ def run_pipeline(domain: str, safebrowsing_enabled: bool = True, phishtank_enabl
 
     try:
         return _run_pipeline_inner(
-            domain, safebrowsing_enabled, phishtank_enabled,
+            domain, safebrowsing_enabled, phishtank_enabled, network_state,
             pipeline_start, pipeline_deadline, agent_errors, degraded_agents,
         )
     finally:
@@ -176,6 +205,7 @@ def _run_pipeline_inner(
     domain: str,
     safebrowsing_enabled: bool,
     phishtank_enabled: bool,
+    network_state: Optional[str],
     pipeline_start: float,
     pipeline_deadline: float,
     agent_errors: Dict[str, str],
@@ -187,6 +217,11 @@ def _run_pipeline_inner(
     cleaned = _uid_module.clean(domain)
     clean_domain = cleaned.clean_domain
     full_url = cleaned.original_input
+    
+    logger.info("Normalized URL: %s | Clean Domain: %s", full_url, clean_domain)
+
+    if not network_state:
+        network_state = _evaluate_network_state(full_url)
 
     # ---------------------------------------------------------------
     # 2) Launch all fast agents as daemon threads (non-blocking)
@@ -282,6 +317,14 @@ def _run_pipeline_inner(
             content_result["risk_score"] = 1.0
             content_time = 0.0
             content_err = "Skipped due to early exit"
+        elif network_state in ("BLOCKED", "UNREACHABLE", "ERROR"):
+            logger.info("Early exit triggered: network state is %s. Skipping content agent.", network_state)
+            content_result = _DEFAULT_CONTENT.copy()
+            content_result["page_reachable"] = False
+            if network_state == "BLOCKED":
+                content_result["is_provider_blocklisted"] = True # Generalize as blocked
+            content_time = 0.0
+            content_err = f"Skipped due to network state: {network_state}"
         else:
             # Run content agent with remaining budget
             content_timeout = min(15.0, remaining - 2.0)  # Reserve 2s for decision
@@ -341,6 +384,7 @@ def _run_pipeline_inner(
         safe_browsing=outputs["safe_browsing"],
         phishtank=outputs["phishtank"],
         cross_reference=cross_ref_result,
+        network_state=network_state,
     )
 
     output = result.to_dict()

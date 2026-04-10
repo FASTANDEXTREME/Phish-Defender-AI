@@ -30,7 +30,17 @@ takess.py
 backup.html
 report.md
 Report2.md
-
+falsepov.log
+falsepov.py
+falsepov_detailed.json
+batch_test_detailed_results.json
+singlelink.log
+singlelink.py
+falsepov_detailed_results.json
+temp.py
+top-1m.csv
+Wrongdone.md    
+wrongdone.pdf
 
 # Frontend build dependencies (rebuild with npm install)
 frontend/node_modules/

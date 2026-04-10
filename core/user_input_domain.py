@@ -20,7 +20,7 @@ _DOMAIN_REGEX = re.compile(
 
 @dataclass(frozen=True)
 class CleanDomainResult:
-    original_input: str
+    original_input: str  # Kept as 'original_input' to avoid downstream rename churn, but represents the normalized URL
     clean_domain: str
 
 
@@ -46,7 +46,31 @@ class UserInputDomainModule:
                 "Examples of valid domains: google.com, amazon.co.uk, login-paypal-security.net."
             )
 
-        return CleanDomainResult(original_input=user_input, clean_domain=domain.lower())
+        normalized_url = self._normalize_url(raw)
+
+        return CleanDomainResult(original_input=normalized_url, clean_domain=domain.lower())
+
+    def _normalize_url(self, value: str) -> str:
+        """
+        Ensure the URL has a scheme. Defaults to http:// if missing.
+        Also normalizes trailing slashes for bare domains.
+        """
+        val = value.strip()
+        if not re.match(r"^[a-zA-Z]+://", val):
+            val = "http://" + val
+        
+        parsed = urlparse(val)
+        scheme = parsed.scheme.lower()
+        netloc = parsed.netloc.lower()
+        path = parsed.path
+        
+        # If the path is exactly '/' and there is no query/fragment, strip it for a cleaner base URL.
+        # This keeps 'http://example.com/' and 'http://example.com' identical.
+        if path == "/" and not parsed.query and not parsed.fragment:
+            path = ""
+            
+        from urllib.parse import urlunparse
+        return urlunparse((scheme, netloc, path, parsed.params, parsed.query, parsed.fragment))
 
     def _extract_root_domain(self, value: str) -> str:
         """

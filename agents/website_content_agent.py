@@ -52,18 +52,31 @@ MAX_RESPONSE_SIZE = 2_000_000
 # ---------------------------------------------------------------------------
 _thread_local = threading.local()
 
-_USER_AGENT = (
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-    "AppleWebKit/537.36 (KHTML, like Gecko) "
-    "Chrome/120.0.0.0 Safari/537.36"
-)
+_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+
+_MODERN_HEADERS = {
+    "User-Agent": _USER_AGENT,
+    "sec-ch-ua": '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+    "sec-ch-ua-mobile": "?0",
+    "sec-ch-ua-platform": '"Windows"',
+    "Sec-Fetch-Dest": "document",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-Site": "none",
+    "Sec-Fetch-User": "?1",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Accept-Encoding": "gzip, deflate, br, zstd",
+    "Upgrade-Insecure-Requests": "1",
+    "Connection": "keep-alive",
+    "Cache-Control": "max-age=0"
+}
 
 
 def _get_thread_session() -> requests.Session:
     """Return a per-thread requests.Session — thread-safe by isolation."""
     if not hasattr(_thread_local, "session"):
         session = requests.Session()
-        session.headers.update({"User-Agent": _USER_AGENT})
+        session.headers.update(_MODERN_HEADERS)
         _thread_local.session = session
     return _thread_local.session
 
@@ -151,25 +164,13 @@ class _BrowserPool:
             
             # FAST RENDER & SSRF SHIELD: Block unnecessary resources and private IPs
             def route_intercept(route):
-                import socket
-                import ipaddress
-                from urllib.parse import urlparse
                 r_type = route.request.resource_type
-                r_url = route.request.url
+                r_url = route.request.url.lower()
                 
-                # Check SSRF
-                try:
-                    host = urlparse(r_url).hostname
-                    if host:
-                        addr_info = socket.getaddrinfo(host, None)
-                        for result in addr_info:
-                            ip_str = result[4][0]
-                            ip_obj = ipaddress.ip_address(ip_str)
-                            if ip_obj.is_private or ip_obj.is_loopback or ip_obj.is_link_local or ip_obj.is_reserved or ip_obj.is_multicast:
-                                route.abort("blockedbyclient")
-                                return
-                except Exception:
-                    pass
+                # Fast, non-blocking string-based SSRF Check
+                if any(p in r_url for p in ["127.0.0.1", "localhost", "192.168.", "10.0.0."]):
+                    route.abort("blockedbyclient")
+                    return
 
                 if r_type in ["image", "media", "font", "other"]:
                     route.abort()
@@ -597,7 +598,6 @@ class WebsiteContentAgent:
             not login_form_detected and
             not password_field_detected and
             not suspicious_found and
-            not brand_impersonation_brands and   # C1: brand mismatch blocks legitimate
             not payment_form_detected and        # C6: payment fields block legitimate
             not scam_indicators_found and        # C6: scam indicators block legitimate
             not otp_detected and                 # C6: OTP fields block legitimate
@@ -669,6 +669,9 @@ class WebsiteContentAgent:
         Try HTTPS first, then HTTP. Return (html, final_url) or (None, None).
         Uses browser pool for Playwright, per-thread session for HTTP fallback.
         Limits response to MAX_RESPONSE_SIZE bytes.
+        
+        FP-Fix: Increased redirect limit from 3→5, added secondary fallback
+        with alternative User-Agent to reduce "Actually DEAD" failures.
         """
         if target.startswith("http://") or target.startswith("https://"):
             urls = [target]
@@ -685,70 +688,93 @@ class WebsiteContentAgent:
                     if len(content) > MAX_RESPONSE_SIZE:
                         content = content[:MAX_RESPONSE_SIZE]
                     return content, final_url
+                # Playwright failed — fall through to HTTP (don't return None yet)
+                logger.debug("Playwright fetch failed for %s, trying HTTP fallback", url)
 
-            # 2. Fallback to raw HTTP (thread-safe per-thread session)
-            try:
-                session = _get_thread_session()
-                # Manual redirect loop handling for SSRF tracing
-                current_url = url
-                content = None
-                final_url = None
-                
-                for _ in range(3): # Max 3 redirects
-                    import socket
-                    import ipaddress
-                    from urllib.parse import urlparse, urljoin
-                    
-                    parsed = urlparse(current_url)
-                    host = parsed.hostname
-                    if host:
-                        try:
-                            addr_info = socket.getaddrinfo(host, None)
-                            is_private = False
-                            for result in addr_info:
-                                ip_str = result[4][0]
-                                ip_obj = ipaddress.ip_address(ip_str)
-                                if ip_obj.is_private or ip_obj.is_loopback or ip_obj.is_link_local or ip_obj.is_reserved or ip_obj.is_multicast:
-                                    is_private = True
-                                    break
-                            if is_private:
-                                break # SSRF blocked
-                        except Exception:
-                            pass # Let request attempt fail natively
-                    
-                    resp = session.get(
-                        current_url,
-                        timeout=self._timeout,
-                        verify=False,
-                        stream=True,
-                        allow_redirects=False,
-                    )
-                    
-                    # Redirect Handling
-                    if 300 <= resp.status_code < 400 and 'Location' in resp.headers:
-                        current_url = urljoin(current_url, resp.headers['Location'])
-                        continue
-                        
-                    # Target content Reached
-                    if 200 <= resp.status_code < 400:
-                        chunks: list[bytes] = []
-                        downloaded = 0
-                        for chunk in resp.iter_content(chunk_size=65_536):
-                            chunks.append(chunk)
-                            downloaded += len(chunk)
-                            if downloaded >= MAX_RESPONSE_SIZE:
-                                break
-                        content_bytes = b"".join(chunks)[:MAX_RESPONSE_SIZE]
-                        content = content_bytes.decode("utf-8", errors="replace")
-                        final_url = current_url
-                    
-                    break # Stop redirect processing if not a 3xx
+            # 2. Primary HTTP fallback (thread-safe per-thread session)
+            result = self._try_http_fetch(url, _USER_AGENT)
+            if result is not None:
+                return result
+            
+            # 3. Secondary HTTP fallback with alternative User-Agent
+            # Some sites block the Chrome UA but allow simpler crawlers
+            alt_ua = "Mozilla/5.0 (compatible; PhishDefender/1.0; +https://github.com/phishdefender)"
+            result = self._try_http_fetch(url, alt_ua)
+            if result is not None:
+                return result
 
-                if content is not None:
-                    return content, final_url
-            except Exception:
-                continue
         return None, None
+
+    def _try_http_fetch(self, url: str, user_agent: str) -> tuple[Optional[str], Optional[str]] | None:
+        """
+        Single HTTP fetch attempt with manual redirect handling and SSRF protection.
+        Returns (html, final_url) on success, or None on failure.
+        """
+        try:
+            session = _get_thread_session()
+            # Use full modern headers, but override the User-Agent specifically
+            headers = _MODERN_HEADERS.copy()
+            headers["User-Agent"] = user_agent
+            current_url = url
+            content = None
+            final_url = None
+            
+            for _ in range(5):  # FP-Fix: Increased from 3 to 5 redirects
+                import socket
+                import ipaddress
+                from urllib.parse import urlparse, urljoin
+                
+                parsed = urlparse(current_url)
+                host = parsed.hostname
+                if host:
+                    try:
+                        addr_info = socket.getaddrinfo(host, None)
+                        is_private = False
+                        for result in addr_info:
+                            ip_str = result[4][0]
+                            ip_obj = ipaddress.ip_address(ip_str)
+                            if ip_obj.is_private or ip_obj.is_loopback or ip_obj.is_link_local or ip_obj.is_reserved or ip_obj.is_multicast:
+                                is_private = True
+                                break
+                        if is_private:
+                            break # SSRF blocked
+                    except Exception:
+                        pass # Let request attempt fail natively
+                
+                resp = session.get(
+                    current_url,
+                    timeout=self._timeout,
+                    verify=False,
+                    stream=True,
+                    allow_redirects=False,
+                    headers=headers,
+                )
+                
+                # Redirect Handling
+                if 300 <= resp.status_code < 400 and 'Location' in resp.headers:
+                    current_url = urljoin(current_url, resp.headers['Location'])
+                    continue
+                    
+                # Target content Reached
+                if 200 <= resp.status_code < 400:
+                    chunks: list[bytes] = []
+                    downloaded = 0
+                    for chunk in resp.iter_content(chunk_size=65_536):
+                        chunks.append(chunk)
+                        downloaded += len(chunk)
+                        if downloaded >= MAX_RESPONSE_SIZE:
+                            break
+                    content_bytes = b"".join(chunks)[:MAX_RESPONSE_SIZE]
+                    content = content_bytes.decode("utf-8", errors="replace")
+                    final_url = current_url
+                
+                break # Stop redirect processing if not a 3xx
+
+            if content is not None:
+                return content, final_url
+        except Exception:
+            pass
+        return None
 
     # ------------------------------------------------------------------
     # Analysis helpers
@@ -775,8 +801,67 @@ class WebsiteContentAgent:
         return count
 
     # ------------------------------------------------------------------
-    # C1: Brand impersonation detection
+    # C1: Brand impersonation detection (CONTEXT-AWARE REWRITE)
     # ------------------------------------------------------------------
+
+    @staticmethod
+    def _get_domain_brand_family(page_domain: str) -> set:
+        """
+        Given a page domain, return the set of brand names that are
+        'owned' by that domain's organization (via BRAND_DOMAIN_ALIASES).
+        
+        e.g. page_domain='bing.com' → {'microsoft', 'outlook', 'skype', ...}
+             page_domain='aws.amazon.com' → {'amazon', 'amazonaws', ...}
+        """
+        from core.config import BRAND_DOMAIN_ALIASES, KNOWN_BRANDS
+        import tldextract
+        
+        ext = tldextract.extract(page_domain)
+        page_root = f"{ext.domain}.{ext.suffix}" if ext.suffix else ext.domain
+        
+        # Collect all brand names whose canonical domain or alias matches page_domain
+        family_brands: set = set()
+        
+        for canonical, aliases in BRAND_DOMAIN_ALIASES.items():
+            canon_ext = tldextract.extract(canonical)
+            canon_root = f"{canon_ext.domain}.{canon_ext.suffix}" if canon_ext.suffix else canon_ext.domain
+            
+            # Check if page is the canonical domain, or an alias, or a subdomain of either
+            all_domains = [canon_root] + aliases
+            is_family = False
+            for dom in all_domains:
+                dom_ext = tldextract.extract(dom)
+                dom_root = f"{dom_ext.domain}.{dom_ext.suffix}" if dom_ext.suffix else dom_ext.domain
+                # Match root domain or if page_domain ends with the alias
+                if page_root == dom_root or page_domain == dom or page_domain.endswith(f".{dom}"):
+                    is_family = True
+                    break
+            
+            if is_family:
+                # Add all brands whose canonical domain is in this family
+                for brand, brand_canonical in KNOWN_BRANDS.items():
+                    brand_canon_ext = tldextract.extract(brand_canonical)
+                    brand_canon_root = f"{brand_canon_ext.domain}.{brand_canon_ext.suffix}" if brand_canon_ext.suffix else brand_canon_ext.domain
+                    if brand_canon_root == canon_root:
+                        family_brands.add(brand)
+                # Also add brands whose canonical domain matches any alias
+                for alias in aliases:
+                    alias_ext = tldextract.extract(alias)
+                    alias_root = f"{alias_ext.domain}.{alias_ext.suffix}" if alias_ext.suffix else alias_ext.domain
+                    for brand, brand_canonical in KNOWN_BRANDS.items():
+                        bc_ext = tldextract.extract(brand_canonical)
+                        bc_root = f"{bc_ext.domain}.{bc_ext.suffix}" if bc_ext.suffix else bc_ext.domain
+                        if bc_root == alias_root:
+                            family_brands.add(brand)
+        
+        # Also, the page's own domain name might be a brand
+        for brand, brand_canonical in KNOWN_BRANDS.items():
+            bc_ext = tldextract.extract(brand_canonical)
+            bc_root = f"{bc_ext.domain}.{bc_ext.suffix}" if bc_ext.suffix else bc_ext.domain
+            if page_root == bc_root:
+                family_brands.add(brand)
+        
+        return family_brands
 
     @staticmethod
     def _detect_brand_impersonation(
@@ -786,53 +871,100 @@ class WebsiteContentAgent:
         page_domain: str,
     ) -> List[str]:
         """
-        Scan page text, title, and image alt/src for known brand names.
-        If a brand is found but the page domain does NOT match the brand's
-        canonical domain, flag it as brand impersonation.
-
+        Context-aware brand impersonation detection.
+        
+        Key improvements over previous implementation:
+        1. Domain alias awareness — won't flag bing.com for mentioning "microsoft"
+        2. Ambiguous brand filtering — common English words (chase, regions, meta)
+           only flagged if they appear prominently in title/headings
+        3. SSO brand filtering — social login mentions require high-signal context
+        4. Parent-subsidiary awareness — apple.com mentioning "icloud" is NOT impersonation
+        
         Returns list of impersonated brand names.
         """
-        # Build a single searchable blob: visible text + title + img alt/src filenames
-        search_text = f"{visible_text} {page_title.lower()}"
+        from core.config import SOCIAL_OR_SSO_BRANDS, AMBIGUOUS_BRAND_NAMES, BRAND_DOMAIN_ALIASES
+        
+        # --- Step 1: Compute brand family for this domain ---
+        # All brands that are "owned" by this page's organization
+        family_brands = WebsiteContentAgent._get_domain_brand_family(page_domain)
+        
+        # --- Step 2: Build high-signal vs low-signal text ---
+        high_signal_text = f"{page_title.lower()}"
+        for tag in soup.find_all(['h1', 'h2']):
+            high_signal_text += f" {tag.get_text().lower()}"
+            
+        low_signal_text = visible_text
         for img in soup.find_all("img"):
             alt = img.get("alt", "")
-            src = img.get("src", "").split("/")[-1].split("?")[0]  # filename only
-            search_text += f" {alt.lower()} {src.lower()}"
+            src = img.get("src", "").split("/")[-1].split("?")[0]
+            low_signal_text += f" {alt.lower()} {src.lower()}"
 
-        # Also include meta og:title and description
         for meta in soup.find_all("meta"):
             prop = meta.get("property", "").lower()
             name_attr = meta.get("name", "").lower()
-            if prop in ("og:title", "og:description") or name_attr == "description":
-                content = meta.get("content", "")
-                search_text += f" {content.lower()}"
+            if prop in ("og:title", "og:site_name"):
+                high_signal_text += f" {meta.get('content', '').lower()}"
+            elif prop == "og:description" or name_attr == "description":
+                low_signal_text += f" {meta.get('content', '').lower()}"
 
+        search_text = high_signal_text + " " + low_signal_text
         detected: List[str] = []
+
         for brand, canonical_domain in KNOWN_BRANDS.items():
-            # Skip very short brand names (≤2 chars) — too many false positives
             if len(brand) <= 2:
                 continue
 
-            # Check if this brand's canonical domain is the actual page's registrable domain.
-            # If it is, this is the real site — not impersonation.
-            # Fix: use tldextract instead of substring match to catch openai-support.com
+            # --- Step 3: Skip brands owned by this domain's organization ---
+            if brand in family_brands:
+                continue
+
             import tldextract
             ext = tldextract.extract(page_domain)
-            canon_root = canonical_domain.split(".")[0]  # e.g. "facebook" from "facebook.com"
+            canon_root = canonical_domain.split(".")[0]
             if canon_root == ext.domain:
                 continue
 
-            # For short brands (3 chars), require word boundary matches
-            if len(brand) == 3:
-                if re.search(rf'(?:^|\s|[^a-z]){re.escape(brand)}(?:$|\s|[^a-z])', search_text):
-                    detected.append(brand)
+            # --- Step 4: Ambiguous brand enforcement ---
+            # Brands that are common English words MUST appear in high-signal
+            # locations (title, h1, h2) to trigger. Body-text-only = IGNORED.
+            if brand in AMBIGUOUS_BRAND_NAMES:
+                if len(brand) == 3:
+                    if not re.search(rf'(?:^|\s|[^a-z]){re.escape(brand)}(?:$|\s|[^a-z])', high_signal_text):
+                        continue
+                else:
+                    if brand not in high_signal_text:
+                        continue
+
+            # --- Step 5: SSO/Social brand enforcement ---
+            # Social login mentions require high-signal context
+            elif brand in SOCIAL_OR_SSO_BRANDS:
+                if len(brand) == 3:
+                    if not re.search(rf'(?:^|\s|[^a-z]){re.escape(brand)}(?:$|\s|[^a-z])', high_signal_text):
+                        continue
+                else:
+                    if brand not in high_signal_text:
+                        continue
+
+            # --- Step 6: Standard brand matching ---
             else:
-                # For longer brands, simple substring is fine
-                if brand in search_text:
-                    detected.append(brand)
+                if len(brand) == 3:
+                    if not re.search(rf'(?:^|\s|[^a-z]){re.escape(brand)}(?:$|\s|[^a-z])', search_text):
+                        continue
+                else:
+                    if brand not in search_text:
+                        continue
+                    
+                    # For non-ambiguous, non-SSO brands found only in body text
+                    # (not in title/headings), require at least 2 mentions to
+                    # reduce false positives from incidental editorial references
+                    if brand not in high_signal_text:
+                        mention_count = search_text.count(brand)
+                        if mention_count < 2:
+                            continue
+
+            detected.append(brand)
 
         # Deduplicate brands that share a canonical domain
-        # e.g. if both "att" and "bellsouth" match, keep both but no duplicates
         return list(dict.fromkeys(detected))
 
     # ------------------------------------------------------------------

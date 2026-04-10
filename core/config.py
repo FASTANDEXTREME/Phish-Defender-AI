@@ -126,6 +126,96 @@ KNOWN_BRANDS: Dict[str, str] = {
 }
 
 # ---------------------------------------------------------------------------
+# Brands frequently mentioned in footers or used for SSO (Social/Auth)
+# These require stricter placement context to trigger brand impersonation.
+# ---------------------------------------------------------------------------
+SOCIAL_OR_SSO_BRANDS: List[str] = [
+    "facebook", "linkedin", "instagram", "twitter", "x", "github", 
+    "discord", "google", "apple", "microsoft"
+]
+
+# ---------------------------------------------------------------------------
+# Ambiguous Brand Names — brands that are also common English words.
+# These MUST appear in high-signal locations (title, h1/h2) to trigger brand
+# impersonation. Body-text-only matches are ignored to prevent false positives
+# on news sites, marketing pages, and general-purpose websites.
+# ---------------------------------------------------------------------------
+AMBIGUOUS_BRAND_NAMES: List[str] = [
+    "chase", "regions", "meta", "wise", "ups", "spectrum",
+    "outlook", "steam", "stripe", "slack", "discord", "spark",
+    "signal", "tide", "heb", "allegro", "phantom", "ledger",
+    "kraken", "coinbase", "opera", "vivaldi", "gemini",
+]
+
+# ---------------------------------------------------------------------------
+# Brand Domain Aliases — maps sub-brands, alternate TLDs, and related domains
+# to their parent organization's canonical domain. Used to prevent false
+# positives when a parent site mentions its own sub-brand (e.g. bing.com
+# mentioning "microsoft" is legitimate, not impersonation).
+# ---------------------------------------------------------------------------
+BRAND_DOMAIN_ALIASES: Dict[str, List[str]] = {
+    "google.com": [
+        "youtube.com", "googleapis.com", "googlesyndication.com",
+        "google-analytics.com", "googledomains.com", "gstatic.com",
+        "doubleclick.net", "googletagmanager.com", "googlevideo.com",
+        "adtrafficquality.google", "pki.goog", "googleusercontent.com",
+        "googleadservices.com", "goo.gl", "withgoogle.com",
+        "blog.google", "domains.google", "about.google",
+        "marketingplatform.google.com",
+    ],
+    "microsoft.com": [
+        "outlook.com", "live.com", "office.com", "office365.com",
+        "bing.com", "skype.com", "azure.com", "msn.com",
+        "windowsupdate.com", "cloud.microsoft", "microsoftonline.com",
+        "sharepoint.com", "windows.net", "windows.com",
+        "teams.live.com", "m365.cloud.microsoft",
+    ],
+    "apple.com": [
+        "icloud.com", "apple-dns.net", "cdn-apple.com", "itunes.com",
+        "appstore.com",
+    ],
+    "meta.com": [
+        "facebook.com", "instagram.com", "whatsapp.com", "fbcdn.net",
+        "fb.com", "threads.net", "whatsapp.net",
+    ],
+    "amazon.com": [
+        "amazonaws.com", "amazonvideo.com", "amazon-adsystem.com",
+        "a2z.com", "primevideo.com", "aws.dev", "aws.amazon.com",
+        "amazon.dev",
+    ],
+    "discord.com": ["discord.gg", "discordapp.com"],
+    "github.com": ["github.io", "githubusercontent.com"],
+    "twitter.com": ["x.com", "t.co"],
+    "telegram.org": ["t.me", "telegram.me"],
+    "cloudflare.com": [
+        "cloudflare-dns.com", "cloudflare.net", "workers.dev",
+        "pages.dev", "one.one.one.one",
+    ],
+    "adobe.com": ["adobe.io", "macromedia.com"],
+    "automattic.com": ["wordpress.com", "wordpress.org", "gravatar.com"],
+    "yahoo.com": ["flickr.com", "tumblr.com"],
+    "spotify.com": ["spotifycdn.com"],
+    "tiktok.com": ["tiktokcdn.com", "tiktokv.com", "tiktokcdn-us.com"],
+    "netflix.com": ["nflxso.net", "nflxext.com", "nflxvideo.net"],
+    "shopify.com": ["myshopify.com", "shopifycloud.com"],
+    "vk.com": ["vkuserphoto.ru", "userapi.com"],
+    "yandex.ru": ["yandex.net", "yandex.com"],
+    "samsung.com": ["samsungcloud.com"],
+    "xiaomi.com": ["mi.com", "miui.com"],
+    "zoom.us": ["zoom.com"],
+    "paypal.com": ["paypalobjects.com"],
+    "ebay.com": ["ebayimg.com", "ebaystatic.com"],
+    "linkedin.com": ["licdn.com"],
+    "pinterest.com": ["pinimg.com"],
+    "snapchat.com": ["snap.com", "snapkit.com"],
+    "twitch.tv": ["twitchcdn.net", "jtvnw.net"],
+    "reddit.com": ["redd.it", "redditstatic.com"],
+    "dropbox.com": ["dropboxapi.com", "dropboxstatic.com"],
+    "intuit.com": ["turbotax.com", "quickbooks.com", "mint.com"],
+    "att.com": ["bellsouth.net"],
+}
+
+# ---------------------------------------------------------------------------
 # Granular Brand Intelligence Tiers (Brand Tier Mapping)
 # ---------------------------------------------------------------------------
 BRAND_TIERS: Dict[str, str] = {
@@ -323,7 +413,8 @@ SCORING_WEIGHTS_WITHOUT_SB = {
 # ---------------------------------------------------------------------------
 # Cross-Reference Engine (CRE) scoring parameters
 # ---------------------------------------------------------------------------
-CRE_BRAND_CONTENT_MISMATCH_RISK: float = 0.75   # Brand in content, not in domain
+CRE_BRAND_CONTENT_MISMATCH_RISK: float = 0.35   # Brand in body text only — reduced from 0.75
+CRE_BRAND_STRONG_MISMATCH_RISK: float = 0.65    # Brand in title/heading — strong impersonation signal
 CRE_BRAND_DOMAIN_MISMATCH_RISK: float = 0.55    # Brand in subdomain on hosted platform
 CRE_HOSTED_BRAND_IMPERSONATION_RISK: float = 0.90  # All 3 signals = near certain phishing
 CRE_BRAND_PLUS_CREDENTIAL_RISK: float = 0.80    # Brand impersonation + credential collection
@@ -343,14 +434,14 @@ SCORING_WEIGHTS_WITHOUT_SB_WITH_CRE = {
 # Max possible score without SB is 1.0 now (with new sim scoring).
 # Lowered from 0.7/0.4 so agents can trigger classification independently.
 # ---------------------------------------------------------------------------
-PHISHING_THRESHOLD: float = 0.45
-SUSPICIOUS_THRESHOLD: float = 0.30
+PHISHING_THRESHOLD: float = 0.55
+SUSPICIOUS_THRESHOLD: float = 0.35
 
 # ---------------------------------------------------------------------------
 # Signal amplification: if N agents report high risk, boost the score
 # ---------------------------------------------------------------------------
 CORROBORATION_THRESHOLD: int = 2   # number of high-risk agents needed
-CORROBORATION_BOOST: float = 1.50  # 50% boost for agreement
+CORROBORATION_BOOST: float = 1.25  # 25% boost for agreement (reduced from 1.50 to prevent score inflation)
 
 __all__ = [
     "KNOWN_BRANDS",
@@ -368,6 +459,7 @@ __all__ = [
     "SCORING_WEIGHTS_WITHOUT_SB",
     "SCORING_WEIGHTS_WITHOUT_SB_WITH_CRE",
     "CRE_BRAND_CONTENT_MISMATCH_RISK",
+    "CRE_BRAND_STRONG_MISMATCH_RISK",
     "CRE_BRAND_DOMAIN_MISMATCH_RISK",
     "CRE_HOSTED_BRAND_IMPERSONATION_RISK",
     "CRE_BRAND_PLUS_CREDENTIAL_RISK",
@@ -377,5 +469,8 @@ __all__ = [
     "SUSPICIOUS_THRESHOLD",
     "CORROBORATION_THRESHOLD",
     "CORROBORATION_BOOST",
+    "SOCIAL_OR_SSO_BRANDS",
+    "AMBIGUOUS_BRAND_NAMES",
+    "BRAND_DOMAIN_ALIASES",
 ]
 

@@ -2,6 +2,20 @@
 
 This changelog documents all structural, architectural, algorithmic, and UI improvements made to transform the Intelligent Phishing Domain Detection System MVP into a robust, production-ready security tool.
 
+## [2.7.0] - 10th April 2026
+### Many Bug Fixes
+  - Fixed many bugs related to general working.
+
+### 🛡️ Anti-Bot Evasion & Scraping Reliability
+- **Comprehensive Browser Header Impersonation**: 
+  - Replaced hardcoded and minimal HTTP headers across the entire scraping and verification pipeline with a detailed, modern Chromium (v124) signature, including `sec-ch-ua` hints, `Sec-Fetch-*` directives, and extensive `Accept` encodings.
+- **Reduced 403 Forbidden Rate**: 
+  - Dramatically improved the ability to successfully pull live HTML content from strictly bot-protected, Cloudflare-fronted, or WAF-protected websites without triggering blocks.
+- **Dynamic Header Management (`agents/website_content_agent.py`)**: 
+  - Centralized connection headers into a `_MODERN_HEADERS` global dictionary. Integrated safe copying mechanics (`.copy()`) during secondary HTTP `User-Agent` fallback parsing to ensure clean session state.
+- **Pre-Check WAF Bypassing (`batch_test.py`)**: 
+  - Overhauled the `is_live` fast pre-check utility to leverage full browser headers. This prevents WAFs from instantly dropping un-headered connection sweeps, eliminating false "DEAD" initial classifications.
+
 ## [2.6.1] - 7th April 2026
 
 ### 🛡️ Security Hardening

@@ -25,6 +25,7 @@ from core.config import (
     HOMOGLYPH_TRANSLATE,
     KNOWN_BRANDS,
     PHISHING_DOMAIN_KEYWORDS,
+    BRAND_DOMAIN_ALIASES,
 )
 
 logger = logging.getLogger(__name__)
@@ -68,6 +69,16 @@ class DomainSimilarityAgent:
             brand: brand.translate(HOMOGLYPH_TRANSLATE)
             for brand in self._brands
         }
+        # Pre-compute domain alias lookup: domain → parent brand
+        self._alias_lookup: Dict[str, str] = {}
+        for canonical, aliases in BRAND_DOMAIN_ALIASES.items():
+            canon_ext = tldextract.extract(canonical)
+            canon_root = f"{canon_ext.domain}.{canon_ext.suffix}" if canon_ext.domain and canon_ext.suffix else canonical
+            self._alias_lookup[canon_root] = canonical
+            for alias in aliases:
+                alias_ext = tldextract.extract(alias)
+                alias_root = f"{alias_ext.domain}.{alias_ext.suffix}" if alias_ext.domain and alias_ext.suffix else alias
+                self._alias_lookup[alias_root] = canonical
 
     def run(self, domain_or_url: str) -> DomainSimilarityResult:
         input_value = domain_or_url.strip().lower()
@@ -87,6 +98,28 @@ class DomainSimilarityAgent:
         # We also want the normalized full domain part (subdomain + domain) for matching
         full_normalized = self._normalize_domain(input_value.replace(f".{ext.suffix}", "") if ext.suffix else input_value)
 
+        # ---------------------------------------------------------------
+        # FP-Fix: Domain Alias Check
+        # If this domain is a known alias of any brand (e.g. discord.gg → discord.com,
+        # github.io → github.com, cloud.microsoft → microsoft.com), treat it as
+        # an exact brand match with zero risk. These are legitimate sub-brands.
+        # ---------------------------------------------------------------
+        if root_domain in self._alias_lookup:
+            parent_canonical = self._alias_lookup[root_domain]
+            parent_ext = tldextract.extract(parent_canonical)
+            parent_brand = parent_ext.domain
+            return DomainSimilarityResult(
+                input_domain=input_value,
+                root_domain=root_domain,
+                normalized_domain=normalized_domain,
+                brand_detected=True,
+                brand_name=parent_brand,
+                closest_brand=parent_brand,
+                similarity_score=0.0,
+                phishing_keywords_in_domain=[],
+                risk_score=0.0,
+            )
+
         brand_name, brand_detected = self._detect_brand_containment(full_normalized)
 
         # Fix alt-TLD impersonation: Only classify as an "exact brand" (score 0) if the full 
@@ -102,6 +135,15 @@ class DomainSimilarityAgent:
             similarity_score = 0.0
         else:
             closest_brand, similarity_score = self._find_closest_brand(full_normalized, full_normalized)
+            
+            # --- Threshold Validation Check ---
+            # Discard low-confidence matches to prevent UI noise ("meta" matching "tanvish")
+            if closest_brand:
+                # Dynamic threshold: Shorter brands need higher similarity to prove it's not noise
+                min_threshold = 0.75 if len(closest_brand) <= 4 else 0.65
+                if similarity_score < min_threshold:
+                    similarity_score = 0.0
+                    closest_brand = None
 
         # Detect phishing keywords in the domain
         phishing_keywords = self._detect_phishing_keywords(domain_part)
@@ -153,6 +195,10 @@ class DomainSimilarityAgent:
 
     def _find_closest_brand(self, normalized_domain: str, domain_part: str) -> Tuple[Optional[str], float]:
         """Multi-algorithm fuzzy matching for better typosquatting detection."""
+        
+        if not self._brands:
+            return None, 0.0
+            
         best_brand: Optional[str] = None
         best_score: float = 0.0
 
