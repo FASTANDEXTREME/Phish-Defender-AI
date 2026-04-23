@@ -484,9 +484,6 @@ class DecisionAgent:
         return ""
 
     def _classify(self, score: float, is_new: bool, is_hosted: bool, network_state: str | None) -> ClassificationLabel:
-        if network_state in ("BLOCKED", "UNREACHABLE", "ERROR"):
-            return "UNKNOWN"
-            
         # FP-Fix: Use consistent thresholds based on domain type.
         # The old code used 0.35 for new/hosted which was far too aggressive.
         phishing_threshold = PHISHING_THRESHOLD  # 0.55 (base)
@@ -499,6 +496,11 @@ class DecisionAgent:
             return "PHISHING"
         if score >= SUSPICIOUS_THRESHOLD:
             return "SUSPICIOUS"
+        # Only return UNKNOWN when score is below suspicious threshold AND
+        # network was degraded — meaning we genuinely had insufficient signal.
+        # Previously this was an unconditional override that ignored computed scores.
+        if network_state in ("BLOCKED", "UNREACHABLE", "ERROR") and score < SUSPICIOUS_THRESHOLD:
+            return "UNKNOWN"
         return "SAFE"
 
     def _compute_confidence(self, score: float, label: ClassificationLabel) -> ConfidenceLabel:

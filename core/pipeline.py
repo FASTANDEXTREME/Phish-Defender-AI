@@ -322,7 +322,7 @@ def _run_pipeline_inner(
             content_result = _DEFAULT_CONTENT.copy()
             content_result["page_reachable"] = False
             if network_state == "BLOCKED":
-                content_result["is_provider_blocklisted"] = True # Generalize as blocked
+                content_result["is_provider_blocklisted"] = True  # Provider/WAF blocked access
             content_time = 0.0
             content_err = f"Skipped due to network state: {network_state}"
         else:
